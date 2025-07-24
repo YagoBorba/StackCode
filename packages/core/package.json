@@ -5,9 +5,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "clean": "rm -rf dist tsconfig.tsbuildinfo",
+  "build": "npm run clean && tsc && cpx \"src/templates/**/*\" \"dist/templates\"",
+  "test": "echo \"Error: no test specified\" && exit 1"
+},
   "keywords": [],
   "author": "Yago Borba",
   "license": "ISC",
