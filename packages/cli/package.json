@@ -1,12 +1,24 @@
 {
   "name": "cli",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "The Command-Line Interface for StackCode",
+  "main": "dist/index.js",
+  "bin": {
+    "stackcode": "dist/index.js"
+  },
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Yago Borba",
   "license": "ISC",
-  "description": ""
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "typescript": "^5.5.2"
+  }
 }

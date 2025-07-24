@@ -5,7 +5,7 @@
   "description": "An intelligent tool to help junior developers apply best practices from day one.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:core": "npm run build --workspace=core"
+    "build:core": "npm run build --workspace=@stackcode/core"
   },
   "author": "Yago Borba",
   "license": "MIT",
@@ -13,7 +13,13 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@types/node": "^24.1.0",
     "chalk": "^5.4.1",
-    "husky": "^9.1.7"
+    "cli": "^1.0.0",
+    "husky": "^9.1.7",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "commander": "^14.0.0"
   }
 }

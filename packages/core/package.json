@@ -1,13 +1,18 @@
 {
-  "name": "core",
+  "name": "@stackcode/core",
   "version": "1.0.0",
-  "main": "index.js",
- "scripts": {
-  "build": "tsc",
-  "test": "echo \"Error: no test specified\" && exit 1"
-},
+  "description": "Core logic for the StackCode tool.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "keywords": [],
-  "author": "",
+  "author": "Yago Borba",
   "license": "ISC",
-  "description": ""
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "typescript": "^5.5.2"
+  }
 }
