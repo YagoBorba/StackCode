@@ -28,14 +28,19 @@ function generateGitignoreContent(stack) {
 }
 /**
  * Generates the content for a README.md file from a template and user answers.
- * @param answers - The user's answers to the prompts.
+ * @param replacements - An object with keys to find (e.g., 'projectName') and values to replace.
  * @returns The content of the README.md file as a string.
  */
-function generateReadmeContent() {
-    // Futuramente, podemos ter templates diferentes aqui
+function generateReadmeContent(replacements) {
     const templatePath = path_1.default.join(__dirname, 'templates/readme/default.tpl');
     try {
-        return fs_1.default.readFileSync(templatePath, 'utf-8');
+        let content = fs_1.default.readFileSync(templatePath, 'utf-8');
+        // Replace all instances of {{key}} with the corresponding value
+        content = content.replace(/\{\{([^{}]+)\}\}/g, (match, key) => {
+            const trimmedKey = key.trim();
+            return replacements[trimmedKey] || match;
+        });
+        return content;
     }
     catch (error) {
         console.error('Error reading readme template', error);

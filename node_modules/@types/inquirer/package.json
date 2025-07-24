@@ -1,0 +1,69 @@
+{
+    "name": "@types/inquirer",
+    "version": "8.2.11",
+    "description": "TypeScript definitions for inquirer",
+    "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/inquirer",
+    "license": "MIT",
+    "contributors": [
+        {
+            "name": "Qubo",
+            "githubUsername": "tkQubo",
+            "url": "https://github.com/tkQubo"
+        },
+        {
+            "name": "Parvez",
+            "githubUsername": "ppathan",
+            "url": "https://github.com/ppathan"
+        },
+        {
+            "name": "Jouderian",
+            "githubUsername": "jouderianjr",
+            "url": "https://github.com/jouderianjr"
+        },
+        {
+            "name": "Qibang",
+            "githubUsername": "bang88",
+            "url": "https://github.com/bang88"
+        },
+        {
+            "name": "Jason Dreyzehner",
+            "githubUsername": "bitjson",
+            "url": "https://github.com/bitjson"
+        },
+        {
+            "name": "Synarque",
+            "githubUsername": "synarque",
+            "url": "https://github.com/synarque"
+        },
+        {
+            "name": "Justin Rockwood",
+            "githubUsername": "jrockwood",
+            "url": "https://github.com/jrockwood"
+        },
+        {
+            "name": "Keith Kelly",
+            "githubUsername": "kwkelly",
+            "url": "https://github.com/kwkelly"
+        },
+        {
+            "name": "Richard Lea",
+            "githubUsername": "chigix",
+            "url": "https://github.com/chigix"
+        }
+    ],
+    "main": "",
+    "types": "index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+        "directory": "types/inquirer"
+    },
+    "scripts": {},
+    "dependencies": {
+        "@types/through": "*",
+        "rxjs": "^7.2.0"
+    },
+    "peerDependencies": {},
+    "typesPublisherContentHash": "f9ff0cfd29ae1bf189ea339b88ae9a25a7ccf22c837166566a391d861dd01382",
+    "typeScriptVersion": "5.1"
+}
