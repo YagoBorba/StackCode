@@ -1,2 +1,2 @@
 export { validateCommitMessage } from './validator';
-export { generateGitignoreContent } from './generators';
+export { generateGitignoreContent, generateReadmeContent } from './generators';

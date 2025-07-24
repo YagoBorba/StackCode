@@ -5,7 +5,8 @@
   "description": "An intelligent tool to help junior developers apply best practices from day one.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc --build --verbose"
+    "clean": "npm run clean --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present"
   },
   "author": "Yago Borba",
   "license": "MIT",
@@ -13,15 +14,18 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@types/inquirer": "^8.2.11",
+    "@stackcode/cli": "^1.0.0",
+    "@stackcode/core": "^1.0.0",
     "@types/node": "^24.1.0",
+    "@types/yargs": "^17.0.33",
     "chalk": "^5.4.1",
     "cli": "^1.0.0",
+    "cpx": "^1.5.0",
     "husky": "^9.1.7",
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "commander": "^14.0.0",
-    "inquirer": "^8.2.6"
+    "inquirer": "^12.8.2",
+    "yargs": "^18.0.0"
   }
 }
