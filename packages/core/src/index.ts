@@ -1,0 +1,1 @@
+export { validateCommitMessage } from './validator';

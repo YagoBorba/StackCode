@@ -10,5 +10,10 @@
   "license": "MIT",
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "devDependencies": {
+    "@types/node": "^24.1.0",
+    "core": "^1.0.0",
+    "typescript": "^5.8.3"
+  }
 }
