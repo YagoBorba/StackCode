@@ -4,12 +4,16 @@
   "private": true,
   "description": "An intelligent tool to help junior developers apply best practices from day one.",
   "scripts": {
-  "test": "echo \"Error: no test specified\" && exit 1",
-  "build:core": "npm run build --workspace=core"
-},
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:core": "npm run build --workspace=core"
+  },
   "author": "Yago Borba",
   "license": "MIT",
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "devDependencies": {
+    "chalk": "^5.4.1",
+    "husky": "^9.1.7"
+  }
 }
