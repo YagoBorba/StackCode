@@ -1,16 +1,13 @@
 #!/usr/bin/env node
 
-/**
- * @fileoverview This is the entry point for the StackCode CLI.
- */
-
 import { Command } from 'commander';
 import chalk from 'chalk';
+import inquirer from 'inquirer';
+import fs from 'fs';
+import path from 'path';
 
-// Importa nossa função de validação do PACOTE 'core'.
-// Note que precisamos primeiro renomear o pacote 'core' em seu package.json.
-// Vamos fazer isso no próximo passo.
-import { validateCommitMessage } from '@stackcode/core';
+// Importa ambas as funções do nosso pacote core
+import { validateCommitMessage, generateGitignoreContent } from '@stackcode/core';
 
 const program = new Command();
 
@@ -19,21 +16,45 @@ program
   .description('An intelligent tool to help junior developers with best practices.')
   .version('1.0.0');
 
-// Define nosso primeiro comando: 'validate'
+// ... (O comando 'validate' que já fizemos continua aqui)
 program
   .command('validate')
   .description('Validates if a string is a conventional commit message.')
-  .argument('<message>', 'The message string to validate')
-  .action((message) => {
-    // Ação que será executada quando o comando for chamado
-    const isValid = validateCommitMessage(message);
+  // ... (código do validate)
 
-    if (isValid) {
-      console.log(chalk.green.bold('✔ Valid: This is a valid conventional commit message.'));
-    } else {
-      console.log(chalk.red.bold('✖ Invalid: This is not a valid conventional commit message.'));
+// Nosso NOVO comando: 'generate'
+const generate = program.command('generate')
+  .description('Generate common project files.');
+
+generate
+  .command('gitignore')
+  .description('Generates a .gitignore file based on the project stack.')
+  .action(async () => {
+    const gitignorePath = path.join(process.cwd(), '.gitignore');
+
+    if (fs.existsSync(gitignorePath)) {
+      const { overwrite } = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'overwrite',
+          message: 'A .gitignore file already exists. Do you want to overwrite it?',
+          default: false,
+        },
+      ]);
+
+      if (!overwrite) {
+        console.log(chalk.yellow('Operation cancelled.'));
+        return;
+      }
     }
+
+    // Futuramente, esta função será inteligente. Por agora, usamos 'node' como padrão.
+    const stack = 'node'; 
+    const content = generateGitignoreContent(stack);
+
+    fs.writeFileSync(gitignorePath, content);
+    console.log(chalk.green.bold('✔ Success! .gitignore file generated for a Node.js project.'));
   });
 
-// Processa os argumentos da linha de comando e executa as ações
+
 program.parse(process.argv);
