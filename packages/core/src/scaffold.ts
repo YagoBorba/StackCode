@@ -28,7 +28,6 @@ function copyTemplateFiles(src: string, dest: string, replacements: Record<strin
         });
     } else {
         let content = fs.readFileSync(src, 'utf8');
-        // Replace all instances of {{key}} with the corresponding value
         content = content.replace(/\{\{([^{}]+)\}\}/g, (match, key) => {
             const trimmedKey = key.trim();
             return replacements[trimmedKey] || match;
@@ -40,7 +39,7 @@ function copyTemplateFiles(src: string, dest: string, replacements: Record<strin
 
 export interface ProjectOptions {
     projectPath: string;
-    stack: 'node-ts'; // For now, only this stack is supported
+    stack: 'node-ts';
     features: ('docker' | 'husky')[];
     replacements: Record<string, string>;
 }
@@ -51,17 +50,39 @@ export interface ProjectOptions {
  */
 export function scaffoldProject(options: ProjectOptions): void {
     const { projectPath, stack, features, replacements } = options;
-
-    // Create the main project directory
     fs.mkdirSync(projectPath, { recursive: true });
 
-    // Copy stack-specific files (e.g., node-ts)
     const stackTemplatePath = path.join(__dirname, 'templates', stack);
     copyTemplateFiles(stackTemplatePath, projectPath, replacements);
     
-    // Copy common files if the feature is selected
     if (features.includes('docker')) {
         const commonTemplatePath = path.join(__dirname, 'templates', 'common');
         copyTemplateFiles(commonTemplatePath, projectPath, replacements);
+    }
+}
+
+// --- NOVA FUNÇÃO ABAIXO ---
+
+/**
+ * Sets up Husky hooks in the newly created project directory.
+ * @param projectPath - The absolute path to the project's root directory.
+ */
+export function setupHusky(projectPath: string): void {
+    const huskyDir = path.join(projectPath, '.husky');
+    fs.mkdirSync(huskyDir, { recursive: true });
+
+    const hookFile = path.join(huskyDir, 'commit-msg');
+    const scriptContent = `#!/bin/sh
+npx stackcode validate "$1"
+`;
+
+    fs.writeFileSync(hookFile, scriptContent);
+
+    // This is a crucial step on Unix-like systems (Linux, macOS).
+    // The hook script must be executable to be run by Git.
+    try {
+        fs.chmodSync(hookFile, '755');
+    } catch (e) {
+        console.warn(`Could not make commit-msg hook executable. This might be an issue on non-Unix systems.`);
     }
 }

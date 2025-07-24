@@ -10,4 +10,7 @@ export { validateCommitMessage } from './validator';
 export { generateGitignoreContent, generateReadmeContent } from './generators';
 
 // From scaffold.ts
-export { scaffoldProject, ProjectOptions } from './scaffold';
+export { scaffoldProject, setupHusky, ProjectOptions } from './scaffold';
+
+// From utils.ts
+export { runCommand } from './utils';
