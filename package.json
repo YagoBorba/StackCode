@@ -1,0 +1,14 @@
+{
+  "name": "stackcode",
+  "version": "1.0.0",
+  "private": true,
+  "description": "An intelligent tool to help junior developers apply best practices from day one.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Yago Borba",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ]
+}
