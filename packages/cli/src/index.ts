@@ -8,6 +8,7 @@ import { validateCommand } from './commands/validate';
 import { generateCommand } from './commands/generate';
 import { initCommand } from './commands/init';
 import { gitCommand } from './commands/git'; // <-- NOSSA NOVA IMPORTAÇÃO
+import { commitCommand } from './commands/commit';
 
 yargs(hideBin(process.argv))
   .scriptName("stackcode")
@@ -15,11 +16,11 @@ yargs(hideBin(process.argv))
   .usage('Usage: $0 <command> [options]')
   .strict()
   
-  // Register all commands in a clean, modular way
   .command(validateCommand)
   .command(generateCommand)
   .command(initCommand)
-  .command(gitCommand) // <-- NOSSO NOVO COMANDO
+  .command(gitCommand)
+   .command(commitCommand)
   
   .demandCommand(1, 'You need at least one command before moving on.')
   .help()

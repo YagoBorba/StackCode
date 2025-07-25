@@ -10,6 +10,7 @@ const helpers_1 = require("yargs/helpers");
 const validate_1 = require("./commands/validate");
 const generate_1 = require("./commands/generate");
 const init_1 = require("./commands/init");
+const git_1 = require("./commands/git"); // <-- NOSSA NOVA IMPORTAÇÃO
 (0, yargs_1.default)((0, helpers_1.hideBin)(process.argv))
     .scriptName("stackcode")
     .version('1.0.0')
@@ -19,6 +20,7 @@ const init_1 = require("./commands/init");
     .command(validate_1.validateCommand)
     .command(generate_1.generateCommand)
     .command(init_1.initCommand)
+    .command(git_1.gitCommand) // <-- NOSSO NOVO COMANDO
     .demandCommand(1, 'You need at least one command before moving on.')
     .help()
     .argv;

@@ -1,0 +1,14 @@
+{
+  "commit": {
+    "command_description": "Starts an interactive wizard to create a conventional commit message.",
+    "prompt": {
+      "select_type": "Select the type of change that you're committing:",
+      "scope": "What is the scope of this change (e.g. component or file name)? (optional)",
+      "short_description": "Write a short, imperative tense description of the change:",
+      "long_description": "Provide a longer description of the change (optional). Use '|' for newlines:",
+      "breaking_changes": "Are there any BREAKING CHANGES? (optional)",
+      "affected_issues": "Does this change affect any open issues? (e.g. 'closes #123') (optional)"
+    },
+    "success": "✔ Commit created successfully!"
+  }
+}
