@@ -1,1 +1,0 @@
-{"root":["./src/index.ts","./src/commands/generate.ts","./src/commands/git.ts","./src/commands/init.ts","./src/commands/validate.ts","./src/commands/git_sub/start-feature.ts"],"version":"5.8.3"}
