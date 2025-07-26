@@ -1,10 +1,15 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import Configstore from 'configstore';
+
+const config = new Configstore('@stackcode/cli');
 
 let translations: Record<string, any> = {};
 
 function loadTranslations() {
-    const lang = process.env.STACKCODE_LANG || 'en';
+
+    const lang = process.env.STACKCODE_LANG || config.get('lang') || 'en';
+    
     const localesDir = path.resolve(__dirname, 'locales');
     const filePath = path.join(localesDir, `${lang}.json`);
 

@@ -49,7 +49,8 @@
       "author_name": "Qual é o nome do autor(a)?",
       "stack": "Qual stack você gostaria de usar?",
       "features": "Quais funcionalidades adicionais você deseja incluir?",
-      "overwrite": "O diretório '{projectName}' já existe. Sobrescrever?"
+      "overwrite": "O diretório '{projectName}' já existe. Sobrescrever?",
+      "commit_validation": "Habilitar validação obrigatória de commits convencionais? (Recomendado)" 
     },
     "step": {
       "scaffold": "-> Criando a estrutura do projeto...",
@@ -84,5 +85,25 @@
   "common": {
     "operation_cancelled": "Operação cancelada.",
     "error_generic": "✖ Ocorreu um erro."
-  }
+  },
+  "config": {
+    "command_description": "Gerencia a configuração do StackCode.",
+    "prompt": {
+        "main": "O que você deseja configurar?",
+        "select_lang": "Selecione seu idioma de preferência (configuração global):",
+        "toggle_validation": "Habilitar validação de commits obrigatória para este projeto?"
+    },
+    "success": {
+        "set": "✔ Sucesso! A configuração '{key}' foi definida como '{value}'.",
+        "set_validation": "✔ Sucesso! A validação de commit para este projeto está agora {status}."
+    },
+    "status": {
+        "enabled": "HABILITADA",
+        "disabled": "DESABILITADA"
+    },
+    "error": {
+        "not_in_project": "✖ Este comando deve ser executado na raiz de um projeto inicializado com o StackCode.",
+        "specify_subcommand": "Por favor, especifique um sub-comando para config."
+    }
+}
 }
