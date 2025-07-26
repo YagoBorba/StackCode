@@ -61,7 +61,6 @@ export function scaffoldProject(options: ProjectOptions): void {
     }
 }
 
-// --- NOVA FUNÇÃO ABAIXO ---
 
 /**
  * Sets up Husky hooks in the newly created project directory.
@@ -78,8 +77,6 @@ npx stackcode validate "$1"
 
     fs.writeFileSync(hookFile, scriptContent);
 
-    // This is a crucial step on Unix-like systems (Linux, macOS).
-    // The hook script must be executable to be run by Git.
     try {
         fs.chmodSync(hookFile, '755');
     } catch (e) {

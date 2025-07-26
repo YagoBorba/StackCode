@@ -46,3 +46,43 @@ export function runCommand(command: string, args: string[], options: RunCommandO
         });
     });
 }
+
+/**
+ * Executes a shell command and captures its standard output.
+ * Ideal for getting information like the current git branch name or remote URL.
+ * @param command - The command to execute.
+ * @param args - An array of string arguments.
+ * @param options - The execution options.
+ * @returns A promise that resolves with the command's stdout string, or rejects with the stderr.
+ */
+export function getCommandOutput(command: string, args: string[], options: RunCommandOptions): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const childProcess = spawn(command, args, {
+            cwd: options.cwd,
+            shell: process.platform === 'win32',
+        });
+
+        let stdout = '';
+        let stderr = '';
+
+        childProcess.stdout.on('data', (data) => {
+            stdout += data.toString();
+        });
+
+        childProcess.stderr.on('data', (data) => {
+            stderr += data.toString();
+        });
+
+        childProcess.on('close', (code) => {
+            if (code === 0) {
+                resolve(stdout.trim());
+            } else {
+                reject(new Error(stderr.trim()));
+            }
+        });
+
+        childProcess.on('error', (error) => {
+            reject(error);
+        });
+    });
+}
