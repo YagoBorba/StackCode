@@ -2,12 +2,12 @@
   "commit": {
     "command_description": "Inicia um assistente interativo para criar uma mensagem de commit convencional.",
     "prompt": {
-        "select_type": "Selecione o tipo de mudança que você está commitando:",
-        "scope": "Qual é o escopo desta mudança (ex: componente ou nome de arquivo)? (opcional)",
-        "short_description": "Escreva uma descrição curta e no imperativo sobre a mudança:",
-        "long_description": "Forneça uma descrição mais longa da mudança (opcional). Use '|' para novas linhas:",
-        "breaking_changes": "Há alguma MUDANÇA QUE QUEBRA A COMPATIBILIDADE (BREAKING CHANGE)? (opcional)",
-        "affected_issues": "Esta mudança afeta alguma issue aberta? (ex: 'closes #123') (opcional)"
+      "select_type": "Selecione o tipo de mudança que você está commitando:",
+      "scope": "Qual é o escopo desta mudança (ex: componente ou nome de arquivo)? (opcional)",
+      "short_description": "Escreva uma descrição curta e no imperativo sobre a mudança:",
+      "long_description": "Forneça uma descrição mais longa da mudança (opcional). Use '|' para novas linhas:",
+      "breaking_changes": "Há alguma MUDANÇA QUE QUEBRA A COMPATIBILIDADE (BREAKING CHANGE)? (opcional)",
+      "affected_issues": "Esta mudança afeta alguma issue aberta? (ex: 'closes #123') (opcional)"
     },
     "types": {
       "feat": "feat:     Uma nova funcionalidade",
@@ -21,5 +21,68 @@
       "revert": "revert:   Reverte um commit anterior"
     },
     "success": "✔ Commit criado com sucesso!"
+  },
+  "validate": {
+    "success": "✔ Válido: Esta é uma mensagem de commit convencional válida.",
+    "error": "✖ Inválido: Esta não é uma mensagem de commit convencional válida."
+  },
+  "generate": {
+    "prompt": {
+      "readme_overwrite": "Um arquivo README.md já existe. Deseja sobrescrevê-lo?"
+    },
+    "error": {
+      "gitignore_exists": "Um arquivo .gitignore já existe. Operação cancelada para evitar sobrescrever.",
+      "specify_file_type": "Por favor, especifique um tipo de arquivo para gerar (ex: gitignore, readme)."
+    },
+    "success": {
+      "gitignore": "✔ Sucesso! Arquivo .gitignore gerado.",
+      "readme": "✔ Sucesso! Template README.md gerado."
+    }
+  },
+  "init": {
+    "welcome": "Bem-vindo ao StackCode! Vamos configurar seu novo projeto.",
+    "setup_start": "🚀 Iniciando a configuração do projeto...",
+    "prompt": {
+      "project_name": "Qual é o nome do seu projeto?",
+      "project_name_error": "O nome do projeto não pode estar vazio.",
+      "description": "Forneça uma breve descrição do projeto:",
+      "author_name": "Qual é o nome do autor(a)?",
+      "stack": "Qual stack você gostaria de usar?",
+      "features": "Quais funcionalidades adicionais você deseja incluir?",
+      "overwrite": "O diretório '{projectName}' já existe. Sobrescrever?"
+    },
+    "step": {
+      "scaffold": "-> Criando a estrutura do projeto...",
+      "readme": "-> Gerando README.md...",
+      "gitignore": "-> Gerando .gitignore...",
+      "husky": "-> Configurando o Husky...",
+      "git": "-> Inicializando o repositório Git...",
+      "deps": "-> Instalando dependências (isso pode levar um momento)..."
+    },
+    "success": {
+      "ready": "✅ Sucesso! Seu projeto está pronto.",
+      "next_steps": "Próximos passos:"
+    }
+  },
+  "git": {
+    "start_feature": {
+      "start": "🚀 Iniciando nova feature: {branchName}",
+      "success": "✅ Sucesso! Trocado para a nova branch '{branchName}'.",
+      "error": "✖ Erro: Não foi possível criar a nova branch. Por favor, verifique seu status do Git."
+    },
+    "finish_feature": {
+      "start": "🚀 Finalizando feature...",
+      "error_not_feature_branch": "✖ Este comando só pode ser executado em uma branch 'feature/'.",
+      "current_branch": "Você está atualmente na branch: '{branchName}'.",
+      "pushing": "-> Enviando a branch '{branchName}' para o remoto...",
+      "opening_browser": "-> Abrindo seu navegador para criar um Pull Request...",
+      "error_parsing_url": "Não foi possível extrair o caminho do repositório GitHub da URL remota.",
+      "success": "✅ Sucesso! Seu navegador está aberto e pronto.",
+      "follow_up": "Por favor, revise suas alterações e crie o Pull Request no GitHub."
+    }
+  },
+  "common": {
+    "operation_cancelled": "Operação cancelada.",
+    "error_generic": "✖ Ocorreu um erro."
   }
 }

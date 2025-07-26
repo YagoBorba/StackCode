@@ -21,5 +21,68 @@
       "revert": "revert:   Reverts a previous commit"
     },
     "success": "✔ Commit created successfully!"
+  },
+  "validate": {
+    "success": "✔ Valid: This is a valid conventional commit message.",
+    "error": "✖ Invalid: This is not a valid conventional commit message."
+  },
+  "generate": {
+    "prompt": {
+      "readme_overwrite": "A README.md file already exists. Do you want to overwrite it?"
+    },
+    "error": {
+      "gitignore_exists": "A .gitignore file already exists. Operation cancelled to avoid overwriting.",
+      "specify_file_type": "Please specify a file type to generate (e.g., gitignore, readme)."
+    },
+    "success": {
+      "gitignore": "✔ Success! .gitignore file generated.",
+      "readme": "✔ Success! README.md template generated."
+    }
+  },
+  "init": {
+    "welcome": "Welcome to StackCode! Let's set up your new project.",
+    "setup_start": "🚀 Starting project setup...",
+    "prompt": {
+      "project_name": "What is the name of your project?",
+      "project_name_error": "Project name cannot be empty.",
+      "description": "Provide a short description of the project:",
+      "author_name": "What is the author's name?",
+      "stack": "Which stack would you like to use?",
+      "features": "Which additional features do you want to include?",
+      "overwrite": "Directory '{projectName}' already exists. Overwrite?"
+    },
+    "step": {
+      "scaffold": "-> Creating project structure...",
+      "readme": "-> Generating README.md...",
+      "gitignore": "-> Generating .gitignore...",
+      "husky": "-> Configuring Husky...",
+      "git": "-> Initializing Git repository...",
+      "deps": "-> Installing dependencies (this may take a moment)..."
+    },
+    "success": {
+      "ready": "✅ Success! Your project is ready.",
+      "next_steps": "Next steps:"
+    }
+  },
+  "git": {
+    "start_feature": {
+      "start": "🚀 Starting new feature: {branchName}",
+      "success": "✅ Success! Switched to new branch '{branchName}'.",
+      "error": "✖ Error: Could not create new branch. Please check your Git status."
+    },
+    "finish_feature": {
+      "start": "🚀 Finalizing feature...",
+      "error_not_feature_branch": "✖ This command can only be run on a 'feature/' branch.",
+      "current_branch": "You are currently on branch: '{branchName}'.",
+      "pushing": "-> Pushing branch '{branchName}' to remote...",
+      "opening_browser": "-> Opening your browser to create a Pull Request...",
+      "error_parsing_url": "Could not parse GitHub repository path from remote URL.",
+      "success": "✅ Success! Your browser is open and ready.",
+      "follow_up": "Please review your changes and create the Pull Request on GitHub."
+    }
+  },
+  "common": {
+    "operation_cancelled": "Operation cancelled.",
+    "error_generic": "✖ An error occurred."
   }
 }

@@ -4,6 +4,7 @@ import inquirer from 'inquirer';
 import fs from 'fs';
 import path from 'path';
 import { generateGitignoreContent, generateReadmeContent } from '@stackcode/core';
+import { t } from '@stackcode/i18n';
 
 export const generateCommand: CommandModule = {
     command: 'generate <filetype>',
@@ -17,12 +18,12 @@ export const generateCommand: CommandModule = {
                 async () => {
                     const gitignorePath = path.join(process.cwd(), '.gitignore');
                     if (fs.existsSync(gitignorePath)) {
-                        console.log(chalk.yellow('A .gitignore file already exists. Operation cancelled to avoid overwriting.'));
+                        console.log(chalk.yellow(t('generate.error.gitignore_exists')));
                         return;
                     }
                     const content = generateGitignoreContent('node');
                     fs.writeFileSync(gitignorePath, content);
-                    console.log(chalk.green.bold('✔ Success! .gitignore file generated.'));
+                    console.log(chalk.green.bold(t('generate.success.gitignore')));
                 }
             )
             .command(
@@ -35,11 +36,11 @@ export const generateCommand: CommandModule = {
                         const { overwrite } = await inquirer.prompt([{
                             type: 'confirm',
                             name: 'overwrite',
-                            message: 'A README.md file already exists. Do you want to overwrite it?',
+                            message: t('generate.prompt.readme_overwrite'),
                             default: false,
                         }]);
                         if (!overwrite) {
-                            console.log(chalk.yellow('Operation cancelled.'));
+                            console.log(chalk.yellow(t('common.operation_cancelled')));
                             return;
                         }
                     }
@@ -49,11 +50,11 @@ export const generateCommand: CommandModule = {
                         authorName: 'Author'
                     });
                     fs.writeFileSync(readmePath, content);
-                    console.log(chalk.green.bold('✔ Success! README.md template generated.'));
+                    console.log(chalk.green.bold(t('generate.success.readme')));
                 }
             );
     },
     handler: () => {
-        console.log(chalk.yellow('Please specify a file type to generate (e.g., gitignore, readme).'));
+        console.log(chalk.yellow(t('generate.error.specify_file_type')));
     }
 };
