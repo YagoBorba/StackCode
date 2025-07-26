@@ -49,7 +49,8 @@
       "author_name": "What is the author's name?",
       "stack": "Which stack would you like to use?",
       "features": "Which additional features do you want to include?",
-      "overwrite": "Directory '{projectName}' already exists. Overwrite?"
+      "overwrite": "Directory '{projectName}' already exists. Overwrite?",
+      "commit_validation": "Enable mandatory conventional commit validation? (Recommended)"
     },
     "step": {
       "scaffold": "-> Creating project structure...",
