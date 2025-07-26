@@ -6,7 +6,7 @@ import { t } from '@stackcode/i18n';
 
 export const finishFeatureCommand: CommandModule = {
     command: 'finish-feature',
-    describe: 'Pushes the current feature branch and opens the New Pull Request page in the browser.',
+    describe: t('git.finish_feature.description'),
     builder: (yargs) => yargs,
     handler: async () => {
         console.log(chalk.cyan(t('git.finish_feature.start')));

@@ -9,7 +9,7 @@ interface StartFeatureArgs {
 
 export const startFeatureCommand: CommandModule<{}, StartFeatureArgs> = {
     command: 'start-feature <name>',
-    describe: 'Starts a new feature branch from the current branch.',
+    describe: t('git.start_feature.description'),
     builder: (yargs) => {
         return yargs.positional('name', {
             describe: 'The name of the feature (e.g., "login-page")',
