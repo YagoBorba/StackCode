@@ -9,6 +9,17 @@
       "breaking_changes": "Are there any BREAKING CHANGES? (optional)",
       "affected_issues": "Does this change affect any open issues? (e.g. 'closes #123') (optional)"
     },
+    "types": {
+      "feat": "feat:     A new feature",
+      "fix": "fix:      A bug fix",
+      "docs": "docs:     Documentation only changes",
+      "style": "style:    Changes that do not affect the meaning of the code",
+      "refactor": "refactor: A code change that neither fixes a bug nor adds a feature",
+      "perf": "perf:     A code change that improves performance",
+      "test": "test:     Adding missing tests or correcting existing tests",
+      "chore": "chore:    Changes to the build process or auxiliary tools",
+      "revert": "revert:   Reverts a previous commit"
+    },
     "success": "✔ Commit created successfully!"
   }
 }

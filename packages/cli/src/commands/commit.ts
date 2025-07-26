@@ -4,17 +4,17 @@ import chalk from 'chalk';
 import { runCommand } from '@stackcode/core';
 import { t } from '@stackcode/i18n';
 
-// Tipos de commit baseados no Conventional Commits
-const commitTypes = [
-    { name: 'feat:     A new feature', value: 'feat' },
-    { name: 'fix:      A bug fix', value: 'fix' },
-    { name: 'docs:     Documentation only changes', value: 'docs' },
-    { name: 'style:    Changes that do not affect the meaning of the code', value: 'style' },
-    { name: 'refactor: A code change that neither fixes a bug nor adds a feature', value: 'refactor' },
-    { name: 'perf:     A code change that improves performance', value: 'perf' },
-    { name: 'test:     Adding missing tests or correcting existing tests', value: 'test' },
-    { name: 'chore:    Changes to the build process or auxiliary tools', value: 'chore' },
-    { name: 'revert:   Reverts a previous commit', value: 'revert' },
+// Esta função agora constrói as opções usando as traduções
+const getCommitTypes = () => [
+    { name: t('commit.types.feat'), value: 'feat' },
+    { name: t('commit.types.fix'), value: 'fix' },
+    { name: t('commit.types.docs'), value: 'docs' },
+    { name: t('commit.types.style'), value: 'style' },
+    { name: t('commit.types.refactor'), value: 'refactor' },
+    { name: t('commit.types.perf'), value: 'perf' },
+    { name: t('commit.types.test'), value: 'test' },
+    { name: t('commit.types.chore'), value: 'chore' },
+    { name: t('commit.types.revert'), value: 'revert' },
 ];
 
 export const commitCommand: CommandModule = {
@@ -27,8 +27,9 @@ export const commitCommand: CommandModule = {
                 type: 'list',
                 name: 'type',
                 message: t('commit.prompt.select_type'),
-                choices: commitTypes,
+                choices: getCommitTypes(), // Usamos a função para obter as opções traduzidas
             },
+            // ...resto das perguntas permanecem iguais
             {
                 type: 'input',
                 name: 'scope',
@@ -57,7 +58,7 @@ export const commitCommand: CommandModule = {
             },
         ]);
 
-        // Monta a mensagem de commit
+        // ...lógica para montar e executar o commit permanece a mesma
         let commitMessage = `${answers.type}`;
         if (answers.scope) {
             commitMessage += `(${answers.scope.trim()})`;
