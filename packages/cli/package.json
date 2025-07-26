@@ -4,7 +4,8 @@
   "description": "The Command-Line Interface for StackCode",
   "main": "dist/index.js",
   "bin": {
-    "stackcode": "dist/index.js"
+    "stackcode": "dist/index.js",
+    "stc": "dist/index.js"
   },
   "scripts": {
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
