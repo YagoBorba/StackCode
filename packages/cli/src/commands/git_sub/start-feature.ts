@@ -1,6 +1,7 @@
 import type { CommandModule } from 'yargs';
 import chalk from 'chalk';
 import { runCommand } from '@stackcode/core';
+import { t } from '@stackcode/i18n';
 
 interface StartFeatureArgs {
     name: string;
@@ -18,15 +19,14 @@ export const startFeatureCommand: CommandModule<{}, StartFeatureArgs> = {
     },
     handler: async (argv) => {
         const branchName = `feature/${argv.name}`;
-        console.log(chalk.cyan(`🚀 Starting new feature: ${branchName}`));
+        console.log(chalk.cyan(t('git.start_feature.start').replace('{branchName}', branchName)));
 
         try {
-            // TODO: Add checks to ensure user is on 'develop' and it's up to date.
             await runCommand('git', ['switch', '-c', branchName], { cwd: process.cwd() });
-            console.log(chalk.green.bold(`✅ Success! Switched to new branch '${branchName}'.`));
+            console.log(chalk.green.bold(t('git.start_feature.success').replace('{branchName}', branchName)));
             console.log(chalk.yellow('   Happy coding!'));
         } catch (error) {
-            console.error(chalk.red(`✖ Error: Could not create new branch. Please check your Git status.`));
+            console.error(chalk.red(t('git.start_feature.error')));
         }
     }
 };
