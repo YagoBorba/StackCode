@@ -1,0 +1,25 @@
+{
+  "commit": {
+    "command_description": "Inicia um assistente interativo para criar uma mensagem de commit convencional.",
+    "prompt": {
+        "select_type": "Selecione o tipo de mudança que você está commitando:",
+        "scope": "Qual é o escopo desta mudança (ex: componente ou nome de arquivo)? (opcional)",
+        "short_description": "Escreva uma descrição curta e no imperativo sobre a mudança:",
+        "long_description": "Forneça uma descrição mais longa da mudança (opcional). Use '|' para novas linhas:",
+        "breaking_changes": "Há alguma MUDANÇA QUE QUEBRA A COMPATIBILIDADE (BREAKING CHANGE)? (opcional)",
+        "affected_issues": "Esta mudança afeta alguma issue aberta? (ex: 'closes #123') (opcional)"
+    },
+    "types": {
+      "feat": "feat:     Uma nova funcionalidade",
+      "fix": "fix:      Uma correção de bug",
+      "docs": "docs:     Apenas mudanças na documentação",
+      "style": "style:    Mudanças que não afetam o significado do código",
+      "refactor": "refactor: Uma mudança de código que não corrige um bug nem adiciona funcionalidade",
+      "perf": "perf:     Uma mudança de código que melhora a performance",
+      "test": "test:     Adicionando ou corrigindo testes",
+      "chore": "chore:    Mudanças no processo de build ou ferramentas auxiliares",
+      "revert": "revert:   Reverte um commit anterior"
+    },
+    "success": "✔ Commit criado com sucesso!"
+  }
+}

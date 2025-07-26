@@ -1,0 +1,18 @@
+{
+  "name": "@stackcode/i18n",
+  "version": "1.0.0",
+  "description": "Internationalization (i18n) package for StackCode.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "Yago Borba",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "typescript": "^5.5.2"
+  }
+}
