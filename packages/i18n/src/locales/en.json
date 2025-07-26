@@ -85,5 +85,25 @@
   "common": {
     "operation_cancelled": "Operation cancelled.",
     "error_generic": "✖ An error occurred."
-  }
+  },
+  "config": {
+    "command_description": "Manage StackCode configuration.",
+    "prompt": {
+        "main": "What do you want to configure?",
+        "select_lang": "Select your preferred language (global setting):",
+        "toggle_validation": "Enable mandatory conventional commit validation for this project?"
+    },
+    "success": {
+        "set": "✔ Success! Configuration '{key}' set to '{value}'.",
+        "set_validation": "✔ Success! Commit validation for this project is now {status}."
+    },
+    "status": {
+        "enabled": "ENABLED",
+        "disabled": "DISABLED"
+    },
+    "error": {
+        "not_in_project": "✖ This command must be run from the root of a project initialized with StackCode.",
+        "specify_subcommand": "Please specify a config subcommand (e.g., set)."
+    }
+}
 }
