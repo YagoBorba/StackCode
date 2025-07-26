@@ -29,7 +29,6 @@ export function generateReadmeContent(replacements: Record<string, string>): str
     const templatePath = path.join(__dirname, 'templates/readme/default.tpl');
     try {
         let content = fs.readFileSync(templatePath, 'utf-8');
-        // Replace all instances of {{key}} with the corresponding value
         content = content.replace(/\{\{([^{}]+)\}\}/g, (match, key) => {
             const trimmedKey = key.trim();
             return replacements[trimmedKey] || match;

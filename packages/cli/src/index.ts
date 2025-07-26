@@ -2,12 +2,10 @@
 
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-
-// Import all command modules from their dedicated files
 import { validateCommand } from './commands/validate';
 import { generateCommand } from './commands/generate';
 import { initCommand } from './commands/init';
-import { gitCommand } from './commands/git'; // <-- NOSSA NOVA IMPORTAÇÃO
+import { gitCommand } from './commands/git'; 
 import { commitCommand } from './commands/commit';
 
 yargs(hideBin(process.argv))

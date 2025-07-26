@@ -5,8 +5,6 @@ let translations: Record<string, any> = {};
 
 function loadTranslations() {
     const lang = process.env.STACKCODE_LANG || 'en';
-    // __dirname pode não estar disponível em todos os contextos de módulo,
-    // mas para nosso build CommonJS, ele funciona.
     const localesDir = path.resolve(__dirname, 'locales');
     const filePath = path.join(localesDir, `${lang}.json`);
 

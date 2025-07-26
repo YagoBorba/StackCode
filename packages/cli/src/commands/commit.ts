@@ -4,7 +4,6 @@ import chalk from 'chalk';
 import { runCommand } from '@stackcode/core';
 import { t } from '@stackcode/i18n';
 
-// Esta função agora constrói as opções usando as traduções
 const getCommitTypes = () => [
     { name: t('commit.types.feat'), value: 'feat' },
     { name: t('commit.types.fix'), value: 'fix' },
@@ -27,9 +26,8 @@ export const commitCommand: CommandModule = {
                 type: 'list',
                 name: 'type',
                 message: t('commit.prompt.select_type'),
-                choices: getCommitTypes(), // Usamos a função para obter as opções traduzidas
+                choices: getCommitTypes(), 
             },
-            // ...resto das perguntas permanecem iguais
             {
                 type: 'input',
                 name: 'scope',
@@ -58,7 +56,6 @@ export const commitCommand: CommandModule = {
             },
         ]);
 
-        // ...lógica para montar e executar o commit permanece a mesma
         let commitMessage = `${answers.type}`;
         if (answers.scope) {
             commitMessage += `(${answers.scope.trim()})`;

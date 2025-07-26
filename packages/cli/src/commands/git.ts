@@ -6,7 +6,6 @@ export const gitCommand: CommandModule = {
     command: 'git <subcommand>',
     describe: 'Provides a suite of commands to assist with the GitFlow workflow.',
     builder: (yargs: Argv) => {
-        // Registra todos os sub-comandos do 'git' aqui
         return yargs
             .command(startFeatureCommand);
     },
