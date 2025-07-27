@@ -3,7 +3,18 @@
  * It exports all the public-facing functions and types.
  */
 
-export { validateCommitMessage } from './validator';
-export { generateGitignoreContent, generateReadmeContent } from './generators';
-export { scaffoldProject, setupHusky, ProjectOptions } from './scaffold';
-export { runCommand, getCommandOutput } from './utils';
+export * from './release.js';
+export { runCommand, getCommandOutput } from './utils.js';
+export { generateGitignoreContent, generateReadmeContent } from './generators.js';
+export { scaffoldProject, setupHusky } from './scaffold.js';
+export { validateCommitMessage } from './validator.js';
+
+export { 
+    detectVersioningStrategy, 
+    getRecommendedBump,
+    updateAllVersions,
+    generateChangelog,
+    VersioningStrategy, 
+    MonorepoInfo,
+    PackageInfo,
+} from './release.js';

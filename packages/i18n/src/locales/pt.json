@@ -112,5 +112,18 @@
   "common": {
     "operation_cancelled": "Operação cancelada.",
     "error_generic": "✖ Ocorreu um erro."
+  },
+  "release": {
+    "command_description": "Ajuda com o versionamento e o lançamento do projeto.",
+    "start": "🚀 Iniciando processo de release...",
+    "error_structure": "✖ Não foi possível determinar a estrutura do projeto. Você está na raiz de um monorepo com um diretório `packages`?",
+    "detected_strategy": "ℹ️ Estratégia de versionamento detectada: {strategy}",
+    "prompt_continue": "Deseja continuar?",
+    "prompt_confirm_release": "A versão atual é {currentVersion}. A próxima versão recomendada é {newVersion}. Confirma o release?",
+    "error_calculating_version": "✖ Erro ao calcular a próxima versão.",
+    "step_updating_versions": "-> Atualizando a versão em todos os arquivos package.json...",
+    "step_generating_changelog": "-> Gerando CHANGELOG.md...",
+    "success_ready_to_commit": "✅ Sucesso! Versão atualizada e CHANGELOG.md gerado.",
+    "next_steps_commit": "Próximos passos: Revise as alterações, depois execute 'git commit' e 'git tag'."
   }
 }
