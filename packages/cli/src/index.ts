@@ -13,7 +13,7 @@ import { initI18n } from '@stackcode/i18n';
 
 async function main() {
   await initI18n();
-
+//teste
   yargs(hideBin(process.argv))
     .scriptName("stackcode")
     .version('1.0.0')
