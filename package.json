@@ -1,6 +1,6 @@
 {
   "name": "stackcode",
-  "version": "1.1.0",
+  "version": "1.3.0",
   "private": true,
   "description": "An intelligent tool to help junior developers apply best practices from day one.",
   "scripts": {
@@ -14,8 +14,8 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@stackcode/cli": "^1.0.0",
-    "@stackcode/core": "^1.0.0",
+    "@stackcode/cli": "1.1.0",
+    "@stackcode/core": "1.1.0",
     "@types/node": "^24.1.0",
     "@types/yargs": "^17.0.33",
     "chalk": "^5.4.1",

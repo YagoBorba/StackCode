@@ -1,6 +1,6 @@
 {
   "name": "@stackcode/cli",
-  "version": "1.1.0",
+  "version": "1.4.0",
   "description": "The Command-Line Interface for StackCode",
   "type": "module",
   "main": "dist/index.js",
@@ -17,7 +17,8 @@
   "author": "Yago Borba",
   "license": "ISC",
   "dependencies": {
-    "@stackcode/core": "1.0.0",
+    "@stackcode/core": "1.1.0",
+    "@stackcode/i18n": "1.1.0",
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
     "configstore": "^7.0.0",
