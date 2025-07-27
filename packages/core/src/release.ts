@@ -3,7 +3,9 @@ import path from 'path';
 import semver from 'semver';
 import { Bumper } from 'conventional-recommended-bump'; 
 import conventionalChangelog from 'conventional-changelog-core';
+import { runCommand } from './git-utils.js';
 
+// --- INTERFACES E TIPOS ---
 export type VersioningStrategy = 'locked' | 'independent' | 'unknown';
 
 export interface PackageInfo {
@@ -19,6 +21,13 @@ export interface MonorepoInfo {
     packages: PackageInfo[];
 }
 
+export interface PackageBumpInfo {
+  pkg: PackageInfo;
+  bumpType: string;
+  newVersion: string;
+}
+
+// --- FUNÇÕES AUXILIARES INTERNAS ---
 async function _safeReadJson(filePath: string): Promise<any | null> {
     try {
         const content = await fs.readFile(filePath, 'utf-8');
@@ -49,6 +58,8 @@ async function _findPackagePaths(rootDir: string, rootPackageJson: any): Promise
     }
     return packagePaths;
 }
+
+// --- FUNÇÕES EXPORTADAS PRINCIPAIS ---
 
 export async function detectVersioningStrategy(startPath: string): Promise<MonorepoInfo> {
     const rootDir = startPath;
@@ -83,9 +94,7 @@ export async function detectVersioningStrategy(startPath: string): Promise<Monor
 
 export async function getRecommendedBump(projectRoot: string): Promise<string> {
   const bumper = new Bumper(projectRoot).loadPreset('angular');
-  // FIX: Cast the result to 'any' to bypass the faulty type definitions.
   const recommendation = await bumper.bump() as any;
-  
   return recommendation?.releaseType || 'patch';
 }
 
@@ -106,22 +115,59 @@ export async function updateAllVersions(monorepoInfo: MonorepoInfo, newVersion: 
     await Promise.all(updatePromises);
 }
 
-export function generateChangelog(monorepoInfo: MonorepoInfo): Promise<string> {
-    return new Promise((resolve, reject) => {
-        let changelogContent = '';
-        
-        const changelogStream = (conventionalChangelog as any)({
-            preset: 'angular',
-            tagPrefix: 'v'
-        }, {}, {
-            path: monorepoInfo.rootDir
-        });
+export async function determinePackageBumps(changedPackages: PackageInfo[]): Promise<PackageBumpInfo[]> {
+  const bumpInfoPromises = changedPackages.map(async (pkg) => {
+    const projectRoot = pkg.path;
+    const currentVersion = pkg.version || '0.0.0';
+    const bumpType = await getRecommendedBump(projectRoot);
+    const newVersion = semver.inc(currentVersion, bumpType as semver.ReleaseType);
 
-        changelogStream.on('data', (chunk: Buffer) => {
-            changelogContent += chunk.toString();
-        });
+    if (!newVersion) {
+      return null;
+    }
 
-        changelogStream.on('end', () => resolve(changelogContent));
-        changelogStream.on('error', (err: Error) => reject(err));
-    });
+    return { pkg, bumpType, newVersion };
+  });
+
+  const results = await Promise.all(bumpInfoPromises);
+  return results.filter((info): info is PackageBumpInfo => info !== null);
+}
+
+export function generateChangelog(monorepoInfo: MonorepoInfo, pkgInfo?: PackageBumpInfo): Promise<string> {
+  return new Promise((resolve, reject) => {
+    let changelogContent = '';
+    const options = { preset: 'angular', tagPrefix: 'v' };
+    const context = {};
+    const gitRawCommitsOpts = {
+      path: pkgInfo ? pkgInfo.pkg.path : monorepoInfo.rootDir,
+    };
+
+    const changelogStream = (conventionalChangelog as any)(options, context, gitRawCommitsOpts);
+
+    changelogStream.on('data', (chunk: Buffer) => changelogContent += chunk.toString());
+    changelogStream.on('end', () => resolve(changelogContent));
+    changelogStream.on('error', (err: Error) => reject(err));
+  });
+}
+
+export async function updatePackageVersion(pkgInfo: PackageBumpInfo): Promise<void> {
+  const pkgJsonPath = path.join(pkgInfo.pkg.path, 'package.json');
+  const pkgJson = await _safeReadJson(pkgJsonPath);
+  if (pkgJson) {
+    pkgJson.version = pkgInfo.newVersion;
+    await fs.writeFile(pkgJsonPath, JSON.stringify(pkgJson, null, 2) + '\n');
+  }
+}
+
+export async function commitAndTagPackage(pkgInfo: PackageBumpInfo, projectRoot: string): Promise<void> {
+  const packageName = pkgInfo.pkg.name.split('/')[1] || pkgInfo.pkg.name;
+  const tagName = `${packageName}@${pkgInfo.newVersion}`;
+  const commitMessage = `chore(release): release ${tagName}`;
+  
+  const pkgJsonPath = path.join(pkgInfo.pkg.path, 'package.json');
+  const changelogPath = path.join(pkgInfo.pkg.path, 'CHANGELOG.md');
+
+  await runCommand(`git add ${pkgJsonPath} ${changelogPath}`, projectRoot);
+  await runCommand(`git commit -m "${commitMessage}"`, projectRoot);
+  await runCommand(`git tag ${tagName}`, projectRoot);
 }

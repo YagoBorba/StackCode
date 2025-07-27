@@ -125,5 +125,8 @@
     "step_generating_changelog": "-> Generating CHANGELOG.md...",
     "success_ready_to_commit": "✅ Success! Version updated and CHANGELOG.md generated.",
     "next_steps_commit": "Next steps: Review the changes, then run 'git commit' and 'git tag'."
-  }
+  },
+  "test": {
+  "hello": "Hello from test"
+}
 }

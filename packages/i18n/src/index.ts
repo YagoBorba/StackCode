@@ -1,33 +1,24 @@
-import * as fs from 'fs/promises'; // Changed to promises API
+import * as fs from 'fs/promises';
 import * as path from 'path';
-import { fileURLToPath } from 'url'; // For ESM __dirname equivalent
+import { fileURLToPath } from 'url';
 import Configstore from 'configstore';
 
-// This block creates a reliable __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const config = new Configstore('@stackcode/cli');
 let translations: Record<string, any> = {};
 
-/**
- * Loads translation files asynchronously.
- * It determines the language from environment variables or config, falling back to 'en'.
- * @returns {Promise<void>}
- */
 async function loadTranslations(): Promise<void> {
   const lang = process.env.STACKCODE_LANG || config.get('lang') || 'en';
   const localesDir = path.resolve(__dirname, 'locales');
   const filePath = path.join(localesDir, `${lang}.json`);
   const fallbackPath = path.join(localesDir, 'en.json');
-
   let fileToLoad = filePath;
 
   try {
-    // Check if the desired language file exists.
     await fs.access(fileToLoad);
   } catch {
-    // If not, fall back to English.
     fileToLoad = fallbackPath;
   }
 
@@ -36,17 +27,17 @@ async function loadTranslations(): Promise<void> {
     translations = JSON.parse(fileContent);
   } catch (error) {
     console.error('Failed to load translation files.', error);
-    translations = {}; // Reset to empty on failure
+    translations = {};
   }
 }
 
 /**
- * Translates a given key by looking it up in the loaded translations.
- * @param {string} key - The key to translate, using dot notation (e.g., 'common.error').
- * @returns {string} The translated string or the key itself if not found.
+ * Translates a key and replaces placeholders with provided variables.
+ * @param key The key to translate, using dot notation (e.g., 'common.error').
+ * @param variables An optional object of placeholders to replace.
+ * @returns The translated and formatted string.
  */
-export function t(key: string): string {
-  // This function remains the same, it's already well-written.
+export function t(key: string, variables?: Record<string, string | number>): string {
   const keys = key.split('.');
   let result: any = translations;
 
@@ -54,18 +45,24 @@ export function t(key: string): string {
     if (result && typeof result === 'object' && k in result) {
       result = result[k];
     } else {
-      return key; // Return the original key if path is broken
+      return key;
     }
   }
 
-  return typeof result === 'string' ? result : key;
+  if (typeof result === 'string') {
+    let formattedString = result;
+    // This logic replaces placeholders like {variable} with their value.
+    if (variables) {
+      for (const [varName, varValue] of Object.entries(variables)) {
+        formattedString = formattedString.replace(new RegExp(`\\{${varName}\\}`, 'g'), String(varValue));
+      }
+    }
+    return formattedString;
+  }
+  
+  return key;
 }
 
-/**
- * Initializes the internationalization module.
- * This should be called once when the application starts.
- * @returns {Promise<void>}
- */
 export async function initI18n(): Promise<void> {
   await loadTranslations();
 }
