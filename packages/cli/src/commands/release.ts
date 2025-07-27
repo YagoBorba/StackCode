@@ -53,7 +53,6 @@ async function handleLockedRelease(monorepoInfo: MonorepoInfo) {
   try {
     existingChangelog = await fs.readFile(changelogPath, 'utf-8');
   } catch (error) {
-    // Arquivo não existe, o que é normal.
   }
   await fs.writeFile(changelogPath, `${changelog}\n${existingChangelog}`);
 

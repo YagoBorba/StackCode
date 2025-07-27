@@ -124,6 +124,12 @@
     "step_updating_versions": "-> Atualizando a versão em todos os arquivos package.json...",
     "step_generating_changelog": "-> Gerando CHANGELOG.md...",
     "success_ready_to_commit": "✅ Sucesso! Versão atualizada e CHANGELOG.md gerado.",
-    "next_steps_commit": "Próximos passos: Revise as alterações, depois execute 'git commit' e 'git tag'."
+    "next_steps_commit": "Próximos passos: Revise as alterações, depois execute 'git commit' e 'git tag'.",
+    "independent_mode_start": "🚀 Iniciando análise para o modo independente...",
+    "independent_mode_no_changes": "✅ Nenhum pacote alterado detectado. Tudo está atualizado!",
+    "independent_mode_no_bumps": "ℹ️ Mudanças detectadas, mas nenhuma requer uma nova versão (ex: apenas chores ou refactors).",
+    "independent_prompt_confirm": "Confirma o release dos pacotes listados acima?",
+    "independent_success": "✅ Release independente concluído com sucesso!",
+    "next_steps_push": "Próximos passos: Execute 'git push --follow-tags' para publicar."
   }
 }
