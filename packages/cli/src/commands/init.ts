@@ -14,7 +14,7 @@ import { t } from '@stackcode/i18n';
 
 export const initCommand: CommandModule = {
     command: 'init',
-    describe: 'Starts an interactive wizard to set up a new project.',
+    describe: t('init.command_description'),
     builder: {},
     handler: async () => {
     console.log(chalk.cyan.bold(t('init.welcome')));

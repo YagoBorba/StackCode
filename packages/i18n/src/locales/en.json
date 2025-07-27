@@ -23,10 +23,12 @@
     "success": "✔ Commit created successfully!"
   },
   "validate": {
+    "command_description": "Validates if a string is a conventional commit message.",
     "success": "✔ Valid: This is a valid conventional commit message.",
     "error": "✖ Invalid: This is not a valid conventional commit message."
   },
   "generate": {
+    "command_description": "Generate common project files.",
     "prompt": {
       "readme_overwrite": "A README.md file already exists. Do you want to overwrite it?"
     },
@@ -40,6 +42,7 @@
     }
   },
   "init": {
+    "command_description": "Starts an interactive wizard to set up a new project.",
     "welcome": "Welcome to StackCode! Let's set up your new project.",
     "setup_start": "🚀 Starting project setup...",
     "prompt": {
@@ -66,12 +69,16 @@
     }
   },
   "git": {
+    "command_description": "Provides a suite of commands to assist with the GitFlow workflow.",
+    "error_specify_subcommand": "Please specify a git subcommand (e.g., start-feature).",
     "start_feature": {
+      "description": "Starts a new feature branch from the current branch.",
       "start": "🚀 Starting new feature: {branchName}",
       "success": "✅ Success! Switched to new branch '{branchName}'.",
       "error": "✖ Error: Could not create new branch. Please check your Git status."
     },
     "finish_feature": {
+      "description": "Pushes the current feature branch and opens the New Pull Request page in the browser.",
       "start": "🚀 Finalizing feature...",
       "error_not_feature_branch": "✖ This command can only be run on a 'feature/' branch.",
       "current_branch": "You are currently on branch: '{branchName}'.",
@@ -82,12 +89,8 @@
       "follow_up": "Please review your changes and create the Pull Request on GitHub."
     }
   },
-  "common": {
-    "operation_cancelled": "Operation cancelled.",
-    "error_generic": "✖ An error occurred."
-  },
   "config": {
-    "command_description": "Manage StackCode configuration.",
+    "command_description": "Manage StackCode global configuration.",
     "prompt": {
         "main": "What do you want to configure?",
         "select_lang": "Select your preferred language (global setting):",
@@ -103,7 +106,11 @@
     },
     "error": {
         "not_in_project": "✖ This command must be run from the root of a project initialized with StackCode.",
-        "specify_subcommand": "Please specify a config subcommand (e.g., set)."
+        "specify_subcommand": "Please specify a config subcommand."
     }
-}
+  },
+  "common": {
+    "operation_cancelled": "Operation cancelled.",
+    "error_generic": "✖ An error occurred."
+  }
 }

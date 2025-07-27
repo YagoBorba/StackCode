@@ -8,7 +8,7 @@ import { t } from '@stackcode/i18n';
 
 export const generateCommand: CommandModule = {
     command: 'generate <filetype>',
-    describe: 'Generate common project files.',
+    describe: t('generate.command_description'),
     builder: (yargs: Argv) => {
         return yargs
             .command(

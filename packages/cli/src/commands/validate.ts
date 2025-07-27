@@ -1,3 +1,4 @@
+
 import type { CommandModule } from 'yargs';
 import chalk from 'chalk';
 import { validateCommitMessage } from '@stackcode/core';
@@ -9,7 +10,7 @@ interface ValidateArgs {
 
 export const validateCommand: CommandModule<{}, ValidateArgs> = {
     command: 'validate <message>',
-    describe: 'Validates if a string is a conventional commit message.',
+    describe: t('validate.command_description'),
     builder: (yargs) => {
         return yargs.positional('message', {
             describe: 'The commit message to validate',

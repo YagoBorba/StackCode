@@ -6,7 +6,7 @@
       "scope": "Qual é o escopo desta mudança (ex: componente ou nome de arquivo)? (opcional)",
       "short_description": "Escreva uma descrição curta e no imperativo sobre a mudança:",
       "long_description": "Forneça uma descrição mais longa da mudança (opcional). Use '|' para novas linhas:",
-      "breaking_changes": "Há alguma MUDANÇA QUE QUEBRA A COMPATIBILIDADE (BREAKING CHANGE)? (opcional)",
+      "breaking_changes": "Há alguma MUDANÇA QUE QUEBRA A COMPATIBilidade (BREAKING CHANGE)? (opcional)",
       "affected_issues": "Esta mudança afeta alguma issue aberta? (ex: 'closes #123') (opcional)"
     },
     "types": {
@@ -23,10 +23,12 @@
     "success": "✔ Commit criado com sucesso!"
   },
   "validate": {
+    "command_description": "Valida se uma string é uma mensagem de commit convencional.",
     "success": "✔ Válido: Esta é uma mensagem de commit convencional válida.",
     "error": "✖ Inválido: Esta não é uma mensagem de commit convencional válida."
   },
   "generate": {
+    "command_description": "Gera arquivos comuns de projeto.",
     "prompt": {
       "readme_overwrite": "Um arquivo README.md já existe. Deseja sobrescrevê-lo?"
     },
@@ -40,6 +42,7 @@
     }
   },
   "init": {
+    "command_description": "Inicia um assistente interativo para configurar um novo projeto.",
     "welcome": "Bem-vindo ao StackCode! Vamos configurar seu novo projeto.",
     "setup_start": "🚀 Iniciando a configuração do projeto...",
     "prompt": {
@@ -50,7 +53,7 @@
       "stack": "Qual stack você gostaria de usar?",
       "features": "Quais funcionalidades adicionais você deseja incluir?",
       "overwrite": "O diretório '{projectName}' já existe. Sobrescrever?",
-      "commit_validation": "Habilitar validação obrigatória de commits convencionais? (Recomendado)" 
+      "commit_validation": "Habilitar validação obrigatória de commits convencionais? (Recomendado)"
     },
     "step": {
       "scaffold": "-> Criando a estrutura do projeto...",
@@ -66,12 +69,16 @@
     }
   },
   "git": {
+    "command_description": "Fornece um conjunto de comandos para auxiliar no fluxo GitFlow.",
+    "error_specify_subcommand": "Por favor, especifique um sub-comando do git (ex: start-feature).",
     "start_feature": {
+      "description": "Inicia uma nova branch de feature a partir da branch atual.",
       "start": "🚀 Iniciando nova feature: {branchName}",
       "success": "✅ Sucesso! Trocado para a nova branch '{branchName}'.",
       "error": "✖ Erro: Não foi possível criar a nova branch. Por favor, verifique seu status do Git."
     },
     "finish_feature": {
+      "description": "Envia a branch de feature atual e abre a página de Novo Pull Request no navegador.",
       "start": "🚀 Finalizando feature...",
       "error_not_feature_branch": "✖ Este comando só pode ser executado em uma branch 'feature/'.",
       "current_branch": "Você está atualmente na branch: '{branchName}'.",
@@ -81,10 +88,6 @@
       "success": "✅ Sucesso! Seu navegador está aberto e pronto.",
       "follow_up": "Por favor, revise suas alterações e crie o Pull Request no GitHub."
     }
-  },
-  "common": {
-    "operation_cancelled": "Operação cancelada.",
-    "error_generic": "✖ Ocorreu um erro."
   },
   "config": {
     "command_description": "Gerencia a configuração do StackCode.",
@@ -105,5 +108,9 @@
         "not_in_project": "✖ Este comando deve ser executado na raiz de um projeto inicializado com o StackCode.",
         "specify_subcommand": "Por favor, especifique um sub-comando para config."
     }
-}
+  },
+  "common": {
+    "operation_cancelled": "Operação cancelada.",
+    "error_generic": "✖ Ocorreu um erro."
+  }
 }
