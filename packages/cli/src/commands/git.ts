@@ -1,7 +1,7 @@
-import type { CommandModule, Argv } from 'yargs';
 import chalk from 'chalk';
-import { startFeatureCommand } from './git_sub/start-feature';
-import { finishFeatureCommand } from './git_sub/finish-feature';
+import { CommandModule, Argv } from 'yargs';
+import { startFeatureCommand } from './git_sub/start-feature.js';
+import { finishFeatureCommand } from './git_sub/finish-feature.js';
 import { t } from '@stackcode/i18n';
 
 export const gitCommand: CommandModule = {

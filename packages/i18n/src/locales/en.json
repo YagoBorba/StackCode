@@ -112,5 +112,21 @@
   "common": {
     "operation_cancelled": "Operation cancelled.",
     "error_generic": "✖ An error occurred."
-  }
+  },
+  "release": {
+    "command_description": "Helps with versioning and releasing the project.",
+    "start": "🚀 Starting release process...",
+    "error_structure": "✖ Could not determine project structure. Are you in the root of a monorepo with a `packages` directory?",
+    "detected_strategy": "ℹ️ Detected versioning strategy: {strategy}",
+    "prompt_continue": "Do you want to continue?",
+    "prompt_confirm_release": "Current version is {currentVersion}. Recommended next version is {newVersion}. Confirm release?",
+    "error_calculating_version": "✖ Error calculating next version.",
+    "step_updating_versions": "-> Updating version in all package.json files...",
+    "step_generating_changelog": "-> Generating CHANGELOG.md...",
+    "success_ready_to_commit": "✅ Success! Version updated and CHANGELOG.md generated.",
+    "next_steps_commit": "Next steps: Review the changes, then run 'git commit' and 'git tag'."
+  },
+  "test": {
+  "hello": "Hello from test"
+}
 }

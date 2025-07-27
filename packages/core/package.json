@@ -1,19 +1,34 @@
 {
   "name": "@stackcode/core",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "description": "Core logic for the StackCode tool.",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
-  "clean": "rm -rf dist tsconfig.tsbuildinfo",
-  "build": "npm run clean && tsc && cpx \"src/templates/**/*\" \"dist/templates\"",
-  "test": "echo \"Error: no test specified\" && exit 1"
-},
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "build": "npm run clean && tsc && cpx \"src/templates/**/*\" \"dist/templates\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "keywords": [],
   "author": "Yago Borba",
   "license": "ISC",
   "devDependencies": {
+    "@types/conventional-changelog-core": "^8.0.0",
     "@types/node": "^20.14.9",
+    "@types/semver": "^7.7.0",
     "typescript": "^5.5.2"
+  },
+  "dependencies": {
+    "conventional-changelog-angular": "^8.0.0",
+    "conventional-changelog-core": "^9.0.0",
+    "conventional-recommended-bump": "^11.2.0",
+    "semver": "^7.7.2"
   }
 }
