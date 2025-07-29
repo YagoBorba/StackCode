@@ -1,0 +1,24 @@
+export type VersioningStrategy = 'locked' | 'independent' | 'unknown';
+export interface PackageInfo {
+    name: string;
+    version?: string;
+    path: string;
+}
+export interface MonorepoInfo {
+    strategy: VersioningStrategy;
+    rootDir: string;
+    rootVersion?: string;
+    packages: PackageInfo[];
+}
+export interface PackageBumpInfo {
+    pkg: PackageInfo;
+    bumpType: string;
+    newVersion: string;
+}
+export declare function detectVersioningStrategy(startPath: string): Promise<MonorepoInfo>;
+export declare function getRecommendedBump(projectRoot: string): Promise<string>;
+export declare function updateAllVersions(monorepoInfo: MonorepoInfo, newVersion: string): Promise<void>;
+export declare function determinePackageBumps(changedPackages: PackageInfo[]): Promise<PackageBumpInfo[]>;
+export declare function generateChangelog(monorepoInfo: MonorepoInfo, pkgInfo?: PackageBumpInfo): Promise<string>;
+export declare function updatePackageVersion(pkgInfo: PackageBumpInfo): Promise<void>;
+export declare function commitAndTagPackage(pkgInfo: PackageBumpInfo, projectRoot: string): Promise<void>;

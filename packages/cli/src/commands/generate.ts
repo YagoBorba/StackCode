@@ -11,16 +11,20 @@ async function handleReadmeGeneration() {
   try {
     await fs.access(readmePath);
     const { overwrite } = await inquirer.prompt([{
-      type: 'confirm',
+      type: 'list',
       name: 'overwrite',
       message: t('generate.prompt.readme_overwrite'),
+      choices: [
+          { name: t('common.yes'), value: true },
+          { name: t('common.no'), value: false }
+      ],
       default: false,
     }]);
     if (!overwrite) {
       console.log(chalk.yellow(t('common.operation_cancelled')));
       return;
     }
-  } catch {} 
+  } catch {}
 
   const content = await generateReadmeContent();
   await fs.writeFile(readmePath, content);
@@ -31,18 +35,21 @@ async function handleGitignoreGeneration() {
   const gitignorePath = path.join(process.cwd(), '.gitignore');
   try {
     await fs.access(gitignorePath);
-
     const { overwrite } = await inquirer.prompt([{
-        type: 'confirm',
-        name: 'overwrite',
-        message: t('generate.prompt.gitignore_overwrite'),
-        default: false,
+      type: 'list',
+      name: 'overwrite',
+      message: t('generate.prompt.gitignore_overwrite'),
+      choices: [
+        { name: t('common.yes'), value: true },
+        { name: t('common.no'), value: false }
+      ],
+      default: false,
     }]);
     if (!overwrite) {
         console.log(chalk.yellow(t('common.operation_cancelled')));
         return;
     }
-  } catch {} 
+  } catch {}
 
   const content = await generateGitignoreContent('node-ts');
   await fs.writeFile(gitignorePath, content);

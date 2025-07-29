@@ -1,29 +1,25 @@
-
-import type { CommandModule } from 'yargs';
-import chalk from 'chalk';
-import { validateCommitMessage } from '@stackcode/core';
+import { CommandModule } from 'yargs';
 import { t } from '@stackcode/i18n';
+import { validateCommitMessage } from '@stackcode/core';
+import chalk from 'chalk';
 
-interface ValidateArgs {
-    message: string;
-}
-
-export const validateCommand: CommandModule<{}, ValidateArgs> = {
-    command: 'validate <message>',
-    describe: t('validate.command_description'),
-    builder: (yargs) => {
-        return yargs.positional('message', {
-            describe: 'The commit message to validate',
-            type: 'string',
-            demandOption: true,
-        });
-    },
-    handler: (argv) => {
-        const isValid = validateCommitMessage(argv.message);
-        if (isValid) {
-            console.log(chalk.green.bold(t('validate.success')));
-        } else {
-            console.log(chalk.red.bold(t('validate.error')));
-        }
+export const getValidateCommand = (): CommandModule => ({
+  command: 'validate <message>',
+  describe: t('validate.command_description'),
+  builder: (yargs) => {
+    return yargs.positional('message', {
+      describe: t('validate.option_message_description'),
+      type: 'string',
+      demandOption: true,
+    });
+  },
+  handler: (argv) => {
+    const message = argv.message as string;
+    if (validateCommitMessage(message)) {
+      console.log(chalk.green(`✔ ${t('validate.success')}`));
+    } else {
+      console.error(chalk.red(`✖ ${t('validate.error_invalid')}`));
+      process.exit(1);
     }
-};
+  },
+});

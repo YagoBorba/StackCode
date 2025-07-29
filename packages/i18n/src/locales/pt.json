@@ -7,7 +7,9 @@
       "short_description": "Escreva uma descrição curta e no imperativo sobre a mudança:",
       "long_description": "Forneça uma descrição mais longa da mudança (opcional). Use '|' para novas linhas:",
       "breaking_changes": "Há alguma MUDANÇA QUE QUEBRA A COMPATIBilidade (BREAKING CHANGE)? (opcional)",
-      "affected_issues": "Esta mudança afeta alguma issue aberta? (ex: 'closes #123') (opcional)"
+      "affected_issues": "Esta mudança afeta alguma issue aberta? (ex: 'closes #123') (opcional)",
+      "operation_cancelled": "Operação cancelada.",
+      "unexpected_error": "✖ Ocorreu um erro inesperado."
     },
     "types": {
       "feat": "feat:     Uma nova funcionalidade",
@@ -113,7 +115,9 @@
   },
   "common": {
     "operation_cancelled": "Operação cancelada.",
-    "error_generic": "✖ Ocorreu um erro."
+    "error_generic": "✖ Ocorreu um erro.",
+    "yes": "Sim",
+    "no": "Não"
   },
   "release": {
     "command_description": "Ajuda com o versionamento e o lançamento do projeto.",

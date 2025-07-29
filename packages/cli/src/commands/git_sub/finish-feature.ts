@@ -1,47 +1,46 @@
 import type { CommandModule } from 'yargs';
 import chalk from 'chalk';
-import open from 'open';
 import { runCommand, getCommandOutput } from '@stackcode/core';
 import { t } from '@stackcode/i18n';
+import inquirer from 'inquirer';
 
-export const finishFeatureCommand: CommandModule = {
-    command: 'finish-feature',
-    describe: t('git.finish_feature.description'),
-    builder: (yargs) => yargs,
-    handler: async () => {
-        console.log(chalk.cyan(t('git.finish_feature.start')));
+export const getFinishFeatureCommand = (): CommandModule => ({
+  command: 'finish-feature',
+  describe: t('git.subcommand_finish_feature_description'),
+  handler: async () => {
+    try {
+      const currentBranch = await getCommandOutput('git', ['branch', '--show-current'], { cwd: process.cwd() });
 
-        try {
-            const branchName = await getCommandOutput('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: process.cwd() });
-            
-            if (!branchName.startsWith('feature/')) {
-                console.error(chalk.red(t('git.finish_feature.error_not_feature_branch')));
-                console.log(chalk.yellow(`   ${t('git.finish_feature.current_branch').replace('{branchName}', branchName)}`));
-                return;
-            }
+      if (!currentBranch.startsWith('feature/')) {
+        console.error(chalk.red(t('git.error_not_on_feature_branch')));
+        return;
+      }
 
-            console.log(chalk.blue(`   ${t('git.finish_feature.pushing').replace('{branchName}', branchName)}`));
-            await runCommand('git', ['push', '--set-upstream', 'origin', branchName], { cwd: process.cwd() });
+      const { confirm } = await inquirer.prompt([{
+        type: 'confirm',
+        name: 'confirm',
+        message: t('git.prompt_finish_feature', { branchName: currentBranch }),
+        default: true,
+      }]);
 
-            const remoteUrl = await getCommandOutput('git', ['remote', 'get-url', 'origin'], { cwd: process.cwd() });
-            
-            const repoPathMatch = remoteUrl.match(/github\.com[/:]([\w-]+\/[\w-]+)\.git/);
-            if (!repoPathMatch) {
-                throw new Error(t('git.finish_feature.error_parsing_url'));
-            }
-            const repoPath = repoPathMatch[1];
-            
-            const prUrl = `https://github.com/${repoPath}/pull/new/${branchName}`;
+      if (!confirm) {
+        console.log(chalk.yellow(t('common.operation_cancelled')));
+        return;
+      }
 
-            console.log(chalk.blue(`   ${t('git.finish_feature.opening_browser')}`));
-            await open(prUrl);
+      console.log(chalk.blue(t('git.info_merging_branch', { branchName: currentBranch })));
+      
+      await runCommand('git', ['checkout', 'develop'], { cwd: process.cwd() });
+      await runCommand('git', ['pull', 'origin', 'develop'], { cwd: process.cwd() });
+      await runCommand('git', ['merge', '--no-ff', currentBranch], { cwd: process.cwd() });
+      await runCommand('git', ['branch', '-d', currentBranch], { cwd: process.cwd() });
 
-            console.log(chalk.green.bold(`\n${t('git.finish_feature.success')}`));
-            console.log(chalk.yellow(`   ${t('git.finish_feature.follow_up')}`));
+      console.log(chalk.green(t('git.success_feature_merged', { branchName: currentBranch })));
+      console.log(chalk.yellow(t('git.info_push_develop')));
 
-        } catch (error: any) {
-            console.error(chalk.red(t('common.error_generic')));
-            console.error(chalk.gray(error.message));
-        }
+    } catch (error: any) {
+      console.error(chalk.red(t('common.unexpected_error')));
+      console.error(chalk.gray(error.message));
     }
-};
+  },
+});

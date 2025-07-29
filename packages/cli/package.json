@@ -17,8 +17,8 @@
   "author": "Yago Borba",
   "license": "ISC",
   "dependencies": {
-    "@stackcode/core": "workspace:*",
-    "@stackcode/i18n": "workspace:*",
+    "@stackcode/core": "1.0.0",
+    "@stackcode/i18n": "1.0.0",
     "chalk": "^5.3.0",
     "configstore": "^7.0.0",
     "inquirer": "^8.2.6",
@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@types/configstore": "^6.0.2",
+    "@types/inquirer": "^9.0.8",
     "@types/node": "^20.14.9",
     "@types/open": "^6.1.0",
     "@types/semver": "^7.7.0",

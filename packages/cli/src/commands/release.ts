@@ -122,7 +122,7 @@ async function handleIndependentRelease(monorepoInfo: MonorepoInfo) {
   console.log(chalk.yellow(`  ${t('release.next_steps_push')}`));
 }
 
-export const releaseCommand: CommandModule = {
+export const getReleaseCommand = (): CommandModule => ({
   command: 'release',
   describe: t('release.command_description'),
   builder: {},
@@ -143,5 +143,5 @@ export const releaseCommand: CommandModule = {
     } else if (monorepoInfo.strategy === 'independent') {
       await handleIndependentRelease(monorepoInfo);
     }
-  }
-};
+  },
+});
