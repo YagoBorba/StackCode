@@ -1,41 +1,26 @@
-/**
- * @fileoverview File generation logic for StackCode.
- * @module core/generators
- */
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
- * Generates the content for a .gitignore file by reading a template.
- * @param stack The technology stack (e.g., 'node').
- * @returns The content of the .gitignore file as a string.
+ * Reads the content of the .gitignore template for a specific stack.
+ * @param {string} stack - The technology stack (e.g., 'node-ts').
+ * @returns {Promise<string>} The template content.
  */
-export function generateGitignoreContent(stack: 'node'): string {
-    const templatePath = path.join(__dirname, `templates/gitignore/${stack}.tpl`);
-    try {
-        return fs.readFileSync(templatePath, 'utf-8');
-    } catch (error) {
-        console.error(`Error reading gitignore template for ${stack}`, error);
-        return ''; // Return empty string on error
-    }
+export async function generateGitignoreContent(stack: string): Promise<string> {
+  const templatePath = path.resolve(__dirname, `templates/${stack}/gitignore.tpl`);
+  return fs.readFile(templatePath, 'utf-8');
 }
 
 /**
- * Generates the content for a README.md file from a template and user answers.
- * @param replacements - An object with keys to find (e.g., 'projectName') and values to replace.
- * @returns The content of the README.md file as a string.
+ * Reads the content of the default README.md template.
+ * @returns {Promise<string>} The template content.
  */
-export function generateReadmeContent(replacements: Record<string, string>): string {
-    const templatePath = path.join(__dirname, 'templates/readme/default.tpl');
-    try {
-        let content = fs.readFileSync(templatePath, 'utf-8');
-        content = content.replace(/\{\{([^{}]+)\}\}/g, (match, key) => {
-            const trimmedKey = key.trim();
-            return replacements[trimmedKey] || match;
-        });
-        return content;
-    } catch (error) {
-        console.error('Error reading readme template', error);
-        return '';
-    }
+export async function generateReadmeContent(): Promise<string> {
+  // Este caminho já estava correto.
+  const templatePath = path.resolve(__dirname, 'templates/readme/default.tpl');
+  return fs.readFile(templatePath, 'utf-8');
 }

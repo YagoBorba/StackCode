@@ -1,18 +1,53 @@
-import chalk from 'chalk';
 import { CommandModule, Argv } from 'yargs';
-import { startFeatureCommand } from './git_sub/start-feature.js';
-import { finishFeatureCommand } from './git_sub/finish-feature.js';
+import inquirer from 'inquirer';
+// Importamos a lógica desacoplada, não mais os handlers
+import { getStartCommand, createBranch } from './git_sub/start.js'; 
+import { getFinishCommand, finishHandler } from './git_sub/finish.js';
 import { t } from '@stackcode/i18n';
 
-export const gitCommand: CommandModule = {
-    command: 'git <subcommand>',
+export const getGitCommand = (): CommandModule => ({
+    command: 'git [subcommand]',
     describe: t('git.command_description'),
     builder: (yargs: Argv) => {
         return yargs
-            .command(startFeatureCommand)
-            .command(finishFeatureCommand);
+            .command(getStartCommand())
+            .command(getFinishCommand())
+            .help();
     },
-    handler: () => {
-        console.log(chalk.yellow(t('git.error_specify_subcommand')));
+    handler: async (argv) => {
+        if (argv.subcommand) {
+            return;
+        }
+
+        const { action } = await inquirer.prompt([{
+            type: 'list',
+            name: 'action',
+            message: t('git.prompt_interactive_action'),
+            choices: [
+                { name: t('git.action_start'), value: 'start' },
+                { name: t('git.action_finish'), value: 'finish' },
+            ]
+        }]);
+
+        if (action === 'start') {
+            const { branchName } = await inquirer.prompt([{
+                type: 'input',
+                name: 'branchName',
+                message: t('git.prompt_branch_name'),
+                validate: (input) => !!input || 'O nome da branch não pode ser vazio.',
+            }]);
+
+            const { branchType } = await inquirer.prompt([{
+                type: 'list',
+                name: 'branchType',
+                message: t('git.prompt_branch_type'),
+                choices: ['feature', 'fix', 'hotfix', 'chore'],
+            }]);
+
+            await createBranch(branchName, branchType);
+
+        } else if (action === 'finish') {
+            await finishHandler();
+        }
     }
-};
+});

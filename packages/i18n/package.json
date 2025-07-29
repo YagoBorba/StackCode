@@ -1,6 +1,6 @@
 {
   "name": "@stackcode/i18n",
-  "version": "1.4.0",
+  "version": "1.0.0",
   "description": "Internationalization (i18n) package for StackCode.",
   "type": "module",
   "main": "dist/index.js",
@@ -13,7 +13,8 @@
   "author": "Yago Borba",
   "license": "ISC",
   "dependencies": {
-    "configstore": "^6.0.0"
+    "configstore": "^6.0.0",
+    "write-file-atomic": "^3.0.3"
   },
   "devDependencies": {
     "@types/node": "^20.14.9",

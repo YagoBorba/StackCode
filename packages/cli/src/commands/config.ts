@@ -2,16 +2,17 @@ import type { CommandModule } from 'yargs';
 import chalk from 'chalk';
 import Configstore from 'configstore';
 import inquirer from 'inquirer';
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
 import { t } from '@stackcode/i18n';
 
-const findProjectRoot = (startPath: string): string | null => {
+const findProjectRoot = async (startPath: string): Promise<string | null> => {
     let currentPath = startPath;
     while (currentPath !== path.parse(currentPath).root) {
-        if (fs.existsSync(path.join(currentPath, 'package.json'))) {
+        try {
+            await fs.access(path.join(currentPath, 'package.json'));
             return currentPath;
-        }
+        } catch {}
         currentPath = path.dirname(currentPath);
     }
     return null;
@@ -19,16 +20,14 @@ const findProjectRoot = (startPath: string): string | null => {
 
 const globalConfig = new Configstore('@stackcode/cli');
 
-export const configCommand: CommandModule = {
+export const getConfigCommand = (): CommandModule => ({
     command: 'config',
     describe: t('config.command_description'),
     builder: {},
     handler: async () => {
         const { choice } = await inquirer.prompt([
             {
-                type: 'list',
-                name: 'choice',
-                message: t('config.prompt.main'),
+                type: 'list', name: 'choice', message: t('config.prompt.main'),
                 choices: [
                     { name: t('config.prompt.select_lang'), value: 'lang' },
                     { name: t('config.prompt.toggle_validation'), value: 'commitValidation' },
@@ -39,46 +38,44 @@ export const configCommand: CommandModule = {
         if (choice === 'lang') {
             const { lang } = await inquirer.prompt([
                 {
-                    type: 'list',
-                    name: 'lang',
-                    message: t('config.prompt.select_lang'),
+                    type: 'list', name: 'lang', message: t('config.prompt.select_lang'),
                     choices: [ { name: 'English', value: 'en' }, { name: 'Português', value: 'pt' } ],
                 }
             ]);
             globalConfig.set('lang', lang);
-            console.log(chalk.green(t('config.success.set').replace('{key}', 'lang').replace('{value}', lang)));
+            console.log(chalk.green(t('config.success.set', { key: 'lang', value: lang })));
         } 
         
         else if (choice === 'commitValidation') {
-            const projectRoot = findProjectRoot(process.cwd());
+            const projectRoot = await findProjectRoot(process.cwd());
             if (!projectRoot) {
                 console.error(chalk.red(t('config.error.not_in_project')));
                 return;
             }
 
             const localConfigPath = path.join(projectRoot, '.stackcoderc.json');
-
-            // Se o arquivo não existir, significa que o projeto não foi criado com a feature
-            if (!fs.existsSync(localConfigPath)) {
+            
+            try {
+                await fs.access(localConfigPath);
+            } catch {
                 console.error(chalk.red(t('config.error.not_in_project')));
                 return;
             }
 
             const { enable } = await inquirer.prompt([
                 {
-                    type: 'confirm',
-                    name: 'enable',
-                    message: t('config.prompt.toggle_validation'),
+                    type: 'confirm', name: 'enable', message: t('config.prompt.toggle_validation'),
                     default: true,
                 }
             ]);
 
-            const localConfig = JSON.parse(fs.readFileSync(localConfigPath, 'utf-8'));
+            const localConfigContent = await fs.readFile(localConfigPath, 'utf-8');
+            const localConfig = JSON.parse(localConfigContent);
             localConfig.features.commitValidation = enable;
-            fs.writeFileSync(localConfigPath, JSON.stringify(localConfig, null, 2));
+            await fs.writeFile(localConfigPath, JSON.stringify(localConfig, null, 2));
 
             const status = enable ? t('config.status.enabled') : t('config.status.disabled');
-            console.log(chalk.green(t('config.success.set_validation').replace('{status}', status)));
+            console.log(chalk.green(t('config.success.set_validation', { status })));
         }
     },
-};
+});

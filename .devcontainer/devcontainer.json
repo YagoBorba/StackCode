@@ -1,16 +1,19 @@
 {
-    "name": "StackCode",
-    "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bullseye",
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "dbaeumer.vscode-eslint",
-                "esbenp.prettier-vscode",
-                "EditorConfig.EditorConfig",
-                "ms-azuretools.vscode-docker",
-                "GitHub.copilot"
-            ]
-        }
-    },
-    "remoteUser": "node"
+  "name": "StackCode",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:22",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "EditorConfig.EditorConfig",
+        "ms-azuretools.vscode-docker",
+        "GitHub.copilot"
+      ]
+    }
+  },
+  
+  "postCreateCommand": "npm install -g npm@latest",
+
+  "remoteUser": "node"
 }
