@@ -1,12 +1,11 @@
 import { CommandModule, Argv } from 'yargs';
 import inquirer from 'inquirer';
-// Importamos a lógica desacoplada, não mais os handlers
 import { getStartCommand, createBranch } from './git_sub/start.js'; 
 import { getFinishCommand, finishHandler } from './git_sub/finish.js';
 import { t } from '@stackcode/i18n';
 
 export const getGitCommand = (): CommandModule => ({
-    command: 'git [subcommand]',
+    command: 'git',
     describe: t('git.command_description'),
     builder: (yargs: Argv) => {
         return yargs
