@@ -29,9 +29,11 @@
   },
   "generate": {
     "command_description": "Generate common project files.",
-    "prompt": {
-      "readme_overwrite": "A README.md file already exists. Do you want to overwrite it?"
-    },
+     "prompt": {
+      "readme_overwrite": "A README.md file already exists. Overwrite?",
+      "gitignore_overwrite": "A .gitignore file already exists. Overwrite?",
+      "interactive_select": "Which files would you like to generate?"
+        },
     "error": {
       "gitignore_exists": "A .gitignore file already exists. Operation cancelled to avoid overwriting.",
       "specify_file_type": "Please specify a file type to generate (e.g., gitignore, readme)."

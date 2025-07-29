@@ -30,7 +30,9 @@
   "generate": {
     "command_description": "Gera arquivos comuns de projeto.",
     "prompt": {
-      "readme_overwrite": "Um arquivo README.md já existe. Deseja sobrescrevê-lo?"
+      "readme_overwrite": "? Um arquivo README.md já existe. Deseja sobrescrevê-lo?",
+        "gitignore_overwrite": "? Um arquivo .gitignore já existe. Deseja sobrescrevê-lo?",
+        "interactive_select": "Quais arquivos você gostaria de gerar?"
     },
     "error": {
       "gitignore_exists": "Um arquivo .gitignore já existe. Operação cancelada para evitar sobrescrever.",
