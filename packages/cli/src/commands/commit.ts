@@ -22,7 +22,7 @@ export const getCommitCommand = (): CommandModule => ({
     builder: {},
     handler: async () => {
         try {
-            const statusOutput = await getCommandOutput('git', ['status', '--porcelain']);
+            const statusOutput = await getCommandOutput('git', ['status', '--porcelain'], { cwd: process.cwd() });
             if (!statusOutput) {
                 console.log(chalk.yellow(t('commit.error_no_changes_staged')));
                 return;
