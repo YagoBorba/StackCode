@@ -1,15 +1,22 @@
 {
+  "common": {
+    "operation_cancelled": "Operação cancelada.",
+    "error_generic": "✖ Ocorreu um erro.",
+    "yes": "Sim",
+    "no": "Não",
+    "error_demand_command": "Você precisa especificar pelo menos um comando."
+  },
   "commit": {
     "command_description": "Inicia um assistente interativo para criar uma mensagem de commit convencional.",
+    "success": "✔ Commit criado com sucesso!",
+    "error_no_changes_staged": "Nenhuma alteração adicionada ao stage. Por favor, use 'git add' antes de commitar.",
     "prompt": {
       "select_type": "Selecione o tipo de mudança que você está commitando:",
       "scope": "Qual é o escopo desta mudança (ex: componente ou nome de arquivo)? (opcional)",
       "short_description": "Escreva uma descrição curta e no imperativo sobre a mudança:",
       "long_description": "Forneça uma descrição mais longa da mudança (opcional). Use '|' para novas linhas:",
-      "breaking_changes": "Há alguma MUDANÇA QUE QUEBRA A COMPATIBilidade (BREAKING CHANGE)? (opcional)",
-      "affected_issues": "Esta mudança afeta alguma issue aberta? (ex: 'closes #123') (opcional)",
-      "operation_cancelled": "Operação cancelada.",
-      "unexpected_error": "✖ Ocorreu um erro inesperado."
+      "breaking_changes": "Há alguma MUDANÇA QUE QUEBRA A COMPATIBILIDADE (BREAKING CHANGE)? (opcional)",
+      "affected_issues": "Esta mudança afeta alguma issue aberta? (ex: 'closes #123') (opcional)"
     },
     "types": {
       "feat": "feat:     Uma nova funcionalidade",
@@ -21,29 +28,52 @@
       "test": "test:     Adicionando ou corrigindo testes",
       "chore": "chore:    Mudanças no processo de build ou ferramentas auxiliares",
       "revert": "revert:   Reverte um commit anterior"
-    },
-    "success": "✔ Commit criado com sucesso!"
+    }
   },
-  "validate": {
-    "command_description": "Valida se uma string é uma mensagem de commit convencional.",
-    "success": "✔ Válido: Esta é uma mensagem de commit convencional válida.",
-    "error": "✖ Inválido: Esta não é uma mensagem de commit convencional válida."
+  "config": {
+    "command_description": "Gerencia as configurações locais e globais do StackCode.",
+    "prompt": {
+      "main": "O que você deseja configurar?",
+      "select_lang": "Selecione seu idioma de preferência (configuração global):",
+      "toggle_validation": "Habilitar validação de commits obrigatória para este projeto?"
+    },
+    "success": {
+      "set": "✔ Sucesso! A configuração '{key}' foi definida como '{value}'.",
+      "set_validation": "✔ Sucesso! A validação de commit para este projeto está agora {status}."
+    },
+    "status": {
+      "enabled": "HABILITADA",
+      "disabled": "DESABILITADA"
+    },
+    "error": {
+      "not_in_project": "✖ Este comando deve ser executado na raiz de um projeto inicializado com o StackCode.",
+      "specify_subcommand": "Por favor, especifique um sub-comando para config."
+    }
   },
   "generate": {
     "command_description": "Gera arquivos comuns de projeto.",
     "prompt": {
       "readme_overwrite": "? Um arquivo README.md já existe. Deseja sobrescrevê-lo?",
-        "gitignore_overwrite": "? Um arquivo .gitignore já existe. Deseja sobrescrevê-lo?",
-        "interactive_select": "Quais arquivos você gostaria de gerar?"
-    },
-    "error": {
-      "gitignore_exists": "Um arquivo .gitignore já existe. Operação cancelada para evitar sobrescrever.",
-      "specify_file_type": "Por favor, especifique um tipo de arquivo para gerar (ex: gitignore, readme)."
+      "gitignore_overwrite": "? Um arquivo .gitignore já existe. Deseja sobrescrevê-lo?",
+      "interactive_select": "Quais arquivos você gostaria de gerar?"
     },
     "success": {
       "gitignore": "✔ Sucesso! Arquivo .gitignore gerado.",
       "readme": "✔ Sucesso! Template README.md gerado."
     }
+  },
+  "git": {
+    "command_description": "Fornece um conjunto de comandos para auxiliar no fluxo Git.",
+    "error_specify_subcommand": "Por favor, especifique um sub-comando do git (ex: start, finish).",
+    "error_branch_exists": "✖ Erro: A branch '{branchName}' já existe.",
+    "error_not_git_repo": "✖ Este comando deve ser executado dentro de um repositório Git.",
+    "error_parsing_remote": "✖ Não foi possível extrair o repositório da URL remota do Git.",
+    "info_creating_branch": "🚀 Criando e mudando para a nova branch: {branchName}",
+    "success_branch_created": "✅ Sucesso! Movid-o para a nova branch '{branchName}'.",
+    "prompt_branch_type": "Selecione o tipo de branch que deseja criar:",
+    "info_pushing_branch": "-> Enviando a branch '{branchName}' para o remoto...",
+    "info_opening_browser": "-> Abrindo o navegador para criar um Pull Request...",
+    "success_pr_ready": "✅ Sucesso! Seu navegador deve abrir em breve."
   },
   "init": {
     "command_description": "Inicia um assistente interativo para configurar um novo projeto.",
@@ -72,59 +102,11 @@
       "next_steps": "Próximos passos:"
     }
   },
-  "git": {
-    "command_description": "Fornece um conjunto de comandos para auxiliar no fluxo GitFlow.",
-    "error_specify_subcommand": "Por favor, especifique um sub-comando do git (ex: start-feature).",
-    "start_feature": {
-      "description": "Inicia uma nova branch de feature a partir da branch atual.",
-      "start": "🚀 Iniciando nova feature: {branchName}",
-      "success": "✅ Sucesso! Trocado para a nova branch '{branchName}'.",
-      "error": "✖ Erro: Não foi possível criar a nova branch. Por favor, verifique seu status do Git."
-    },
-    "finish_feature": {
-      "description": "Envia a branch de feature atual e abre a página de Novo Pull Request no navegador.",
-      "start": "🚀 Finalizando feature...",
-      "error_not_feature_branch": "✖ Este comando só pode ser executado em uma branch 'feature/'.",
-      "current_branch": "Você está atualmente na branch: '{branchName}'.",
-      "pushing": "-> Enviando a branch '{branchName}' para o remoto...",
-      "opening_browser": "-> Abrindo seu navegador para criar um Pull Request...",
-      "error_parsing_url": "Não foi possível extrair o caminho do repositório GitHub da URL remota.",
-      "success": "✅ Sucesso! Seu navegador está aberto e pronto.",
-      "follow_up": "Por favor, revise suas alterações e crie o Pull Request no GitHub."
-    }
-  },
-  "config": {
-    "command_description": "Gerencia a configuração do StackCode.",
-    "prompt": {
-        "main": "O que você deseja configurar?",
-        "select_lang": "Selecione seu idioma de preferência (configuração global):",
-        "toggle_validation": "Habilitar validação de commits obrigatória para este projeto?"
-    },
-    "success": {
-        "set": "✔ Sucesso! A configuração '{key}' foi definida como '{value}'.",
-        "set_validation": "✔ Sucesso! A validação de commit para este projeto está agora {status}."
-    },
-    "status": {
-        "enabled": "HABILITADA",
-        "disabled": "DESABILITADA"
-    },
-    "error": {
-        "not_in_project": "✖ Este comando deve ser executado na raiz de um projeto inicializado com o StackCode.",
-        "specify_subcommand": "Por favor, especifique um sub-comando para config."
-    }
-  },
-  "common": {
-    "operation_cancelled": "Operação cancelada.",
-    "error_generic": "✖ Ocorreu um erro.",
-    "yes": "Yes",
-    "no": "No"
-  },
   "release": {
     "command_description": "Ajuda com o versionamento e o lançamento do projeto.",
     "start": "🚀 Iniciando processo de release...",
     "error_structure": "✖ Não foi possível determinar a estrutura do projeto. Você está na raiz de um monorepo com um diretório `packages`?",
     "detected_strategy": "ℹ️ Estratégia de versionamento detectada: {strategy}",
-    "prompt_continue": "Deseja continuar?",
     "prompt_confirm_release": "A versão atual é {currentVersion}. A próxima versão recomendada é {newVersion}. Confirma o release?",
     "error_calculating_version": "✖ Erro ao calcular a próxima versão.",
     "step_updating_versions": "-> Atualizando a versão em todos os arquivos package.json...",
@@ -136,6 +118,20 @@
     "independent_mode_no_bumps": "ℹ️ Mudanças detectadas, mas nenhuma requer uma nova versão (ex: apenas chores ou refactors).",
     "independent_prompt_confirm": "Confirma o release dos pacotes listados acima?",
     "independent_success": "✅ Release independente concluído com sucesso!",
-    "next_steps_push": "Próximos passos: Execute 'git push --follow-tags' para publicar."
+    "next_steps_push": "Próximos passos: Execute 'git push --follow-tags' para publicar.",
+    "independent_mode_packages_to_update": "Os seguintes pacotes serão atualizados:",
+    "table_header_package": "Pacote",
+    "table_header_current_version": "Versão Atual",
+    "table_header_bump_type": "Tipo de Bump",
+    "table_header_new_version": "Nova Versão",
+    "info_releasing_package": "Iniciando release para {pkgName}...",
+    "step_updating_version": "-> Atualizando versão...",
+    "step_committing_and_tagging": "-> Criando commit e tag...",
+    "step_done": "✔"
+  },
+  "validate": {
+    "command_description": "Valida se uma string é uma mensagem de commit convencional.",
+    "success": "✔ Válido: Esta é uma mensagem de commit convencional válida.",
+    "error_invalid": "✖ Inválido: Esta não é uma mensagem de commit convencional válida."
   }
 }

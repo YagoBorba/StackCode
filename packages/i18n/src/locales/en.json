@@ -1,15 +1,22 @@
 {
+  "common": {
+    "operation_cancelled": "Operation cancelled.",
+    "error_generic": "✖ An error occurred.",
+    "yes": "Yes",
+    "no": "No",
+    "error_demand_command": "You need to specify at least one command."
+  },
   "commit": {
     "command_description": "Starts an interactive wizard to create a conventional commit message.",
+    "success": "✔ Commit created successfully!",
+    "error_no_changes_staged": "No changes added to stage. Please use 'git add' before committing.",
     "prompt": {
       "select_type": "Select the type of change that you're committing:",
       "scope": "What is the scope of this change (e.g. component or file name)? (optional)",
       "short_description": "Write a short, imperative tense description of the change:",
       "long_description": "Provide a longer description of the change (optional). Use '|' for newlines:",
       "breaking_changes": "Are there any BREAKING CHANGES? (optional)",
-      "affected_issues": "Does this change affect any open issues? (e.g. 'closes #123') (optional)",
-      "operation_cancelled": "Operação cancelada.",
-      "unexpected_error": "✖ Ocorreu um erro inesperado."
+      "affected_issues": "Does this change affect any open issues? (e.g. 'closes #123') (optional)"
     },
     "types": {
       "feat": "feat:     A new feature",
@@ -21,29 +28,62 @@
       "test": "test:     Adding missing tests or correcting existing tests",
       "chore": "chore:    Changes to the build process or auxiliary tools",
       "revert": "revert:   Reverts a previous commit"
-    },
-    "success": "✔ Commit created successfully!"
+    }
   },
-  "validate": {
-    "command_description": "Validates if a string is a conventional commit message.",
-    "success": "✔ Valid: This is a valid conventional commit message.",
-    "error": "✖ Invalid: This is not a valid conventional commit message."
+  "config": {
+    "command_description": "Manage StackCode global and local configuration.",
+    "prompt": {
+      "main": "What do you want to configure?",
+      "select_lang": "Select your preferred language (global setting):",
+      "toggle_validation": "Enable mandatory conventional commit validation for this project?"
+    },
+    "success": {
+      "set": "✔ Success! Configuration '{key}' set to '{value}'.",
+      "set_validation": "✔ Success! Commit validation for this project is now {status}."
+    },
+    "status": {
+      "enabled": "ENABLED",
+      "disabled": "DISABLED"
+    },
+    "error": {
+      "not_in_project": "✖ This command must be run from the root of a project initialized with StackCode.",
+      "specify_subcommand": "Please specify a config subcommand."
+    }
   },
   "generate": {
-    "command_description": "Generate common project files.",
-     "prompt": {
+    "command_description": "Generates project files. Run interactively or specify a type (e.g., readme).",
+    "option_filetype_description": "The type of file to generate.",
+    "prompt": {
       "readme_overwrite": "A README.md file already exists. Overwrite?",
       "gitignore_overwrite": "A .gitignore file already exists. Overwrite?",
       "interactive_select": "Which files would you like to generate?"
-        },
-    "error": {
-      "gitignore_exists": "A .gitignore file already exists. Operation cancelled to avoid overwriting.",
-      "specify_file_type": "Please specify a file type to generate (e.g., gitignore, readme)."
     },
     "success": {
       "gitignore": "✔ Success! .gitignore file generated.",
       "readme": "✔ Success! README.md template generated."
     }
+  },
+  "git": {
+    "command_description": "Provides a suite of commands to assist with the Git workflow.",
+    "prompt_interactive_action": "What Git action would you like to perform?",
+    "action_start": "Start a new branch (start)",
+    "action_finish": "Finish a branch and open a PR (finish)",
+    "subcommand_start_feature_description": "Creates a new branch from the latest 'develop' branch.",
+    "option_name_description": "The name of the new branch (e.g., 'add-login-feature').",
+    "finish_feature": {
+      "description": "Pushes the current branch and opens the New Pull Request page in the browser."
+    },
+    "error_specify_subcommand": "Please specify a git subcommand (e.g., start, finish).",
+    "error_branch_exists": "✖ Error: Branch '{branchName}' already exists.",
+    "error_not_git_repo": "✖ This command must be run inside a Git repository.",
+    "error_parsing_remote": "✖ Could not parse GitHub repository path from remote URL.",
+    "info_creating_branch": "🚀 Creating and switching to new branch: {branchName}",
+    "success_branch_created": "✅ Success! Switched to new branch '{branchName}'.",
+    "prompt_branch_type": "Select the type of branch you want to create:",
+    "prompt_branch_name": "Enter the name for the new branch:",
+    "info_pushing_branch": "-> Pushing branch '{branchName}' to remote...",
+    "info_opening_browser": "-> Opening your browser to create a Pull Request...",
+    "success_pr_ready": "✅ Success! Your browser should open shortly."
   },
   "init": {
     "command_description": "Starts an interactive wizard to set up a new project.",
@@ -72,59 +112,11 @@
       "next_steps": "Next steps:"
     }
   },
-  "git": {
-    "command_description": "Provides a suite of commands to assist with the GitFlow workflow.",
-    "error_specify_subcommand": "Please specify a git subcommand (e.g., start-feature).",
-    "start_feature": {
-      "description": "Starts a new feature branch from the current branch.",
-      "start": "🚀 Starting new feature: {branchName}",
-      "success": "✅ Success! Switched to new branch '{branchName}'.",
-      "error": "✖ Error: Could not create new branch. Please check your Git status."
-    },
-    "finish_feature": {
-      "description": "Pushes the current feature branch and opens the New Pull Request page in the browser.",
-      "start": "🚀 Finalizing feature...",
-      "error_not_feature_branch": "✖ This command can only be run on a 'feature/' branch.",
-      "current_branch": "You are currently on branch: '{branchName}'.",
-      "pushing": "-> Pushing branch '{branchName}' to remote...",
-      "opening_browser": "-> Opening your browser to create a Pull Request...",
-      "error_parsing_url": "Could not parse GitHub repository path from remote URL.",
-      "success": "✅ Success! Your browser is open and ready.",
-      "follow_up": "Please review your changes and create the Pull Request on GitHub."
-    }
-  },
-  "config": {
-    "command_description": "Manage StackCode global configuration.",
-    "prompt": {
-        "main": "What do you want to configure?",
-        "select_lang": "Select your preferred language (global setting):",
-        "toggle_validation": "Enable mandatory conventional commit validation for this project?"
-    },
-    "success": {
-        "set": "✔ Success! Configuration '{key}' set to '{value}'.",
-        "set_validation": "✔ Success! Commit validation for this project is now {status}."
-    },
-    "status": {
-        "enabled": "ENABLED",
-        "disabled": "DISABLED"
-    },
-    "error": {
-        "not_in_project": "✖ This command must be run from the root of a project initialized with StackCode.",
-        "specify_subcommand": "Please specify a config subcommand."
-    }
-  },
-  "common": {
-    "operation_cancelled": "Operation cancelled.",
-    "error_generic": "✖ An error occurred.",
-    "yes": "Yes",
-    "no": "No"
-  },
   "release": {
     "command_description": "Helps with versioning and releasing the project.",
     "start": "🚀 Starting release process...",
     "error_structure": "✖ Could not determine project structure. Are you in the root of a monorepo with a `packages` directory?",
     "detected_strategy": "ℹ️ Detected versioning strategy: {strategy}",
-    "prompt_continue": "Do you want to continue?",
     "prompt_confirm_release": "Current version is {currentVersion}. Recommended next version is {newVersion}. Confirm release?",
     "error_calculating_version": "✖ Error calculating next version.",
     "step_updating_versions": "-> Updating version in all package.json files...",
@@ -136,6 +128,30 @@
     "independent_mode_no_bumps": "ℹ️ Changes detected, but none require a new version (e.g., only chores or refactors).",
     "independent_prompt_confirm": "Confirm the release of the packages listed above?",
     "independent_success": "✅ Independent release completed successfully!",
-    "next_steps_push": "Next steps: Run 'git push --follow-tags' to publish."
+    "next_steps_push": "Next steps: Run 'git push --follow-tags' to publish.",
+    "independent_mode_packages_to_update": "The following packages will be updated:",
+    "table_header_package": "Package",
+    "table_header_current_version": "Current Version",
+    "table_header_bump_type": "Bump Type",
+    "table_header_new_version": "New Version",
+    "info_releasing_package": "Starting release for {pkgName}...",
+    "step_updating_version": "-> Updating version...",
+    "step_committing_and_tagging": "-> Committing and tagging...",
+    "step_done": "✔"
+  },
+  "validate": {
+    "command_description": "Validates if a string is a conventional commit message.",
+    "option_message_description": "The commit message string to validate.",
+    "success": "✔ Valid: This is a valid conventional commit message.",
+    "error_invalid": "✖ Invalid: This is not a valid conventional commit message."
+  },
+  "yargs": {
+    "Commands:": "Commands:",
+    "Options:": "Options:",
+    "Positionals:": "Positionals:",
+    "Examples:": "Examples:",
+    "required": "required",
+    "Show help": "Show help",
+    "Show version number": "Show version number"
   }
 }

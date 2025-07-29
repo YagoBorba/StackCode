@@ -11,8 +11,7 @@ const findProjectRoot = async (startPath) => {
             await fs.access(path.join(currentPath, 'package.json'));
             return currentPath;
         }
-        catch {
-        }
+        catch { }
         currentPath = path.dirname(currentPath);
     }
     return null;

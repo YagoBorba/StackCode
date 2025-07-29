@@ -4,43 +4,30 @@ import fs from 'fs/promises';
 import path from 'path';
 import { generateGitignoreContent, generateReadmeContent } from '@stackcode/core';
 import { t } from '@stackcode/i18n';
-async function handleReadmeGeneration() {
-    const readmePath = path.join(process.cwd(), 'README.md');
+async function getProjectStack() {
+    const configPath = path.join(process.cwd(), '.stackcoderc.json');
     try {
-        await fs.access(readmePath);
-        const { overwrite } = await inquirer.prompt([{
-                type: 'list',
-                name: 'overwrite',
-                message: t('generate.prompt.readme_overwrite'),
-                choices: [
-                    { name: t('common.yes'), value: true },
-                    { name: t('common.no'), value: false }
-                ],
-                default: false,
-            }]);
-        if (!overwrite) {
-            console.log(chalk.yellow(t('common.operation_cancelled')));
-            return;
-        }
+        const content = await fs.readFile(configPath, 'utf-8');
+        const config = JSON.parse(content);
+        return config.stack || 'node-ts';
     }
-    catch { }
-    const content = await generateReadmeContent();
-    await fs.writeFile(readmePath, content);
-    console.log(chalk.green.bold(t('generate.success.readme')));
+    catch {
+        return 'node-ts';
+    }
 }
-async function handleGitignoreGeneration() {
-    const gitignorePath = path.join(process.cwd(), '.gitignore');
+async function handleFileGeneration(options) {
+    const filePath = path.join(process.cwd(), options.fileName);
     try {
-        await fs.access(gitignorePath);
+        await fs.access(filePath);
         const { overwrite } = await inquirer.prompt([{
-                type: 'list',
+                type: 'confirm',
                 name: 'overwrite',
-                message: t('generate.prompt.gitignore_overwrite'),
+                message: t(options.overwriteMsgKey),
+                default: false,
                 choices: [
                     { name: t('common.yes'), value: true },
-                    { name: t('common.no'), value: false }
+                    { name: t('common.no'), value: false },
                 ],
-                default: false,
             }]);
         if (!overwrite) {
             console.log(chalk.yellow(t('common.operation_cancelled')));
@@ -48,9 +35,9 @@ async function handleGitignoreGeneration() {
         }
     }
     catch { }
-    const content = await generateGitignoreContent('node-ts');
-    await fs.writeFile(gitignorePath, content);
-    console.log(chalk.green.bold(t('generate.success.gitignore')));
+    const content = await options.contentPromise;
+    await fs.writeFile(filePath, content);
+    console.log(chalk.green.bold(t(options.successMsgKey)));
 }
 export const getGenerateCommand = () => ({
     command: 'generate [filetype]',
@@ -63,10 +50,23 @@ export const getGenerateCommand = () => ({
     handler: async (argv) => {
         const filetype = argv.filetype;
         if (filetype) {
-            if (filetype === 'readme')
-                await handleReadmeGeneration();
-            if (filetype === 'gitignore')
-                await handleGitignoreGeneration();
+            if (filetype === 'readme') {
+                await handleFileGeneration({
+                    fileName: 'README.md',
+                    overwriteMsgKey: 'generate.prompt.readme_overwrite',
+                    successMsgKey: 'generate.success.readme',
+                    contentPromise: generateReadmeContent(),
+                });
+            }
+            if (filetype === 'gitignore') {
+                const stack = await getProjectStack();
+                await handleFileGeneration({
+                    fileName: '.gitignore',
+                    overwriteMsgKey: 'generate.prompt.gitignore_overwrite',
+                    successMsgKey: 'generate.success.gitignore',
+                    contentPromise: generateGitignoreContent(stack),
+                });
+            }
             return;
         }
         const { filesToGenerate } = await inquirer.prompt([{
@@ -83,10 +83,21 @@ export const getGenerateCommand = () => ({
             return;
         }
         if (filesToGenerate.includes('readme')) {
-            await handleReadmeGeneration();
+            await handleFileGeneration({
+                fileName: 'README.md',
+                overwriteMsgKey: 'generate.prompt.readme_overwrite',
+                successMsgKey: 'generate.success.readme',
+                contentPromise: generateReadmeContent(),
+            });
         }
         if (filesToGenerate.includes('gitignore')) {
-            await handleGitignoreGeneration();
+            const stack = await getProjectStack();
+            await handleFileGeneration({
+                fileName: '.gitignore',
+                overwriteMsgKey: 'generate.prompt.gitignore_overwrite',
+                successMsgKey: 'generate.success.gitignore',
+                contentPromise: generateGitignoreContent(stack),
+            });
         }
     },
 });

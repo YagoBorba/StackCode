@@ -48,7 +48,7 @@ async function handleFileGeneration(options: {
 }
 
 export const getGenerateCommand = (): CommandModule => ({
-  command: 'generate [filetype]',
+  command: 'generate',
   describe: t('generate.command_description'),
   builder: (yargs) =>
     yargs.positional('filetype', {
