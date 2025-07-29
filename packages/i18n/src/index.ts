@@ -10,9 +10,6 @@ const config = new Configstore('@stackcode/cli');
 let translations: Record<string, any> = {};
 let currentLocale = 'en';
 
-/**
- * Loads the translation file for the configured locale.
- */
 export async function initI18n(): Promise<void> {
   currentLocale = config.get('lang') || 'en';
   const localeFilePath = path.join(__dirname, `locales/${currentLocale}.json`);
@@ -26,31 +23,28 @@ export async function initI18n(): Promise<void> {
   }
 }
 
-/**
- * Returns the currently configured locale.
- * @returns {string} The active locale string (e.g., 'en', 'pt').
- */
 export function getLocale(): string {
   return currentLocale;
 }
 
-/**
- * Gets a translation string for a given key.
- * @param {string} key - The key to translate (e.g., 'common.operation_cancelled').
- * @param {Record<string, string>} [variables] - Variables to replace in the string.
- * @returns {string} The translated string or the key itself if not found.
- */
 export function t(key: string, variables?: Record<string, string>): string {
   const keys = key.split('.');
-  let result = keys.reduce((acc, currentKey) => acc?.[currentKey], translations);
+  
+  const foundValue: unknown = keys.reduce((acc: any, currentKey: string) => {
+    if (acc && typeof acc === 'object' && currentKey in acc) {
+      return acc[currentKey];
+    }
+    return undefined;
+  }, translations);
 
-  if (typeof result === 'string') {
+  if (typeof foundValue === 'string') {
+    let processedString = foundValue;
     if (variables) {
       Object.entries(variables).forEach(([varKey, varValue]) => {
-        result = (result as string).replace(`{${varKey}}`, varValue);
+        processedString = processedString.replace(`{${varKey}}`, String(varValue));
       });
     }
-    return result;
+    return processedString;
   }
   
   return key;

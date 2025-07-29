@@ -51,7 +51,8 @@
     }
   },
   "generate": {
-    "command_description": "Gera arquivos comuns de projeto.",
+    "command_description": "Gera arquivos de projeto. Rode interativamente ou especifique um tipo (ex: readme).",
+    "option_filetype_description": "O tipo de arquivo a ser gerado.",
     "prompt": {
       "readme_overwrite": "? Um arquivo README.md já existe. Deseja sobrescrevê-lo?",
       "gitignore_overwrite": "? Um arquivo .gitignore já existe. Deseja sobrescrevê-lo?",
@@ -64,6 +65,14 @@
   },
   "git": {
     "command_description": "Fornece um conjunto de comandos para auxiliar no fluxo Git.",
+    "prompt_interactive_action": "Qual ação Git você gostaria de realizar?",
+    "action_start": "Iniciar uma nova branch (start)",
+    "action_finish": "Finalizar uma branch e abrir PR (finish)",
+    "subcommand_start_feature_description": "Cria uma nova branch a partir da branch 'develop' mais recente.",
+    "option_name_description": "O nome da nova branch (ex: 'adicionar-feature-login').",
+    "finish_feature": {
+      "description": "Envia a branch atual para o remoto e abre a página de Novo Pull Request no navegador."
+    },
     "error_specify_subcommand": "Por favor, especifique um sub-comando do git (ex: start, finish).",
     "error_branch_exists": "✖ Erro: A branch '{branchName}' já existe.",
     "error_not_git_repo": "✖ Este comando deve ser executado dentro de um repositório Git.",
@@ -71,6 +80,7 @@
     "info_creating_branch": "🚀 Criando e mudando para a nova branch: {branchName}",
     "success_branch_created": "✅ Sucesso! Movid-o para a nova branch '{branchName}'.",
     "prompt_branch_type": "Selecione o tipo de branch que deseja criar:",
+    "prompt_branch_name": "Digite o nome para a nova branch:",
     "info_pushing_branch": "-> Enviando a branch '{branchName}' para o remoto...",
     "info_opening_browser": "-> Abrindo o navegador para criar um Pull Request...",
     "success_pr_ready": "✅ Sucesso! Seu navegador deve abrir em breve."
@@ -131,7 +141,17 @@
   },
   "validate": {
     "command_description": "Valida se uma string é uma mensagem de commit convencional.",
+    "option_message_description": "A mensagem de commit a ser validada.",
     "success": "✔ Válido: Esta é uma mensagem de commit convencional válida.",
     "error_invalid": "✖ Inválido: Esta não é uma mensagem de commit convencional válida."
+  },
+  "yargs": {
+    "Commands:": "Comandos:",
+    "Options:": "Opções:",
+    "Positionals:": "Argumentos:",
+    "Examples:": "Exemplos:",
+    "required": "obrigatório",
+    "Show help": "Exibir ajuda",
+    "Show version number": "Exibir número da versão"
   }
 }

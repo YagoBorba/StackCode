@@ -8,16 +8,18 @@ import { getGitCommand } from './commands/git.js';
 import { getCommitCommand } from './commands/commit.js';
 import { getConfigCommand } from './commands/config.js';
 import { getReleaseCommand } from './commands/release.js';
-import { initI18n } from '@stackcode/i18n';
+import { initI18n, t, getLocale } from '@stackcode/i18n';
 async function main() {
     try {
         await initI18n();
+        const locale = getLocale();
         yargs(hideBin(process.argv))
             .scriptName("stackcode")
             .version('1.0.0')
             .alias('h', 'help')
             .alias('v', 'version')
             .strict()
+            .locale(locale)
             .command(getValidateCommand())
             .command(getGenerateCommand())
             .command(getInitCommand())
@@ -25,7 +27,7 @@ async function main() {
             .command(getCommitCommand())
             .command(getConfigCommand())
             .command(getReleaseCommand())
-            .demandCommand(1, 'Você precisa de pelo menos um comando.')
+            .demandCommand(1, t('common.error_demand_command'))
             .help()
             .argv;
     }

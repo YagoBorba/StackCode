@@ -8,9 +8,25 @@ type StartCommandArgs = {
   name: string;
 };
 
-export const startHandler = async (argv: ArgumentsCamelCase<StartCommandArgs>) => {
-  const featureName = argv.name;
+/**
+ * A lógica principal de criar a branch. Agora está separada e pode ser
+ * chamada de qualquer lugar, inclusive do nosso menu interativo.
+ */
+export async function createBranch(branchName: string, branchType: string) {
+  const fullBranchName = `${branchType}/${branchName}`;
+  try {
+    console.log(chalk.blue(t('git.info_creating_branch', { branchName: fullBranchName })));
+    await runCommand('git', ['checkout', 'develop'], { cwd: process.cwd() });
+    await runCommand('git', ['pull', 'origin', 'develop'], { cwd: process.cwd() });
+    await runCommand('git', ['checkout', '-b', fullBranchName], { cwd: process.cwd() });
+    console.log(chalk.green(t('git.success_branch_created', { branchName: fullBranchName })));
+  } catch (error: any) {
+    console.error(chalk.red(t('git.error_branch_exists', { branchName: fullBranchName })));
+    console.error(chalk.gray(error.stderr || error.message));
+  }
+}
 
+export const startHandler = async (argv: ArgumentsCamelCase<StartCommandArgs>) => {
   const { branchType } = await inquirer.prompt([{
       type: 'list',
       name: 'branchType',
@@ -18,18 +34,7 @@ export const startHandler = async (argv: ArgumentsCamelCase<StartCommandArgs>) =
       choices: ['feature', 'fix', 'hotfix', 'chore'],
   }]);
   
-  const branchName = `${branchType}/${featureName}`;
-  
-  try {
-    console.log(chalk.blue(t('git.info_creating_branch', { branchName })));
-    await runCommand('git', ['checkout', 'develop'], { cwd: process.cwd() });
-    await runCommand('git', ['pull', 'origin', 'develop'], { cwd: process.cwd() });
-    await runCommand('git', ['checkout', '-b', branchName], { cwd: process.cwd() });
-    console.log(chalk.green(t('git.success_branch_created', { branchName })));
-  } catch (error: any) {
-    console.error(chalk.red(t('git.error_branch_exists', { branchName })));
-    console.error(chalk.gray(error.stderr || error.message));
-  }
+  await createBranch(argv.name, branchType);
 };
 
 export const getStartCommand = (): CommandModule<object, StartCommandArgs> => ({

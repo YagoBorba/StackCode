@@ -1,61 +1,43 @@
-import * as fs from 'fs/promises';
-import * as path from 'path';
+import fs from 'fs/promises';
+import path from 'path';
 import { fileURLToPath } from 'url';
 import Configstore from 'configstore';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const config = new Configstore('@stackcode/cli');
 let translations = {};
-async function loadTranslations() {
-    const lang = process.env.STACKCODE_LANG || config.get('lang') || 'en';
-    const localesDir = path.resolve(__dirname, 'locales');
-    const filePath = path.join(localesDir, `${lang}.json`);
-    const fallbackPath = path.join(localesDir, 'en.json');
-    let fileToLoad = filePath;
+let currentLocale = 'en';
+export async function initI18n() {
+    currentLocale = config.get('lang') || 'en';
+    const localeFilePath = path.join(__dirname, `locales/${currentLocale}.json`);
     try {
-        await fs.access(fileToLoad);
-    }
-    catch {
-        fileToLoad = fallbackPath;
-    }
-    try {
-        const fileContent = await fs.readFile(fileToLoad, 'utf-8');
+        const fileContent = await fs.readFile(localeFilePath, 'utf-8');
         translations = JSON.parse(fileContent);
     }
     catch (error) {
-        console.error('Failed to load translation files.', error);
+        console.error(`Could not load translations for locale: ${currentLocale}`, error);
         translations = {};
     }
 }
-/**
- * Translates a key and replaces placeholders with provided variables.
- * @param key The key to translate, using dot notation (e.g., 'common.error').
- * @param variables An optional object of placeholders to replace.
- * @returns The translated and formatted string.
- */
+export function getLocale() {
+    return currentLocale;
+}
 export function t(key, variables) {
     const keys = key.split('.');
-    let result = translations;
-    for (const k of keys) {
-        if (result && typeof result === 'object' && k in result) {
-            result = result[k];
+    const foundValue = keys.reduce((acc, currentKey) => {
+        if (acc && typeof acc === 'object' && currentKey in acc) {
+            return acc[currentKey];
         }
-        else {
-            return key;
-        }
-    }
-    if (typeof result === 'string') {
-        let formattedString = result;
-        // This logic replaces placeholders like {variable} with their value.
+        return undefined;
+    }, translations);
+    if (typeof foundValue === 'string') {
+        let processedString = foundValue;
         if (variables) {
-            for (const [varName, varValue] of Object.entries(variables)) {
-                formattedString = formattedString.replace(new RegExp(`\\{${varName}\\}`, 'g'), String(varValue));
-            }
+            Object.entries(variables).forEach(([varKey, varValue]) => {
+                processedString = processedString.replace(`{${varKey}}`, String(varValue));
+            });
         }
-        return formattedString;
+        return processedString;
     }
     return key;
-}
-export async function initI18n() {
-    await loadTranslations();
 }

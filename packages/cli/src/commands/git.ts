@@ -1,22 +1,24 @@
 import { CommandModule, Argv } from 'yargs';
 import inquirer from 'inquirer';
-import { getStartCommand, startHandler } from './git_sub/start.js';
+// Importamos a lógica desacoplada, não mais os handlers
+import { getStartCommand, createBranch } from './git_sub/start.js'; 
 import { getFinishCommand, finishHandler } from './git_sub/finish.js';
 import { t } from '@stackcode/i18n';
 
 export const getGitCommand = (): CommandModule => ({
-    command: 'git [subcommand]', 
+    command: 'git [subcommand]',
     describe: t('git.command_description'),
     builder: (yargs: Argv) => {
         return yargs
             .command(getStartCommand())
             .command(getFinishCommand())
-            .help(); 
+            .help();
     },
     handler: async (argv) => {
         if (argv.subcommand) {
             return;
         }
+
         const { action } = await inquirer.prompt([{
             type: 'list',
             name: 'action',
@@ -32,9 +34,18 @@ export const getGitCommand = (): CommandModule => ({
                 type: 'input',
                 name: 'branchName',
                 message: t('git.prompt_branch_name'),
-                validate: (input) => input ? true : 'Branch name cannot be empty.'
+                validate: (input) => !!input || 'O nome da branch não pode ser vazio.',
             }]);
-            await startHandler({ name: branchName });
+
+            const { branchType } = await inquirer.prompt([{
+                type: 'list',
+                name: 'branchType',
+                message: t('git.prompt_branch_type'),
+                choices: ['feature', 'fix', 'hotfix', 'chore'],
+            }]);
+
+            await createBranch(branchName, branchType);
+
         } else if (action === 'finish') {
             await finishHandler();
         }

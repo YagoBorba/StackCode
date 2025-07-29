@@ -40,7 +40,7 @@ async function handleFileGeneration(options) {
     console.log(chalk.green.bold(t(options.successMsgKey)));
 }
 export const getGenerateCommand = () => ({
-    command: 'generate [filetype]',
+    command: 'generate',
     describe: t('generate.command_description'),
     builder: (yargs) => yargs.positional('filetype', {
         describe: t('generate.option_filetype_description'),
