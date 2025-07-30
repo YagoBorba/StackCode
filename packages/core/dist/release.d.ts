@@ -16,6 +16,7 @@ export interface PackageBumpInfo {
     newVersion: string;
 }
 export declare function detectVersioningStrategy(startPath: string): Promise<MonorepoInfo>;
+export declare function findChangedPackages(allPackages: PackageInfo[], projectRoot: string): Promise<PackageInfo[]>;
 export declare function getRecommendedBump(projectRoot: string): Promise<string>;
 export declare function updateAllVersions(monorepoInfo: MonorepoInfo, newVersion: string): Promise<void>;
 export declare function determinePackageBumps(changedPackages: PackageInfo[]): Promise<PackageBumpInfo[]>;
