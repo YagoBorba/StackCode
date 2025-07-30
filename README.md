@@ -15,9 +15,12 @@ We believe developers should focus on creating, not on repetitive boilerplate an
 With intelligent scaffolding, guided commits, a simplified Gitflow, and automated releases, your workflow is about to get a major upgrade. <br/>
 **Your only frustration will be not having this from the start.** 😉
 
-[![CI Status][ci-shield]][ci-link]
-[![NPM Version][npm-shield]][npm-link]
-[![MIT License][license-shield]][license-link]
+[ci-shield]: https://github.com/YagoBorba/StackCode/actions/workflows/ci.yml/badge.svg?branch=develop
+[ci-link]: https://github.com/YagoBorba/StackCode/actions/workflows/ci.yml
+[npm-shield]: https://img.shields.io/npm/v/stackcode-cli?style=flat-square&logo=npm&labelColor=black&color=CB3837
+[npm-link]: #
+[license-shield]: https://img.shields.io/github/license/YagoBorba/StackCode?style=flat-square&logo=github&labelColor=black&color=508CF9
+[license-link]: https://github.com/YagoBorba/StackCode/blob/develop/LICENSE
 
 </br>
 
