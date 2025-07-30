@@ -19,7 +19,7 @@ export {
     findChangedPackages,
     determinePackageBumps,
     updatePackageVersion,
-    commitAndTagPackage,
+    performReleaseCommit, 
     type VersioningStrategy,
     type MonorepoInfo,
     type PackageInfo,

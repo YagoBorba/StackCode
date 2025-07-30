@@ -7,7 +7,6 @@ import path from 'path';
 import { t } from '@stackcode/i18n';
 import {
   MonorepoInfo,
-  PackageBumpInfo,
   detectVersioningStrategy,
   updateAllVersions,
   generateChangelog,
@@ -15,7 +14,7 @@ import {
   findChangedPackages,
   determinePackageBumps,
   updatePackageVersion,
-  commitAndTagPackage,
+  performReleaseCommit, 
 } from '@stackcode/core';
 
 async function handleLockedRelease(monorepoInfo: MonorepoInfo) {
@@ -52,12 +51,11 @@ async function handleLockedRelease(monorepoInfo: MonorepoInfo) {
   let existingChangelog = '';
   try {
     existingChangelog = await fs.readFile(changelogPath, 'utf-8');
-  } catch (error) {
-  }
+  } catch (error) {}
   await fs.writeFile(changelogPath, `${changelog}\n${existingChangelog}`);
 
   console.log(chalk.green.bold(`\n${t('release.success_ready_to_commit')}`));
-  console.log(chalk.yellow(`  ${t('release.next_steps_commit')}`));
+  console.log(chalk.yellow(`  ${t('release.next_steps_commit')}`));
 }
 
 async function handleIndependentRelease(monorepoInfo: MonorepoInfo) {
@@ -75,13 +73,13 @@ async function handleIndependentRelease(monorepoInfo: MonorepoInfo) {
     return;
   }
   
-  console.log(chalk.yellow('Os seguintes pacotes serão atualizados:'));
+  console.log(chalk.yellow(t('release.independent_mode_packages_to_update')));
   console.table(
     packagesToUpdate.map(info => ({
-      Package: info.pkg.name,
-      'Versão Atual': info.pkg.version,
-      'Tipo de Bump': info.bumpType,
-      'Nova Versão': info.newVersion,
+      [t('release.table_header_package')]: info.pkg.name,
+      [t('release.table_header_current_version')]: info.pkg.version,
+      [t('release.table_header_bump_type')]: info.bumpType,
+      [t('release.table_header_new_version')]: info.newVersion,
     }))
   );
 
@@ -97,29 +95,31 @@ async function handleIndependentRelease(monorepoInfo: MonorepoInfo) {
     return;
   }
 
+  const stepDone = chalk.green(t('release.step_done'));
+
   for (const pkgInfo of packagesToUpdate) {
     const pkgName = chalk.bold(pkgInfo.pkg.name);
-    console.log(chalk.cyan(`\nIniciando release para ${pkgName}...`));
+    console.log(chalk.cyan(`\n${t('release.info_releasing_package', { pkgName })}`));
     
-    process.stdout.write(' -> Atualizando versão... ');
+    process.stdout.write(`${t('release.step_updating_version')} `);
     await updatePackageVersion(pkgInfo);
-    process.stdout.write(chalk.green('✔\n'));
+    process.stdout.write(`${stepDone}\n`);
 
-    process.stdout.write(' -> Gerando changelog... ');
+    process.stdout.write(`${t('release.step_generating_changelog')} `);
     const changelogContent = await generateChangelog(monorepoInfo, pkgInfo);
     const changelogPath = path.join(pkgInfo.pkg.path, 'CHANGELOG.md');
     let existingChangelog = '';
     try { existingChangelog = await fs.readFile(changelogPath, 'utf-8'); } catch (error) {}
     await fs.writeFile(changelogPath, `${changelogContent}\n${existingChangelog}`);
-    process.stdout.write(chalk.green('✔\n'));
+    process.stdout.write(`${stepDone}\n`);
 
-    process.stdout.write(' -> Criando commit e tag... ');
-    await commitAndTagPackage(pkgInfo, monorepoInfo.rootDir);
-    process.stdout.write(chalk.green('✔\n'));
+    process.stdout.write(`${t('release.step_committing_and_tagging')} `);
+    await performReleaseCommit(pkgInfo, monorepoInfo.rootDir);
+    process.stdout.write(`${stepDone}\n`);
   }
 
   console.log(chalk.green.bold(`\n${t('release.independent_success')}`));
-  console.log(chalk.yellow(`  ${t('release.next_steps_push')}`));
+  console.log(chalk.yellow(`  ${t('release.next_steps_push')}`));
 }
 
 export const getReleaseCommand = (): CommandModule => ({
