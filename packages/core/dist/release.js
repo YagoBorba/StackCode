@@ -148,7 +148,11 @@ export async function updatePackageVersion(pkgInfo) {
         await fs.writeFile(pkgJsonPath, JSON.stringify(pkgJson, null, 2) + '\n');
     }
 }
-export async function commitAndTagPackage(pkgInfo, projectRoot) {
+/**
+ * Executes the git commands to add, commit, and tag a release.
+ * This is the function we are testing.
+ */
+export async function performReleaseCommit(pkgInfo, projectRoot) {
     const packageName = pkgInfo.pkg.name.split('/')[1] || pkgInfo.pkg.name;
     const tagName = `${packageName}@${pkgInfo.newVersion}`;
     const commitMessage = `chore(release): release ${tagName}`;

@@ -50,7 +50,6 @@ async function _findPackagePaths(rootDir: string, rootPackageJson: any): Promise
                     }
                 }
             } catch (error) {
-               
             }
         } else {
             packagePaths.push(path.join(rootDir, pattern));
@@ -64,7 +63,6 @@ async function _getLatestTagForPackage(packageName: string, projectRoot: string)
         const tags = await getCommandOutput('git', ['tag', '--list', `${packageName}@*`, '--sort=-v:refname'], { cwd: projectRoot });
         return tags.split('\n')[0] || null;
     } catch (error) {
-       
         return null;
     }
 }
@@ -196,7 +194,11 @@ export async function updatePackageVersion(pkgInfo: PackageBumpInfo): Promise<vo
     }
 }
 
-export async function commitAndTagPackage(pkgInfo: PackageBumpInfo, projectRoot: string): Promise<void> {
+/**
+ * Executes the git commands to add, commit, and tag a release.
+ * This is the function we are testing.
+ */
+export async function performReleaseCommit(pkgInfo: PackageBumpInfo, projectRoot: string): Promise<void> {
     const packageName = pkgInfo.pkg.name.split('/')[1] || pkgInfo.pkg.name;
     const tagName = `${packageName}@${pkgInfo.newVersion}`;
     const commitMessage = `chore(release): release ${tagName}`;

@@ -22,4 +22,8 @@ export declare function updateAllVersions(monorepoInfo: MonorepoInfo, newVersion
 export declare function determinePackageBumps(changedPackages: PackageInfo[]): Promise<PackageBumpInfo[]>;
 export declare function generateChangelog(monorepoInfo: MonorepoInfo, pkgInfo?: PackageBumpInfo): Promise<string>;
 export declare function updatePackageVersion(pkgInfo: PackageBumpInfo): Promise<void>;
-export declare function commitAndTagPackage(pkgInfo: PackageBumpInfo, projectRoot: string): Promise<void>;
+/**
+ * Executes the git commands to add, commit, and tag a release.
+ * This is the function we are testing.
+ */
+export declare function performReleaseCommit(pkgInfo: PackageBumpInfo, projectRoot: string): Promise<void>;
