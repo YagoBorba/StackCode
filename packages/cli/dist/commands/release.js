@@ -4,7 +4,67 @@ import semver from 'semver';
 import fs from 'fs/promises';
 import path from 'path';
 import { t } from '@stackcode/i18n';
-import { detectVersioningStrategy, updateAllVersions, generateChangelog, getRecommendedBump, findChangedPackages, determinePackageBumps, updatePackageVersion, performReleaseCommit, } from '@stackcode/core';
+import Configstore from 'configstore';
+import { detectVersioningStrategy, updateAllVersions, generateChangelog, getRecommendedBump, findChangedPackages, determinePackageBumps, updatePackageVersion, performReleaseCommit, createGitHubRelease, getCommandOutput, } from '@stackcode/core';
+const config = new Configstore('@stackcode/cli', { github_token: '' });
+async function handleGitHubReleaseCreation(tagName, releaseNotes) {
+    // DEBUG 1: Ver se a função é chamada
+    console.log(chalk.yellowBright('DEBUG: Função handleGitHubReleaseCreation foi iniciada.'));
+    const { createRelease } = await inquirer.prompt([{
+            type: 'confirm',
+            name: 'createRelease',
+            message: t('release.prompt_create_github_release'),
+            default: true,
+        }]);
+    // DEBUG 2: Ver o resultado do primeiro prompt
+    console.log(chalk.yellowBright(`DEBUG: Resultado do prompt 'createRelease': ${createRelease}`));
+    if (!createRelease)
+        return;
+    let token = config.get('github_token');
+    if (!token) {
+        console.log(chalk.yellow(`\n${t('release.info_github_token_needed')}`));
+        console.log(chalk.blue(t('release.info_github_token_instructions')));
+        const { pat } = await inquirer.prompt([{
+                type: 'password',
+                name: 'pat',
+                message: t('release.prompt_github_token'),
+                mask: '*',
+            }]);
+        token = pat;
+        const { saveToken } = await inquirer.prompt([{
+                type: 'confirm',
+                name: 'saveToken',
+                message: t('release.prompt_save_token'),
+                default: true,
+            }]);
+        if (saveToken) {
+            config.set('github_token', token);
+        }
+    }
+    try {
+        const remoteUrl = await getCommandOutput('git', ['remote', 'get-url', 'origin'], { cwd: process.cwd() });
+        const match = remoteUrl.match(/github\.com[/:]([\w-]+\/[\w-.]+)/);
+        if (!match) {
+            throw new Error('Could not parse GitHub owner/repo from remote URL.');
+        }
+        const [owner, repo] = match[1].replace('.git', '').split('/');
+        await createGitHubRelease({
+            owner,
+            repo,
+            tagName,
+            releaseNotes,
+            token,
+        });
+    }
+    catch (error) {
+        console.error(chalk.red(`\n${t('common.error_generic')}`));
+        console.error(chalk.gray(error.message));
+        if (error.message.toLowerCase().includes('bad credentials')) {
+            config.delete('github_token');
+            console.log(chalk.yellow('Your saved GitHub token was invalid and has been cleared. Please try again.'));
+        }
+    }
+}
 async function handleLockedRelease(monorepoInfo) {
     const projectRoot = monorepoInfo.rootDir;
     const currentVersion = monorepoInfo.rootVersion || '0.0.0';
@@ -37,6 +97,7 @@ async function handleLockedRelease(monorepoInfo) {
     await fs.writeFile(changelogPath, `${changelog}\n${existingChangelog}`);
     console.log(chalk.green.bold(`\n${t('release.success_ready_to_commit')}`));
     console.log(chalk.yellow(`  ${t('release.next_steps_commit')}`));
+    await handleGitHubReleaseCreation(`v${newVersion}`, changelog);
 }
 async function handleIndependentRelease(monorepoInfo) {
     console.log(chalk.blue(t('release.independent_mode_start')));
@@ -87,6 +148,12 @@ async function handleIndependentRelease(monorepoInfo) {
         process.stdout.write(`${t('release.step_committing_and_tagging')} `);
         await performReleaseCommit(pkgInfo, monorepoInfo.rootDir);
         process.stdout.write(`${stepDone}\n`);
+        const tagName = `${pkgInfo.pkg.name.split('/')[1] || pkgInfo.pkg.name}@${pkgInfo.newVersion}`;
+        // DEBUG 3: Ver se estamos prestes a chamar a função
+        console.log(chalk.yellowBright('DEBUG: Dentro do loop, antes de chamar handleGitHubReleaseCreation...'));
+        await handleGitHubReleaseCreation(tagName, changelogContent);
+        // DEBUG 4: Ver se a execução continua após a chamada
+        console.log(chalk.yellowBright('DEBUG: A execução continuou após handleGitHubReleaseCreation.'));
     }
     console.log(chalk.green.bold(`\n${t('release.independent_success')}`));
     console.log(chalk.yellow(`  ${t('release.next_steps_push')}`));
