@@ -137,7 +137,13 @@
     "info_releasing_package": "Iniciando release para {pkgName}...",
     "step_updating_version": "-> Atualizando versão...",
     "step_committing_and_tagging": "-> Criando commit e tag...",
-    "step_done": "✔"
+    "step_done": "✔",
+    "prompt_create_github_release": "Deseja criar um release no GitHub para esta versão?",
+    "info_github_token_needed": "Para criar um release no GitHub, o StackCode precisa de um Personal Access Token (PAT).",
+    "info_github_token_instructions": "1. Crie um token aqui: https://github.com/settings/tokens/new\n  2. Dê a ele a permissão (scope) de 'repo'.\n  3. Copie o token (ele começa com ghp_...) e cole-o abaixo.",
+    "prompt_github_token": "Cole seu GitHub PAT aqui:",
+    "prompt_save_token": "Deseja salvar este token de forma segura para uso futuro?",
+    "success_github_release_created": "✅ Release criada com sucesso no GitHub!"
   },
   "validate": {
     "command_description": "Valida se uma string é uma mensagem de commit convencional.",
