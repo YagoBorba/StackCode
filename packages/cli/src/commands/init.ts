@@ -9,6 +9,7 @@ import {
     generateReadmeContent,
     generateGitignoreContent,
     runCommand,
+    type ProjectOptions
 } from '@stackcode/core';
 import { t } from '@stackcode/i18n';
 
@@ -23,7 +24,7 @@ export const getInitCommand = (): CommandModule => ({
         const answers = await inquirer.prompt([
             {
                 type: 'input', name: 'projectName', message: t('init.prompt.project_name'),
-                validate: (input) => input ? true : t('init.prompt.project_name_error'),
+                validate: (input) => !!input || t('init.prompt.project_name_error'),
             },
             {
                 type: 'input', name: 'description', message: t('init.prompt.description'),
@@ -71,44 +72,48 @@ export const getInitCommand = (): CommandModule => ({
             authorName: answers.authorName,
         };
 
-        console.log(chalk.blue(`   ${t('init.step.scaffold')}`));
-        scaffoldProject({
+        const projectOptions: ProjectOptions = {
             projectPath,
             stack: answers.stack,
             features: answers.features,
             replacements,
-        });
+        };
+
+        console.log(chalk.blue(`   ${t('init.step.scaffold')}`));
+        await scaffoldProject(projectOptions);
         
         if (answers.features.includes('husky') && answers.commitValidation !== undefined) {
-            const config = { features: { commitValidation: answers.commitValidation } };
+            const config = { 
+                stack: answers.stack, 
+                features: { commitValidation: answers.commitValidation } 
+            };
             await fs.writeFile(path.join(projectPath, '.stackcoderc.json'), JSON.stringify(config, null, 2));
         }
 
-        console.log(chalk.blue(`   ${t('init.step.readme')}`));
+        console.log(chalk.blue(`   ${t('init.step.readme')}`));
         const readmeContent = await generateReadmeContent();
         await fs.writeFile(path.join(projectPath, 'README.md'), readmeContent);
         
-        console.log(chalk.blue(`   ${t('init.step.gitignore')}`));
-        // CORREÇÃO: Passando a 'stack' selecionada pelo usuário para a função.
-        const gitignoreContent = await generateGitignoreContent(answers.stack);
+        console.log(chalk.blue(`   ${t('init.step.gitignore')}`));
+        const gitignoreContent = await generateGitignoreContent([answers.stack]);
         await fs.writeFile(path.join(projectPath, '.gitignore'), gitignoreContent);
 
         if (answers.features.includes('husky')) {
-            console.log(chalk.blue(`   ${t('init.step.husky')}`));
-            setupHusky(projectPath);
+            console.log(chalk.blue(`   ${t('init.step.husky')}`));
+            await setupHusky(projectPath);
         }
 
-        console.log(chalk.blue(`   ${t('init.step.git')}`));
+        console.log(chalk.blue(`   ${t('init.step.git')}`));
         await runCommand('git', ['init'], { cwd: projectPath });
         
-        console.log(chalk.blue(`   ${t('init.step.deps')}`));
+        console.log(chalk.blue(`   ${t('init.step.deps')}`));
         await runCommand('npm', ['install'], { cwd: projectPath });
 
         console.log(chalk.gray('----------------------------------------------------'));
         console.log(chalk.green.bold(t('init.success.ready')));
         console.log(chalk.cyan(`\n${t('init.success.next_steps')}`));
-        console.log(`   1. cd ${answers.projectName}`);
-        console.log('   2. Open the project in your favorite editor.');
-        console.log('   3. Start coding! 🎉');
+        console.log(`   1. cd ${answers.projectName}`);
+        console.log('   2. Open the project in your favorite editor.');
+        console.log('   3. Start coding! 🎉');
     },
 });

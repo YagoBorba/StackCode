@@ -16,7 +16,6 @@ async function getProjectStack(): Promise<string> {
     return 'node-ts';
   }
 }
-
 async function handleFileGeneration(options: {
   fileName: string;
   overwriteMsgKey: string;
@@ -31,10 +30,6 @@ async function handleFileGeneration(options: {
       name: 'overwrite',
       message: t(options.overwriteMsgKey),
       default: false,
-      choices: [
-        { name: t('common.yes'), value: true },
-        { name: t('common.no'), value: false },
-      ],
     }]);
     if (!overwrite) {
       console.log(chalk.yellow(t('common.operation_cancelled')));
@@ -48,7 +43,7 @@ async function handleFileGeneration(options: {
 }
 
 export const getGenerateCommand = (): CommandModule => ({
-  command: 'generate',
+  command: 'generate [filetype]',
   describe: t('generate.command_description'),
   builder: (yargs) =>
     yargs.positional('filetype', {
@@ -74,7 +69,7 @@ export const getGenerateCommand = (): CommandModule => ({
           fileName: '.gitignore',
           overwriteMsgKey: 'generate.prompt.gitignore_overwrite',
           successMsgKey: 'generate.success.gitignore',
-          contentPromise: generateGitignoreContent(stack),
+          contentPromise: generateGitignoreContent([stack]),
         });
       }
       return;
@@ -109,7 +104,7 @@ export const getGenerateCommand = (): CommandModule => ({
         fileName: '.gitignore',
         overwriteMsgKey: 'generate.prompt.gitignore_overwrite',
         successMsgKey: 'generate.success.gitignore',
-        contentPromise: generateGitignoreContent(stack),
+        contentPromise: generateGitignoreContent([stack]),
       });
     }
   },

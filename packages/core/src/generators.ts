@@ -6,13 +6,29 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
- * Reads the content of the .gitignore template for a specific stack.
- * @param {string} stack - The technology stack (e.g., 'node-ts').
- * @returns {Promise<string>} The template content.
+ * Generates a .gitignore file content by combining multiple templates.
+ * @param technologies An array of strings representing the technologies (e.g., ['node', 'ides']).
+ * @returns {Promise<string>} The combined and formatted .gitignore content.
  */
-export async function generateGitignoreContent(stack: string): Promise<string> {
-  const templatePath = path.resolve(__dirname, `templates/${stack}/gitignore.tpl`);
-  return fs.readFile(templatePath, 'utf-8');
+export async function generateGitignoreContent(technologies: string[]): Promise<string> {
+  const contentParts: string[] = [];
+
+  const allTechs = [...new Set(technologies)]; 
+
+  for (const tech of allTechs) {
+    const templatePath = path.resolve(__dirname, 'templates/gitignore', `${tech}.tpl`);
+    
+    try {
+      const templateContent = await fs.readFile(templatePath, 'utf-8');
+      
+      const header = `# --- ${tech.charAt(0).toUpperCase() + tech.slice(1)} ---`;
+      contentParts.push(header, templateContent.trim(), '');
+    } catch (error) {
+      console.warn(`[Warning] Gitignore template for '${tech}' not found. Skipping.`);
+    }
+  }
+
+  return contentParts.join('\n');
 }
 
 /**
@@ -20,7 +36,6 @@ export async function generateGitignoreContent(stack: string): Promise<string> {
  * @returns {Promise<string>} The template content.
  */
 export async function generateReadmeContent(): Promise<string> {
-  // Este caminho já estava correto.
   const templatePath = path.resolve(__dirname, 'templates/readme/default.tpl');
   return fs.readFile(templatePath, 'utf-8');
 }
