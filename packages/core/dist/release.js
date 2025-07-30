@@ -3,8 +3,7 @@ import path from 'path';
 import semver from 'semver';
 import { Bumper } from 'conventional-recommended-bump';
 import conventionalChangelog from 'conventional-changelog-core';
-import { runCommand } from './git-utils.js';
-// --- FUNÇÕES AUXILIARES INTERNAS ---
+import { getCommandOutput, runCommand } from './utils.js';
 async function _safeReadJson(filePath) {
     try {
         const content = await fs.readFile(filePath, 'utf-8');
@@ -28,7 +27,8 @@ async function _findPackagePaths(rootDir, rootPackageJson) {
                     }
                 }
             }
-            catch (error) { }
+            catch (error) {
+            }
         }
         else {
             packagePaths.push(path.join(rootDir, pattern));
@@ -36,7 +36,15 @@ async function _findPackagePaths(rootDir, rootPackageJson) {
     }
     return packagePaths;
 }
-// --- FUNÇÕES EXPORTADAS PRINCIPAIS ---
+async function _getLatestTagForPackage(packageName, projectRoot) {
+    try {
+        const tags = await getCommandOutput('git', ['tag', '--list', `${packageName}@*`, '--sort=-v:refname'], { cwd: projectRoot });
+        return tags.split('\n')[0] || null;
+    }
+    catch (error) {
+        return null;
+    }
+}
 export async function detectVersioningStrategy(startPath) {
     const rootDir = startPath;
     const rootPackageJsonPath = path.join(rootDir, 'package.json');
@@ -60,6 +68,30 @@ export async function detectVersioningStrategy(startPath) {
         return { strategy: 'independent', rootDir, rootVersion, packages };
     }
     return { strategy: 'locked', rootDir, rootVersion, packages };
+}
+export async function findChangedPackages(allPackages, projectRoot) {
+    const changedPackages = [];
+    for (const pkg of allPackages) {
+        const packageNameWithoutScope = pkg.name.split('/')[1] || pkg.name;
+        const latestTag = await _getLatestTagForPackage(packageNameWithoutScope, projectRoot);
+        let hasChanges = false;
+        if (latestTag) {
+            const diffOutput = await getCommandOutput('git', ['diff', '--name-only', latestTag, 'HEAD', '--', pkg.path], { cwd: projectRoot });
+            if (diffOutput) {
+                hasChanges = true;
+            }
+        }
+        else {
+            const lsOutput = await getCommandOutput('git', ['ls-files', pkg.path], { cwd: projectRoot });
+            if (lsOutput) {
+                hasChanges = true;
+            }
+        }
+        if (hasChanges) {
+            changedPackages.push(pkg);
+        }
+    }
+    return changedPackages;
 }
 export async function getRecommendedBump(projectRoot) {
     const bumper = new Bumper(projectRoot).loadPreset('angular');
@@ -122,7 +154,7 @@ export async function commitAndTagPackage(pkgInfo, projectRoot) {
     const commitMessage = `chore(release): release ${tagName}`;
     const pkgJsonPath = path.join(pkgInfo.pkg.path, 'package.json');
     const changelogPath = path.join(pkgInfo.pkg.path, 'CHANGELOG.md');
-    await runCommand(`git add ${pkgJsonPath} ${changelogPath}`, projectRoot);
-    await runCommand(`git commit -m "${commitMessage}"`, projectRoot);
-    await runCommand(`git tag ${tagName}`, projectRoot);
+    await runCommand('git', ['add', pkgJsonPath, changelogPath], { cwd: projectRoot });
+    await runCommand('git', ['commit', '-m', commitMessage], { cwd: projectRoot });
+    await runCommand('git', ['tag', tagName], { cwd: projectRoot });
 }
