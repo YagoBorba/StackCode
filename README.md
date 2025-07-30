@@ -15,13 +15,20 @@ We believe developers should focus on creating, not on repetitive boilerplate an
 With intelligent scaffolding, guided commits, a simplified Gitflow, and automated releases, your workflow is about to get a major upgrade. <br/>
 **Your only frustration will be not having this from the start.** 😉
 
+<div align="center">
+
+[![CI Status][ci-shield]][ci-link]
+[![NPM Version][npm-shield]][npm-link]
+[![MIT License][license-shield]][license-link]
+
+</div>
+
 [ci-shield]: https://github.com/YagoBorba/StackCode/actions/workflows/ci.yml/badge.svg?branch=develop
 [ci-link]: https://github.com/YagoBorba/StackCode/actions/workflows/ci.yml
-[npm-shield]: https://img.shields.io/npm/v/stackcode-cli?style=flat-square&logo=npm&labelColor=black&color=CB3837
-[npm-link]: #
+[npm-shield]: https://img.shields.io/npm/v/@stackcode/cli?style=flat-square&logo=npm&labelColor=black&color=CB3837
+[npm-link]: https://www.npmjs.com/package/@stackcode/cli
 [license-shield]: https://img.shields.io/github/license/YagoBorba/StackCode?style=flat-square&logo=github&labelColor=black&color=508CF9
 [license-link]: https://github.com/YagoBorba/StackCode/blob/develop/LICENSE
-
 </br>
 
 </div>
@@ -79,7 +86,7 @@ This is the recommended approach for everyday use, especially for commands like 
 
 1.  Install the CLI globally using npm:
     ```bash
-    npm install -g @stackcode/cli  # Replace with your actual package name on npm
+    npm install -g @stackcode/cli  
     ```
 2.  You can now run `stc` from any directory on your system!
     ```bash

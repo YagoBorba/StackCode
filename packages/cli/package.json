@@ -1,7 +1,7 @@
 {
   "name": "@stackcode/cli",
-  "version": "1.0.0",
-  "description": "The Command-Line Interface for StackCode",
+  "version": "1.0.3",
+  "description": "The Command-/Line Interface for StackCode",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
