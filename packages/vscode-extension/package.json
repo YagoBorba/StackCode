@@ -1,10 +1,10 @@
 {
   "name": "vscode-extension",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "main": "index.js",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"✅ No tests for this package\""
   },
   "keywords": [],
   "author": "Yago Borba",

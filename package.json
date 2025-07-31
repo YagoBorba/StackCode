@@ -1,10 +1,10 @@
 {
   "name": "stackcode-monorepo",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "private": true,
   "description": "An intelligent tool to help junior developers apply best practices from day one.",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm test --workspaces --if-present",
     "clean": "npm run clean --workspaces --if-present",
     "build": "tsc --build && cpx \"packages/i18n/src/locales/**/*.json\" \"packages/i18n/dist/locales\" && cpx \"packages/core/src/templates/**\" \"packages/core/dist/templates\" && echo '\\n--- Conteúdo de dist/templates após a cópia: ---' && ls -R packages/core/dist/templates && chmod +x packages/cli/dist/index.js"
   },
