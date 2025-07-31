@@ -1,4 +1,3 @@
-cat <<EOF > .gitignore
 # Dependencies
 /node_modules
 /.pnp
@@ -37,4 +36,3 @@ lerna-debug.log*
 
 # TypeScript
 *.tsbuildinfo
-EOF
