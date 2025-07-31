@@ -1,8 +1,4 @@
 import { Octokit } from '@octokit/rest';
-/**
- * Creates a new release on GitHub.
- * @param options The release options.
- */
 export async function createGitHubRelease(options) {
     const { owner, repo, tagName, releaseNotes, token } = options;
     const octokit = new Octokit({ auth: token });

@@ -23,12 +23,16 @@ async function _findPackagePaths(rootDir, rootPackageJson) {
                 const entries = await fs.readdir(baseDir, { withFileTypes: true });
                 for (const entry of entries) {
                     if (entry.isDirectory()) {
-                        packagePaths.push(path.join(baseDir, entry.name));
+                        const pkgJsonPath = path.join(baseDir, entry.name, 'package.json');
+                        try {
+                            await fs.access(pkgJsonPath);
+                            packagePaths.push(path.join(baseDir, entry.name));
+                        }
+                        catch { }
                     }
                 }
             }
-            catch (error) {
-            }
+            catch (error) { }
         }
         else {
             packagePaths.push(path.join(rootDir, pattern));
@@ -36,14 +40,23 @@ async function _findPackagePaths(rootDir, rootPackageJson) {
     }
     return packagePaths;
 }
-async function _getLatestTagForPackage(packageName, projectRoot) {
+async function _getLatestTags(packageNames, projectRoot) {
+    const tagMap = new Map();
     try {
-        const tags = await getCommandOutput('git', ['tag', '--list', `${packageName}@*`, '--sort=-v:refname'], { cwd: projectRoot });
-        return tags.split('\n')[0] || null;
+        const allTags = await getCommandOutput('git', ['tag', '--list', '*@*'], { cwd: projectRoot });
+        const tagLines = allTags.split('\n').filter(Boolean);
+        for (const pkgName of packageNames) {
+            const shortName = pkgName.split('/')[1] || pkgName;
+            const pkgTags = tagLines
+                .filter(tag => tag.startsWith(`${shortName}@`))
+                .sort(semver.rcompare);
+            if (pkgTags.length > 0) {
+                tagMap.set(pkgName, pkgTags[0]);
+            }
+        }
     }
-    catch (error) {
-        return null;
-    }
+    catch (error) { }
+    return tagMap;
 }
 export async function detectVersioningStrategy(startPath) {
     const rootDir = startPath;
@@ -55,73 +68,42 @@ export async function detectVersioningStrategy(startPath) {
     const rootVersion = rootPackageJson.version;
     const packagePaths = await _findPackagePaths(rootDir, rootPackageJson);
     const packagePromises = packagePaths.map(async (pkgPath) => {
-        const pkgJsonPath = path.join(pkgPath, 'package.json');
-        const pkgJson = await _safeReadJson(pkgJsonPath);
-        if (pkgJson?.name) {
-            const packageInfo = { name: pkgJson.name, version: pkgJson.version, path: pkgPath };
-            return packageInfo;
-        }
-        return null;
+        const pkgJson = await _safeReadJson(path.join(pkgPath, 'package.json'));
+        return pkgJson?.name ? { name: pkgJson.name, version: pkgJson.version, path: pkgPath } : null;
     });
     const packages = (await Promise.all(packagePromises)).filter((p) => p !== null);
-    if (!rootVersion || packages.length === 0 || packages.some(p => p.version !== rootVersion)) {
+    if (!rootVersion || packages.some(p => p.version !== rootVersion)) {
         return { strategy: 'independent', rootDir, rootVersion, packages };
     }
     return { strategy: 'locked', rootDir, rootVersion, packages };
 }
 export async function findChangedPackages(allPackages, projectRoot) {
-    const changedPackages = [];
-    for (const pkg of allPackages) {
-        const packageNameWithoutScope = pkg.name.split('/')[1] || pkg.name;
-        const latestTag = await _getLatestTagForPackage(packageNameWithoutScope, projectRoot);
-        let hasChanges = false;
-        if (latestTag) {
-            const diffOutput = await getCommandOutput('git', ['diff', '--name-only', latestTag, 'HEAD', '--', pkg.path], { cwd: projectRoot });
-            if (diffOutput) {
-                hasChanges = true;
-            }
-        }
-        else {
-            const lsOutput = await getCommandOutput('git', ['ls-files', pkg.path], { cwd: projectRoot });
-            if (lsOutput) {
-                hasChanges = true;
-            }
-        }
-        if (hasChanges) {
-            changedPackages.push(pkg);
-        }
+    const packageNames = allPackages.map(p => p.name);
+    const latestTags = await _getLatestTags(packageNames, projectRoot);
+    if (latestTags.size === 0) {
+        return allPackages;
     }
-    return changedPackages;
+    const changedFilesOutput = await getCommandOutput('git', ['diff', '--name-only', 'HEAD', ...latestTags.values()], { cwd: projectRoot });
+    const changedFiles = new Set(changedFilesOutput.split('\n'));
+    return allPackages.filter(pkg => {
+        const relativePkgPath = path.relative(projectRoot, pkg.path).replace(/\\/g, '/');
+        for (const file of changedFiles) {
+            if (file.startsWith(relativePkgPath))
+                return true;
+        }
+        return !latestTags.has(pkg.name);
+    });
 }
 export async function getRecommendedBump(projectRoot) {
     const bumper = new Bumper(projectRoot).loadPreset('angular');
-    const recommendation = await bumper.bump();
+    const recommendation = (await bumper.bump());
     return recommendation?.releaseType || 'patch';
-}
-export async function updateAllVersions(monorepoInfo, newVersion) {
-    const allPackageJsonPaths = [
-        path.join(monorepoInfo.rootDir, 'package.json'),
-        ...monorepoInfo.packages.map(pkg => path.join(pkg.path, 'package.json'))
-    ];
-    const updatePromises = allPackageJsonPaths.map(async (pkgPath) => {
-        const pkgJson = await _safeReadJson(pkgPath);
-        if (pkgJson) {
-            pkgJson.version = newVersion;
-            await fs.writeFile(pkgPath, JSON.stringify(pkgJson, null, 2) + '\n');
-        }
-    });
-    await Promise.all(updatePromises);
 }
 export async function determinePackageBumps(changedPackages) {
     const bumpInfoPromises = changedPackages.map(async (pkg) => {
-        const projectRoot = pkg.path;
-        const currentVersion = pkg.version || '0.0.0';
-        const bumpType = await getRecommendedBump(projectRoot);
-        const newVersion = semver.inc(currentVersion, bumpType);
-        if (!newVersion) {
-            return null;
-        }
-        return { pkg, bumpType, newVersion };
+        const bumpType = await getRecommendedBump(pkg.path);
+        const newVersion = semver.inc(pkg.version || '0.0.0', bumpType);
+        return newVersion ? { pkg, bumpType, newVersion } : null;
     });
     const results = await Promise.all(bumpInfoPromises);
     return results.filter((info) => info !== null);
@@ -129,15 +111,14 @@ export async function determinePackageBumps(changedPackages) {
 export function generateChangelog(monorepoInfo, pkgInfo) {
     return new Promise((resolve, reject) => {
         let changelogContent = '';
-        const options = { preset: 'angular', tagPrefix: 'v' };
-        const context = {};
-        const gitRawCommitsOpts = {
-            path: pkgInfo ? pkgInfo.pkg.path : monorepoInfo.rootDir,
-        };
-        const changelogStream = conventionalChangelog(options, context, gitRawCommitsOpts);
-        changelogStream.on('data', (chunk) => changelogContent += chunk.toString());
-        changelogStream.on('end', () => resolve(changelogContent));
-        changelogStream.on('error', (err) => reject(err));
+        const shortName = pkgInfo?.pkg.name.split('/')[1] || pkgInfo?.pkg.name;
+        const tagPrefix = pkgInfo ? `${shortName}@` : 'v';
+        const options = { preset: 'angular', tagPrefix };
+        const gitRawCommitsOpts = { path: pkgInfo ? pkgInfo.pkg.path : monorepoInfo.rootDir };
+        const stream = conventionalChangelog(options, {}, gitRawCommitsOpts);
+        stream.on('data', (chunk) => (changelogContent += chunk.toString()));
+        stream.on('end', () => resolve(changelogContent));
+        stream.on('error', reject);
     });
 }
 export async function updatePackageVersion(pkgInfo) {
@@ -148,17 +129,31 @@ export async function updatePackageVersion(pkgInfo) {
         await fs.writeFile(pkgJsonPath, JSON.stringify(pkgJson, null, 2) + '\n');
     }
 }
-/**
- * Executes the git commands to add, commit, and tag a release.
- * This is the function we are testing.
- */
-export async function performReleaseCommit(pkgInfo, projectRoot) {
-    const packageName = pkgInfo.pkg.name.split('/')[1] || pkgInfo.pkg.name;
-    const tagName = `${packageName}@${pkgInfo.newVersion}`;
-    const commitMessage = `chore(release): release ${tagName}`;
-    const pkgJsonPath = path.join(pkgInfo.pkg.path, 'package.json');
-    const changelogPath = path.join(pkgInfo.pkg.path, 'CHANGELOG.md');
-    await runCommand('git', ['add', pkgJsonPath, changelogPath], { cwd: projectRoot });
+export async function updateAllVersions(monorepoInfo, newVersion) {
+    const allPaths = [
+        path.join(monorepoInfo.rootDir, 'package.json'),
+        ...monorepoInfo.packages.map(pkg => path.join(pkg.path, 'package.json')),
+    ];
+    await Promise.all(allPaths.map(async (pkgPath) => {
+        const pkgJson = await _safeReadJson(pkgPath);
+        if (pkgJson) {
+            pkgJson.version = newVersion;
+            await fs.writeFile(pkgPath, JSON.stringify(pkgJson, null, 2) + '\n');
+        }
+    }));
+}
+export async function performReleaseCommit(packages, projectRoot) {
+    const filesToAdd = [];
+    let commitMessage = 'chore(release): release\n\n';
+    for (const pkgInfo of packages) {
+        const tagName = `${pkgInfo.pkg.name.split('/')[1] || pkgInfo.pkg.name}@${pkgInfo.newVersion}`;
+        commitMessage += `- ${tagName}\n`;
+        filesToAdd.push(path.join(pkgInfo.pkg.path, 'package.json'), path.join(pkgInfo.pkg.path, 'CHANGELOG.md'));
+    }
+    await runCommand('git', ['add', ...filesToAdd], { cwd: projectRoot });
     await runCommand('git', ['commit', '-m', commitMessage], { cwd: projectRoot });
-    await runCommand('git', ['tag', tagName], { cwd: projectRoot });
+    for (const pkgInfo of packages) {
+        const tagName = `${pkgInfo.pkg.name.split('/')[1] || pkgInfo.pkg.name}@${pkgInfo.newVersion}`;
+        await runCommand('git', ['tag', tagName], { cwd: projectRoot });
+    }
 }
