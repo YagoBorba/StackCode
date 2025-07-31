@@ -21,10 +21,11 @@ jobs:
           cache: 'npm'
 
       - name: 3. Instalar Dependências
-        run: npm install
+        run: npm ci
 
       - name: 4. Compilar todos os pacotes
         run: npm run build
 
       - name: 5. Rodar os Testes de todos os pacotes
-        run: npm test -- --run 
+    
+        run: npm test

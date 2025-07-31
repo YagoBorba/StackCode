@@ -1,13 +1,14 @@
 {
   "name": "@stackcode/i18n",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Internationalization (i18n) package for StackCode.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "echo \"✅ No tests for this package\""
   },
   "keywords": [],
   "author": "Yago Borba",
@@ -15,9 +16,5 @@
   "dependencies": {
     "configstore": "^6.0.0",
     "write-file-atomic": "^3.0.3"
-  },
-  "devDependencies": {
-    "@types/node": "^20.14.9",
-    "typescript": "^5.5.2"
   }
 }

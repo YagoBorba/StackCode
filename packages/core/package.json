@@ -1,6 +1,6 @@
 {
   "name": "@stackcode/core",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Core logic for the StackCode tool.",
   "type": "module",
   "main": "dist/index.js",
@@ -20,18 +20,16 @@
   "keywords": [],
   "author": "Yago Borba",
   "license": "ISC",
-  "devDependencies": {
-    "@types/conventional-changelog-core": "^8.0.0",
-    "@types/node": "^20.14.9",
-    "@types/semver": "^7.7.0",
-    "typescript": "^5.5.2",
-    "vitest": "^3.2.4"
-  },
   "dependencies": {
     "@octokit/rest": "^22.0.0",
     "conventional-changelog-angular": "^8.0.0",
     "conventional-changelog-core": "^9.0.0",
     "conventional-recommended-bump": "^11.2.0",
     "semver": "^7.7.2"
+  },
+  "devDependencies": {
+    "@types/conventional-changelog-core": "^8.0.0",
+    "@types/semver": "^7.7.0",
+    "vitest": "^3.2.4"
   }
 }
