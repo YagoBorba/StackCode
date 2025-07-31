@@ -1,6 +1,8 @@
 {
-  "name": "StackCode",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:22",
+  "name": "StackCode (Custom Node Env)",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+  "postCreateCommand": "bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && export NVM_DIR=\"$([ -z \"${XDG_CONFIG_HOME-}\" ] && printf %s \"${HOME}/.nvm\" || printf %s \"${XDG_CONFIG_HOME}/nvm\")\" && . \"$NVM_DIR/nvm.sh\" && nvm install --lts'",
+
   "customizations": {
     "vscode": {
       "extensions": [
@@ -13,7 +15,5 @@
     }
   },
   
-  "postCreateCommand": "npm install -g npm@latest",
-
-  "remoteUser": "node"
+  "remoteUser": "vscode"
 }
