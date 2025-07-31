@@ -1,6 +1,6 @@
 {
   "name": "@stackcode/core",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Core logic for the StackCode tool.",
   "type": "module",
   "main": "dist/index.js",
