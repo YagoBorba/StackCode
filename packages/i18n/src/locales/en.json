@@ -144,7 +144,6 @@
     "prompt_github_token": "Paste your GitHub PAT here:",
     "prompt_save_token": "Do you want to save this token securely for future use?",
     "success_github_release_created": "✅ GitHub release created successfully!"
-  }
   },
   "validate": {
     "command_description": "Validates if a string is a conventional commit message.",
