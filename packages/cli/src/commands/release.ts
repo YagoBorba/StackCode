@@ -24,18 +24,12 @@ import {
 const config = new Configstore('@stackcode/cli', { github_token: '' });
 
 async function handleGitHubReleaseCreation(tagName: string, releaseNotes: string) {
-  // DEBUG 1: Ver se a função é chamada
-  console.log(chalk.yellowBright('DEBUG: Função handleGitHubReleaseCreation foi iniciada.'));
-
   const { createRelease } = await inquirer.prompt([{
     type: 'confirm',
     name: 'createRelease',
     message: t('release.prompt_create_github_release'),
     default: true,
   }]);
-
-  // DEBUG 2: Ver o resultado do primeiro prompt
-  console.log(chalk.yellowBright(`DEBUG: Resultado do prompt 'createRelease': ${createRelease}`));
 
   if (!createRelease) return;
 
@@ -129,7 +123,7 @@ async function handleLockedRelease(monorepoInfo: MonorepoInfo) {
   await fs.writeFile(changelogPath, `${changelog}\n${existingChangelog}`);
 
   console.log(chalk.green.bold(`\n${t('release.success_ready_to_commit')}`));
-  console.log(chalk.yellow(`  ${t('release.next_steps_commit')}`));
+  console.log(chalk.yellow(`  ${t('release.next_steps_commit')}`));
 
   await handleGitHubReleaseCreation(`v${newVersion}`, changelog);
 }
@@ -172,6 +166,7 @@ async function handleIndependentRelease(monorepoInfo: MonorepoInfo) {
   }
 
   const stepDone = chalk.green(t('release.step_done'));
+  const allChangelogs: string[] = [];
 
   for (const pkgInfo of packagesToUpdate) {
     const pkgName = chalk.bold(pkgInfo.pkg.name);
@@ -193,17 +188,21 @@ async function handleIndependentRelease(monorepoInfo: MonorepoInfo) {
     await performReleaseCommit(pkgInfo, monorepoInfo.rootDir);
     process.stdout.write(`${stepDone}\n`);
     
-    const tagName = `${pkgInfo.pkg.name.split('/')[1] || pkgInfo.pkg.name}@${pkgInfo.newVersion}`;
-    
-    // DEBUG 3: Ver se estamos prestes a chamar a função
-    console.log(chalk.yellowBright('DEBUG: Dentro do loop, antes de chamar handleGitHubReleaseCreation...'));
-    await handleGitHubReleaseCreation(tagName, changelogContent);
-    // DEBUG 4: Ver se a execução continua após a chamada
-    console.log(chalk.yellowBright('DEBUG: A execução continuou após handleGitHubReleaseCreation.'));
+    const header = `### 🎉 Release for ${pkgInfo.pkg.name}@${pkgInfo.newVersion}`;
+    allChangelogs.push(header, changelogContent);
   }
 
   console.log(chalk.green.bold(`\n${t('release.independent_success')}`));
-  console.log(chalk.yellow(`  ${t('release.next_steps_push')}`));
+  
+  const combinedReleaseNotes = allChangelogs.join('\n\n');
+  const primaryPackageUpdate = packagesToUpdate.find(p => p.pkg.name === '@stackcode/cli') || packagesToUpdate[0];
+  
+  if (primaryPackageUpdate) {
+    const primaryTagName = `${primaryPackageUpdate.pkg.name.split('/')[1] || primaryPackageUpdate.pkg.name}@${primaryPackageUpdate.newVersion}`;
+    await handleGitHubReleaseCreation(primaryTagName, combinedReleaseNotes);
+  }
+
+  console.log(chalk.yellow(`  ${t('release.next_steps_push')}`));
 }
 
 export const getReleaseCommand = (): CommandModule => ({
@@ -216,7 +215,7 @@ export const getReleaseCommand = (): CommandModule => ({
 
     if (monorepoInfo.strategy === 'unknown') {
       console.error(chalk.red(t('release.error_structure')));
-      return;
+      process.exit(1); // Encerra com erro
     }
 
     const strategyText = chalk.bold(monorepoInfo.strategy);
@@ -227,5 +226,7 @@ export const getReleaseCommand = (): CommandModule => ({
     } else if (monorepoInfo.strategy === 'independent') {
       await handleIndependentRelease(monorepoInfo);
     }
+
+    process.exit(0);
   },
 });

@@ -8,16 +8,12 @@ import Configstore from 'configstore';
 import { detectVersioningStrategy, updateAllVersions, generateChangelog, getRecommendedBump, findChangedPackages, determinePackageBumps, updatePackageVersion, performReleaseCommit, createGitHubRelease, getCommandOutput, } from '@stackcode/core';
 const config = new Configstore('@stackcode/cli', { github_token: '' });
 async function handleGitHubReleaseCreation(tagName, releaseNotes) {
-    // DEBUG 1: Ver se a função é chamada
-    console.log(chalk.yellowBright('DEBUG: Função handleGitHubReleaseCreation foi iniciada.'));
     const { createRelease } = await inquirer.prompt([{
             type: 'confirm',
             name: 'createRelease',
             message: t('release.prompt_create_github_release'),
             default: true,
         }]);
-    // DEBUG 2: Ver o resultado do primeiro prompt
-    console.log(chalk.yellowBright(`DEBUG: Resultado do prompt 'createRelease': ${createRelease}`));
     if (!createRelease)
         return;
     let token = config.get('github_token');
@@ -96,7 +92,7 @@ async function handleLockedRelease(monorepoInfo) {
     catch (error) { }
     await fs.writeFile(changelogPath, `${changelog}\n${existingChangelog}`);
     console.log(chalk.green.bold(`\n${t('release.success_ready_to_commit')}`));
-    console.log(chalk.yellow(`  ${t('release.next_steps_commit')}`));
+    console.log(chalk.yellow(`  ${t('release.next_steps_commit')}`));
     await handleGitHubReleaseCreation(`v${newVersion}`, changelog);
 }
 async function handleIndependentRelease(monorepoInfo) {
@@ -129,6 +125,7 @@ async function handleIndependentRelease(monorepoInfo) {
         return;
     }
     const stepDone = chalk.green(t('release.step_done'));
+    const allChangelogs = [];
     for (const pkgInfo of packagesToUpdate) {
         const pkgName = chalk.bold(pkgInfo.pkg.name);
         console.log(chalk.cyan(`\n${t('release.info_releasing_package', { pkgName })}`));
@@ -148,15 +145,17 @@ async function handleIndependentRelease(monorepoInfo) {
         process.stdout.write(`${t('release.step_committing_and_tagging')} `);
         await performReleaseCommit(pkgInfo, monorepoInfo.rootDir);
         process.stdout.write(`${stepDone}\n`);
-        const tagName = `${pkgInfo.pkg.name.split('/')[1] || pkgInfo.pkg.name}@${pkgInfo.newVersion}`;
-        // DEBUG 3: Ver se estamos prestes a chamar a função
-        console.log(chalk.yellowBright('DEBUG: Dentro do loop, antes de chamar handleGitHubReleaseCreation...'));
-        await handleGitHubReleaseCreation(tagName, changelogContent);
-        // DEBUG 4: Ver se a execução continua após a chamada
-        console.log(chalk.yellowBright('DEBUG: A execução continuou após handleGitHubReleaseCreation.'));
+        const header = `### 🎉 Release for ${pkgInfo.pkg.name}@${pkgInfo.newVersion}`;
+        allChangelogs.push(header, changelogContent);
     }
     console.log(chalk.green.bold(`\n${t('release.independent_success')}`));
-    console.log(chalk.yellow(`  ${t('release.next_steps_push')}`));
+    const combinedReleaseNotes = allChangelogs.join('\n\n');
+    const primaryPackageUpdate = packagesToUpdate.find(p => p.pkg.name === '@stackcode/cli') || packagesToUpdate[0];
+    if (primaryPackageUpdate) {
+        const primaryTagName = `${primaryPackageUpdate.pkg.name.split('/')[1] || primaryPackageUpdate.pkg.name}@${primaryPackageUpdate.newVersion}`;
+        await handleGitHubReleaseCreation(primaryTagName, combinedReleaseNotes);
+    }
+    console.log(chalk.yellow(`  ${t('release.next_steps_push')}`));
 }
 export const getReleaseCommand = () => ({
     command: 'release',
@@ -167,7 +166,7 @@ export const getReleaseCommand = () => ({
         const monorepoInfo = await detectVersioningStrategy(process.cwd());
         if (monorepoInfo.strategy === 'unknown') {
             console.error(chalk.red(t('release.error_structure')));
-            return;
+            process.exit(1); // Encerra com erro
         }
         const strategyText = chalk.bold(monorepoInfo.strategy);
         console.log(chalk.blue(t('release.detected_strategy', { strategy: strategyText })));
@@ -177,5 +176,6 @@ export const getReleaseCommand = () => ({
         else if (monorepoInfo.strategy === 'independent') {
             await handleIndependentRelease(monorepoInfo);
         }
+        process.exit(0);
     },
 });

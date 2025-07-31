@@ -11,6 +11,8 @@ export { scaffoldProject, setupHusky, type ProjectOptions } from './scaffold.js'
 
 export { validateCommitMessage } from './validator.js';
 
+export * from './github.js';
+
 export {
     detectVersioningStrategy,
     getRecommendedBump,
