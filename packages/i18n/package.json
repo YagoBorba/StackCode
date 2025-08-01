@@ -10,9 +10,18 @@
     "build": "tsc",
     "test": "echo \"✅ No tests for this package\""
   },
-  "keywords": [],
+  "keywords": ["i18n", "internationalization", "localization", "translations"],
   "author": "Yago Borba",
-  "license": "ISC",
+  "license": "MIT",
+  "homepage": "https://github.com/YagoBorba/StackCode#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YagoBorba/StackCode.git",
+    "directory": "packages/i18n"
+  },
+  "bugs": {
+    "url": "https://github.com/YagoBorba/StackCode/issues"
+  },
   "dependencies": {
     "configstore": "^7.0.0",
     "write-file-atomic": "^3.0.3"

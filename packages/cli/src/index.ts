@@ -19,7 +19,7 @@ async function main() {
 
     yargs(hideBin(process.argv))
       .scriptName("stackcode")
-      .version('1.0.0')
+      .version('1.0.3')
       .alias('h', 'help')
       .alias('v', 'version')
       .strict()

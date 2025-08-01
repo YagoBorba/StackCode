@@ -7,7 +7,7 @@
     "error_demand_command": "Você precisa especificar pelo menos um comando."
   },
   "commit": {
-    "command_description": "Inicia um assistente interativo para criar uma mensagem de commit convencional.",
+    "command_description": "Inicia uistente interativo para criar uma mensagem de commit convencional.",
     "success": "✔ Commit criado com sucesso!",
     "error_no_changes_staged": "Nenhuma alteração adicionada ao stage. Por favor, use 'git add' antes de commitar.",
     "prompt": {

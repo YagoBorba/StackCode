@@ -1,5 +1,5 @@
 {
   "features": {
-    "commitValidation": true
+    "commitValidation": false
   }
 }

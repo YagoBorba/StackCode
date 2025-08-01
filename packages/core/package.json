@@ -17,9 +17,18 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "keywords": [],
+  "keywords": ["scaffolding", "templates", "automation", "release", "conventional-commits", "typescript"],
   "author": "Yago Borba",
-  "license": "ISC",
+  "license": "MIT",
+  "homepage": "https://github.com/YagoBorba/StackCode#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YagoBorba/StackCode.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/YagoBorba/StackCode/issues"
+  },
   "dependencies": {
     "@octokit/rest": "^22.0.0",
     "conventional-changelog-angular": "^8.0.0",

@@ -13,9 +13,18 @@
     "build": "tsc && chmod +x dist/index.js",
     "test": "echo \"✅ No tests for this package\""
   },
-  "keywords": [],
+  "keywords": ["cli", "scaffolding", "conventional-commits", "gitflow", "automation", "devops", "typescript"],
   "author": "Yago Borba",
-  "license": "ISC",
+  "license": "MIT",
+  "homepage": "https://github.com/YagoBorba/StackCode#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YagoBorba/StackCode.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/YagoBorba/StackCode/issues"
+  },
   "dependencies": {
     "@stackcode/core": "^1.0.3",
     "@stackcode/i18n": "^1.0.3",
