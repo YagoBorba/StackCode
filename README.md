@@ -10,11 +10,6 @@
 
 ---
 
-**Ever felt the tedious grind of setting up new projects, enforcing conventions, and managing releases?** <br/>
-We believe developers should focus on creating, not on repetitive boilerplate and configuration. That's why we built **StackCode**: the developer's automated Ops Assistant. <br/>
-With intelligent scaffolding, guided commits, a simplified Gitflow, and automated releases, your workflow is about to get a major upgrade. <br/>
-**Your only frustration will be not having this from the start.** 😉
-
 <div align="center">
 
 [![CI Status][ci-shield]][ci-link]
@@ -121,10 +116,3 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 <div align="right">
     <a href="#readme-top">Back to Top</a>
 </div>
-
-[ci-shield]: https://github.com/YagoBorba/StackCode/actions/workflows/ci.yml/badge.svg
-[ci-link]: https://github.com/YagoBorba/StackCode/actions/workflows/ci.yml
-[npm-shield]: https://img.shields.io/npm/v/@stackcode/cli?style=flat-square&logo=npm&labelColor=black&color=CB3837
-[npm-link]: https://www.npmjs.com/package/@stackcode/cli
-[license-shield]: https://img.shields.io/github/license/YagoBorba/StackCode?style=flat-square&logo=github&labelColor=black&color=508CF9
-[license-link]: https://github.com/YagoBorba/StackCode/blob/develop/LICENSE
