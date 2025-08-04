@@ -11,9 +11,17 @@
   "scripts": {
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "build": "tsc && chmod +x dist/index.js",
-    "test": "echo \"✅ No tests for this package\""
+    "test": "vitest run"
   },
-  "keywords": ["cli", "scaffolding", "conventional-commits", "gitflow", "automation", "devops", "typescript"],
+  "keywords": [
+    "cli",
+    "scaffolding",
+    "conventional-commits",
+    "gitflow",
+    "automation",
+    "devops",
+    "typescript"
+  ],
   "author": "Yago Borba",
   "license": "MIT",
   "homepage": "https://github.com/YagoBorba/StackCode#readme",
@@ -42,6 +50,7 @@
     "@types/open": "^6.1.0",
     "@types/semver": "^7.7.0",
     "@types/yargs": "^17.0.32",
-    "typescript": "^5.5.2"
+    "typescript": "^5.5.2",
+    "vitest": "^3.2.4"
   }
 }
