@@ -1,12 +1,9 @@
-// packages/cli/test/commands/release.test.ts
-
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { getReleaseCommand } from '../../src/commands/release';
 import * as core from '@stackcode/core';
 import inquirer from 'inquirer';
 import fs from 'fs/promises';
 
-// Mock das dependências externas
 vi.mock('@stackcode/core');
 vi.mock('inquirer');
 vi.mock('fs/promises');
@@ -16,14 +13,12 @@ describe('Release Command Handler', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Silencia o console.log antes de cada teste
     vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.spyOn(console, 'table').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    // Restaura os mocks para o estado original depois de todos os testes
     vi.restoreAllMocks();
   });
 

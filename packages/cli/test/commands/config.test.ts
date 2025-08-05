@@ -1,12 +1,9 @@
-// packages/cli/test/commands/config.test.ts
-
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import inquirer from 'inquirer';
 import { getConfigCommand, handleNonInteractiveMode, runInteractiveMode } from '../../src/commands/config';
 import fs from 'fs/promises';
 import path from 'path';
 
-// --- Mocks ---
 vi.mock('inquirer');
 
 const mockSet = vi.fn();
@@ -26,8 +23,6 @@ vi.mock('configstore', () => ({
 vi.mock('fs/promises');
 vi.mock('@stackcode/i18n', () => ({ t: (key: string) => key }));
 
-
-// --- Type Assertions for Mocks ---
 const mockedInquirer = vi.mocked(inquirer);
 const mockedFs = vi.mocked(fs);
 
@@ -46,8 +41,7 @@ describe('Config Command', () => {
     const { handler } = getConfigCommand();
 
     it('should call runInteractiveMode when no action is provided', async () => {
-        // FIX: Provide a resolved value for the prompt to prevent the TypeError.
-        // An empty object is sufficient as we only want to test the call.
+
         mockedInquirer.prompt.mockResolvedValue({});
 
         await handler({ _: ['config'], $0: 'stc' });
