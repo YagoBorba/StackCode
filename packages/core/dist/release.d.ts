@@ -1,4 +1,4 @@
-import { PackageInfo, MonorepoInfo, PackageBumpInfo } from './types.js';
+import { PackageInfo, MonorepoInfo, PackageBumpInfo } from "./types.js";
 export declare function detectVersioningStrategy(startPath: string): Promise<MonorepoInfo>;
 export declare function findChangedPackages(allPackages: PackageInfo[], projectRoot: string): Promise<PackageInfo[]>;
 export declare function getRecommendedBump(projectRoot: string): Promise<string>;

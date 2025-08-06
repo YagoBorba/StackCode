@@ -24,6 +24,7 @@
 [npm-link]: https://www.npmjs.com/package/@stackcode/cli
 [license-shield]: https://img.shields.io/github/license/YagoBorba/StackCode?style=flat-square&logo=github&labelColor=black&color=508CF9
 [license-link]: https://github.com/YagoBorba/StackCode/blob/develop/LICENSE
+
 </br>
 
 </div>
@@ -41,35 +42,35 @@ Our goal is to make best practices the easiest path.
 
 StackCode is a suite of tools designed to work together seamlessly:
 
-* 🚀 **Effortless Project Scaffolding (`init`):**
+- 🚀 **Effortless Project Scaffolding (`init`):**
   Generate a complete, production-ready project structure in seconds. Starts with a professional Node.js + TypeScript stack, with more to come.
 
-* 📝 **Intelligent File Generation (`generate`):**
+- 📝 **Intelligent File Generation (`generate`):**
   Need a `.gitignore`? Don't just get one—get a perfect one. Our composable template engine combines rules for your stack, IDE, and tools (like Docker) into a single, organized file.
 
-* 💬 **Guided Conventional Commits (`commit`):**
+- 💬 **Guided Conventional Commits (`commit`):**
   Never write a non-compliant commit message again. Our interactive wizard guides you through the Conventional Commits specification, ensuring a clean and readable Git history.
 
-* 🔗 **Simplified Gitflow (`git`):**
+- 🔗 **Simplified Gitflow (`git`):**
   Forget memorizing branch names. Use `stc git start` and `stc git finish` to manage feature branches with ease. Our interactive menu makes the process foolproof.
 
-* 🔖 **Automated Versioning & Releases (`release`):**
+- 🔖 **Automated Versioning & Releases (`release`):**
   This is where the magic happens. The `release` command analyzes your commits, automatically determines the next semantic version (`patch`, `minor`, `major`), updates all `package.json` files, generates a `CHANGELOG.md`, and creates the corresponding commit and Git tag.
 
-* ✅ **Guaranteed Commit Quality (`validate`):**
+- ✅ **Guaranteed Commit Quality (`validate`):**
   Integrates seamlessly with Husky git hooks. The `stc validate` command ensures that no non-conventional commit ever makes it into your repository.
 
-* ⚙️ **Flexible Configuration (`config`):**
+- ⚙️ **Flexible Configuration (`config`):**
   Manage global preferences (like language) and project-specific settings (like enabling commit validation) with a simple, interactive command.
 
 ## 🛠️ Under the Hood (Main Technologies)
 
-* **[TypeScript](https://www.typescriptlang.org/)**: For a robust, type-safe, and maintainable codebase.
-* **[Node.js](https://nodejs.org/)**: The runtime environment for our powerful backend logic.
-* **[Yargs](https://yargs.js.org/)**: For building a clean, professional, and extensible command-line interface.
-* **[Inquirer](https://github.com/SBoudrias/Inquirer.js/)**: To create the intuitive and interactive prompts that guide the user.
-* **[Vitest](https://vitest.dev/)**: For a fast, modern, and reliable testing suite that guarantees our core logic is solid.
-* **[GitHub Actions](https://github.com/features/actions)**: For our CI pipeline that automatically builds and tests every Pull Request.
+- **[TypeScript](https://www.typescriptlang.org/)**: For a robust, type-safe, and maintainable codebase.
+- **[Node.js](https://nodejs.org/)**: The runtime environment for our powerful backend logic.
+- **[Yargs](https://yargs.js.org/)**: For building a clean, professional, and extensible command-line interface.
+- **[Inquirer](https://github.com/SBoudrias/Inquirer.js/)**: To create the intuitive and interactive prompts that guide the user.
+- **[Vitest](https://vitest.dev/)**: For a fast, modern, and reliable testing suite that guarantees our core logic is solid.
+- **[GitHub Actions](https://github.com/features/actions)**: For our CI pipeline that automatically builds and tests every Pull Request.
 
 ## 🚀 Getting Started
 
@@ -81,7 +82,7 @@ This is the recommended approach for everyday use, especially for commands like 
 
 1.  Install the CLI globally using npm:
     ```bash
-    npm install -g @stackcode/cli  
+    npm install -g @stackcode/cli
     ```
 2.  You can now run `stc` from any directory on your system!
     ```bash

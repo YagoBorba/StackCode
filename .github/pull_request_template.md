@@ -1,15 +1,10 @@
 ## 📋 Description
 
-<!-- Describe your changes in detail -->
-
 ## 🔗 Related Issue
 
-<!-- Please link to the issue here: -->
 Fixes #(issue)
 
 ## 🧪 Type of Change
-
-<!-- Mark the relevant option with "x" -->
 
 - [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
 - [ ] ✨ New feature (non-breaking change which adds functionality)
@@ -21,19 +16,13 @@ Fixes #(issue)
 
 ## 📝 How Has This Been Tested?
 
-<!-- Describe the tests that you ran to verify your changes -->
-
 - [ ] Unit tests pass
 - [ ] Manual testing completed
 - [ ] CI/CD pipeline passes
 
 ## 📷 Screenshots (if applicable)
 
-<!-- Add screenshots to help explain your changes -->
-
 ## ✅ Checklist
-
-<!-- Mark completed items with "x" -->
 
 - [ ] My code follows the project's coding standards
 - [ ] I have performed a self-review of my own code
@@ -46,8 +35,6 @@ Fixes #(issue)
 
 ## 🔄 Dependencies
 
-<!-- List any dependencies that are required for this change -->
-
 ## 📚 Additional Notes
 
-<!-- Add any other context about the pull request here -->
+**Issue Reference**: Closes #

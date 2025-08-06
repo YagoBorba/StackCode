@@ -1,4 +1,4 @@
-export type VersioningStrategy = 'locked' | 'independent' | 'unknown';
+export type VersioningStrategy = "locked" | "independent" | "unknown";
 
 export interface PackageInfo {
   name: string;

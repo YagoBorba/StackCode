@@ -1,6 +1,6 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,25 +10,33 @@ const __dirname = path.dirname(__filename);
  * @param technologies An array of strings representing the technologies (e.g., ['node', 'ides']).
  * @returns {Promise<string>} The combined and formatted .gitignore content.
  */
-export async function generateGitignoreContent(technologies: string[]): Promise<string> {
+export async function generateGitignoreContent(
+  technologies: string[],
+): Promise<string> {
   const contentParts: string[] = [];
 
-  const allTechs = [...new Set(technologies)]; 
+  const allTechs = [...new Set(technologies)];
 
   for (const tech of allTechs) {
-    const templatePath = path.resolve(__dirname, 'templates/gitignore', `${tech}.tpl`);
-    
+    const templatePath = path.resolve(
+      __dirname,
+      "templates/gitignore",
+      `${tech}.tpl`,
+    );
+
     try {
-      const templateContent = await fs.readFile(templatePath, 'utf-8');
-      
+      const templateContent = await fs.readFile(templatePath, "utf-8");
+
       const header = `# --- ${tech.charAt(0).toUpperCase() + tech.slice(1)} ---`;
-      contentParts.push(header, templateContent.trim(), '');
-    } catch (error) {
-      console.warn(`[Warning] Gitignore template for '${tech}' not found. Skipping.`);
+      contentParts.push(header, templateContent.trim(), "");
+    } catch {
+      console.warn(
+        `[Warning] Gitignore template for '${tech}' not found. Skipping.`,
+      );
     }
   }
 
-  return contentParts.join('\n');
+  return contentParts.join("\n");
 }
 
 /**
@@ -36,6 +44,6 @@ export async function generateGitignoreContent(technologies: string[]): Promise<
  * @returns {Promise<string>} The template content.
  */
 export async function generateReadmeContent(): Promise<string> {
-  const templatePath = path.resolve(__dirname, 'templates/readme/default.tpl');
-  return fs.readFile(templatePath, 'utf-8');
+  const templatePath = path.resolve(__dirname, "templates/readme/default.tpl");
+  return fs.readFile(templatePath, "utf-8");
 }

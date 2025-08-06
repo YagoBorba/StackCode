@@ -11,7 +11,7 @@ body:
         - [README.md](https://github.com/YagoBorba/StackCode/blob/develop/README.md)
         - [CONTRIBUTING.md](https://github.com/YagoBorba/StackCode/blob/develop/CONTRIBUTING.md)
         - [Existing Issues](https://github.com/YagoBorba/StackCode/issues)
-        
+
   - type: textarea
     id: question
     attributes:
@@ -20,14 +20,14 @@ body:
       placeholder: "How can I...?"
     validations:
       required: true
-      
+
   - type: textarea
     id: context
     attributes:
       label: Additional Context
       description: Add any other context about your question
       placeholder: "I'm trying to... but..."
-      
+
   - type: checkboxes
     id: terms
     attributes:
