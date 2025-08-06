@@ -1,17 +1,17 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import Configstore from 'configstore';
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
+import Configstore from "configstore";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const config = new Configstore('@stackcode/cli');
+const config = new Configstore("@stackcode/cli");
 let translations = {};
-let currentLocale = 'en';
+let currentLocale = "en";
 export async function initI18n() {
-    currentLocale = config.get('lang') || 'en';
+    currentLocale = config.get("lang") || "en";
     const localeFilePath = path.join(__dirname, `locales/${currentLocale}.json`);
     try {
-        const fileContent = await fs.readFile(localeFilePath, 'utf-8');
+        const fileContent = await fs.readFile(localeFilePath, "utf-8");
         translations = JSON.parse(fileContent);
     }
     catch (error) {
@@ -23,14 +23,14 @@ export function getLocale() {
     return currentLocale;
 }
 export function t(key, variables) {
-    const keys = key.split('.');
+    const keys = key.split(".");
     const foundValue = keys.reduce((acc, currentKey) => {
-        if (acc && typeof acc === 'object' && currentKey in acc) {
+        if (acc && typeof acc === "object" && currentKey in acc) {
             return acc[currentKey];
         }
         return undefined;
     }, translations);
-    if (typeof foundValue === 'string') {
+    if (typeof foundValue === "string") {
         let processedString = foundValue;
         if (variables) {
             Object.entries(variables).forEach(([varKey, varValue]) => {

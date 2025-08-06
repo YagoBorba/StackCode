@@ -1,43 +1,47 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getReleaseCommand } from '../../src/commands/release';
-import * as core from '@stackcode/core';
-import inquirer from 'inquirer';
-import fs from 'fs/promises';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { getReleaseCommand } from "../../src/commands/release";
+import * as core from "@stackcode/core";
+import inquirer from "inquirer";
+import fs from "fs/promises";
 
-vi.mock('@stackcode/core');
-vi.mock('inquirer');
-vi.mock('fs/promises');
+vi.mock("@stackcode/core");
+vi.mock("inquirer");
+vi.mock("fs/promises");
 
-describe('Release Command Handler', () => {
+describe("Release Command Handler", () => {
   const { handler } = getReleaseCommand();
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(console, 'log').mockImplementation(() => {});
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    vi.spyOn(console, 'table').mockImplementation(() => {});
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "table").mockImplementation(() => {});
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-
   it('should call the correct core functions for a "locked" release', async () => {
     // Arrange
     vi.mocked(core.detectVersioningStrategy).mockResolvedValue({
-      strategy: 'locked',
-      rootDir: '/fake',
+      strategy: "locked",
+      rootDir: "/fake",
       packages: [],
     });
-    vi.mocked(inquirer.prompt).mockResolvedValue({ confirm: true, createRelease: true });
-    vi.mocked(core.getRecommendedBump).mockResolvedValue('patch');
-    vi.mocked(core.getCommandOutput).mockResolvedValue('git@github.com:owner/repo.git');
-    vi.mocked(fs.readFile).mockResolvedValue('');
+    vi.mocked(inquirer.prompt).mockResolvedValue({
+      confirm: true,
+      createRelease: true,
+    });
+    vi.mocked(core.getRecommendedBump).mockResolvedValue("patch");
+    vi.mocked(core.getCommandOutput).mockResolvedValue(
+      "git@github.com:owner/repo.git",
+    );
+    vi.mocked(fs.readFile).mockResolvedValue("");
     vi.mocked(fs.writeFile).mockResolvedValue();
 
     // Act
-    // @ts-ignore
+    // @ts-expect-error - Testing with empty options object
     await handler({});
 
     // Assert
@@ -49,21 +53,30 @@ describe('Release Command Handler', () => {
   it('should call the correct core functions for an "independent" release', async () => {
     // Arrange
     vi.mocked(core.detectVersioningStrategy).mockResolvedValue({
-      strategy: 'independent',
-      rootDir: '/fake',
-      packages: [{ name: 'pkg1', path: '/fake/pkg1' }],
+      strategy: "independent",
+      rootDir: "/fake",
+      packages: [{ name: "pkg1", path: "/fake/pkg1" }],
     });
-    vi.mocked(inquirer.prompt).mockResolvedValue({ confirmRelease: true, createRelease: true });
-    vi.mocked(core.findChangedPackages).mockResolvedValue([{ name: 'pkg1', path: '/fake/pkg1' }]);
-    vi.mocked(core.determinePackageBumps).mockResolvedValue([{ 
-      pkg: { name: 'pkg1', path: '/fake/pkg1' }, 
-      bumpType: 'patch', 
-      newVersion: '1.0.1' 
-    }]);
-    vi.mocked(core.getCommandOutput).mockResolvedValue('git@github.com:owner/repo.git');
+    vi.mocked(inquirer.prompt).mockResolvedValue({
+      confirmRelease: true,
+      createRelease: true,
+    });
+    vi.mocked(core.findChangedPackages).mockResolvedValue([
+      { name: "pkg1", path: "/fake/pkg1" },
+    ]);
+    vi.mocked(core.determinePackageBumps).mockResolvedValue([
+      {
+        pkg: { name: "pkg1", path: "/fake/pkg1" },
+        bumpType: "patch",
+        newVersion: "1.0.1",
+      },
+    ]);
+    vi.mocked(core.getCommandOutput).mockResolvedValue(
+      "git@github.com:owner/repo.git",
+    );
 
     // Act
-    // @ts-ignore
+    // @ts-expect-error - Testing with empty options object
     await handler({});
 
     // Assert

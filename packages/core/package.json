@@ -17,7 +17,14 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "keywords": ["scaffolding", "templates", "automation", "release", "conventional-commits", "typescript"],
+  "keywords": [
+    "scaffolding",
+    "templates",
+    "automation",
+    "release",
+    "conventional-commits",
+    "typescript"
+  ],
   "author": "Yago Borba",
   "license": "MIT",
   "homepage": "https://github.com/YagoBorba/StackCode#readme",

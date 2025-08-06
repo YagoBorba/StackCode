@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         Thanks for suggesting a new feature! 🚀
-        
+
   - type: textarea
     id: problem
     attributes:
@@ -16,7 +16,7 @@ body:
       placeholder: "I'm always frustrated when..."
     validations:
       required: true
-      
+
   - type: textarea
     id: solution
     attributes:
@@ -25,14 +25,14 @@ body:
       placeholder: "I would like to see..."
     validations:
       required: true
-      
+
   - type: textarea
     id: alternatives
     attributes:
       label: Alternatives Considered
       description: Describe any alternative solutions or features you've considered
       placeholder: "Alternative approaches could be..."
-      
+
   - type: dropdown
     id: priority
     attributes:
@@ -45,7 +45,7 @@ body:
         - Critical
     validations:
       required: true
-      
+
   - type: checkboxes
     id: willing-to-implement
     attributes:
@@ -53,7 +53,7 @@ body:
       description: Are you willing to work on this feature?
       options:
         - label: I'm willing to submit a PR for this feature
-          
+
   - type: checkboxes
     id: terms
     attributes:

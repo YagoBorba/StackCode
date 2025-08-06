@@ -2,7 +2,7 @@
  * @fileoverview General utility functions for StackCode.
  * @module core/utils
  */
-import { spawn } from 'child_process';
+import { spawn } from "child_process";
 /**
  * Executes a shell command and streams its output.
  * Ideal for long-running processes like 'npm install' where the user needs to see the output live.
@@ -15,10 +15,10 @@ export function runCommand(command, args, options) {
     return new Promise((resolve, reject) => {
         const childProcess = spawn(command, args, {
             cwd: options.cwd,
-            stdio: 'inherit',
-            shell: process.platform === 'win32',
+            stdio: "inherit",
+            shell: process.platform === "win32",
         });
-        childProcess.on('close', (code) => {
+        childProcess.on("close", (code) => {
             if (code === 0) {
                 resolve();
             }
@@ -26,7 +26,7 @@ export function runCommand(command, args, options) {
                 reject(new Error(`Command failed with exit code ${code}`));
             }
         });
-        childProcess.on('error', (error) => {
+        childProcess.on("error", (error) => {
             reject(error);
         });
     });
@@ -43,17 +43,17 @@ export function getCommandOutput(command, args, options) {
     return new Promise((resolve, reject) => {
         const childProcess = spawn(command, args, {
             cwd: options.cwd,
-            shell: process.platform === 'win32',
+            shell: process.platform === "win32",
         });
-        let stdout = '';
-        let stderr = '';
-        childProcess.stdout.on('data', (data) => {
+        let stdout = "";
+        let stderr = "";
+        childProcess.stdout.on("data", (data) => {
             stdout += data.toString();
         });
-        childProcess.stderr.on('data', (data) => {
+        childProcess.stderr.on("data", (data) => {
             stderr += data.toString();
         });
-        childProcess.on('close', (code) => {
+        childProcess.on("close", (code) => {
             if (code === 0) {
                 resolve(stdout.trim());
             }
@@ -61,8 +61,20 @@ export function getCommandOutput(command, args, options) {
                 reject(new Error(stderr.trim()));
             }
         });
-        childProcess.on('error', (error) => {
+        childProcess.on("error", (error) => {
             reject(error);
         });
     });
+}
+export function getErrorMessage(error) {
+    if (typeof error === "object" &&
+        error !== null &&
+        "stderr" in error &&
+        typeof error.stderr === "string") {
+        return error.stderr;
+    }
+    if (error instanceof Error) {
+        return error.message;
+    }
+    return String(error);
 }

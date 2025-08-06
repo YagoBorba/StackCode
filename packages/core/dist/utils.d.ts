@@ -19,4 +19,5 @@ export declare function runCommand(command: string, args: string[], options: Run
  * @returns A promise that resolves with the command's stdout string.
  */
 export declare function getCommandOutput(command: string, args: string[], options: RunCommandOptions): Promise<string>;
+export declare function getErrorMessage(error: unknown): string;
 export {};

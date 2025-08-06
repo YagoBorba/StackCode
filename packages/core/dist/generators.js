@@ -1,6 +1,6 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 /**
@@ -12,23 +12,23 @@ export async function generateGitignoreContent(technologies) {
     const contentParts = [];
     const allTechs = [...new Set(technologies)];
     for (const tech of allTechs) {
-        const templatePath = path.resolve(__dirname, 'templates/gitignore', `${tech}.tpl`);
+        const templatePath = path.resolve(__dirname, "templates/gitignore", `${tech}.tpl`);
         try {
-            const templateContent = await fs.readFile(templatePath, 'utf-8');
+            const templateContent = await fs.readFile(templatePath, "utf-8");
             const header = `# --- ${tech.charAt(0).toUpperCase() + tech.slice(1)} ---`;
-            contentParts.push(header, templateContent.trim(), '');
+            contentParts.push(header, templateContent.trim(), "");
         }
         catch (error) {
             console.warn(`[Warning] Gitignore template for '${tech}' not found. Skipping.`);
         }
     }
-    return contentParts.join('\n');
+    return contentParts.join("\n");
 }
 /**
  * Reads the content of the default README.md template.
  * @returns {Promise<string>} The template content.
  */
 export async function generateReadmeContent() {
-    const templatePath = path.resolve(__dirname, 'templates/readme/default.tpl');
-    return fs.readFile(templatePath, 'utf-8');
+    const templatePath = path.resolve(__dirname, "templates/readme/default.tpl");
+    return fs.readFile(templatePath, "utf-8");
 }

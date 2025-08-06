@@ -10,7 +10,12 @@
     "build": "tsc",
     "test": "echo \"✅ No tests for this package\""
   },
-  "keywords": ["i18n", "internationalization", "localization", "translations"],
+  "keywords": [
+    "i18n",
+    "internationalization",
+    "localization",
+    "translations"
+  ],
   "author": "Yago Borba",
   "license": "MIT",
   "homepage": "https://github.com/YagoBorba/StackCode#readme",

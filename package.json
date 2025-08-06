@@ -6,7 +6,10 @@
   "scripts": {
     "test": "npm test --workspaces --if-present",
     "clean": "npm run clean --workspaces --if-present",
-    "build": "tsc --build && cpx \"packages/i18n/src/locales/**/*.json\" \"packages/i18n/dist/locales\" && cpx \"packages/core/src/templates/**\" \"packages/core/dist/templates\" && echo '\\n--- Conteúdo de dist/templates após a cópia: ---' && ls -R packages/core/dist/templates && chmod +x packages/cli/dist/index.js"
+    "build": "tsc --build && cpx \"packages/i18n/src/locales/**/*.json\" \"packages/i18n/dist/locales\" && cpx \"packages/core/src/templates/**\" \"packages/core/dist/templates\" && echo '\\n--- Conteúdo de dist/templates após a cópia: ---' && ls -R packages/core/dist/templates && chmod +x packages/cli/dist/index.js",
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "format:fix": "prettier --write ."
   },
   "author": "Yago Borba",
   "license": "MIT",
@@ -14,8 +17,15 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@eslint/js": "^9.32.0",
     "@types/node": "^24.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
     "cpx": "^1.5.0",
-    "typescript": "^5.8.3"
+    "eslint": "^9.32.0",
+    "globals": "^16.3.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.39.0"
   }
 }

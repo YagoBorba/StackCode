@@ -1,4 +1,4 @@
-import { Octokit } from '@octokit/rest';
+import { Octokit } from "@octokit/rest";
 export async function createGitHubRelease(options) {
     const { owner, repo, tagName, releaseNotes, token } = options;
     const octokit = new Octokit({ auth: token });
@@ -11,5 +11,5 @@ export async function createGitHubRelease(options) {
         body: releaseNotes,
         prerelease: false,
     });
-    console.log('✅ GitHub release created successfully!');
+    console.log("✅ GitHub release created successfully!");
 }

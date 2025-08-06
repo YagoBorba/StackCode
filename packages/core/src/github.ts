@@ -1,7 +1,9 @@
-import { Octokit } from '@octokit/rest';
-import { GitHubReleaseOptions } from './types.js';
+import { Octokit } from "@octokit/rest";
+import { GitHubReleaseOptions } from "./types.js";
 
-export async function createGitHubRelease(options: GitHubReleaseOptions): Promise<void> {
+export async function createGitHubRelease(
+  options: GitHubReleaseOptions,
+): Promise<void> {
   const { owner, repo, tagName, releaseNotes, token } = options;
   const octokit = new Octokit({ auth: token });
 
@@ -16,5 +18,5 @@ export async function createGitHubRelease(options: GitHubReleaseOptions): Promis
     prerelease: false,
   });
 
-  console.log('✅ GitHub release created successfully!');
+  console.log("✅ GitHub release created successfully!");
 }
