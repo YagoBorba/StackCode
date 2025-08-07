@@ -41,3 +41,4 @@ export function t(key, variables) {
     }
     return key;
 }
+//# sourceMappingURL=index.js.map

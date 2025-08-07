@@ -1,20 +1,7 @@
 import type { CommandModule } from "yargs";
-import inquirer from "inquirer";
-import chalk from "chalk";
 import { runCommand, getCommandOutput, getErrorMessage } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
-
-const getCommitTypes = () => [
-  { name: t("commit.types.feat"), value: "feat" },
-  { name: t("commit.types.fix"), value: "fix" },
-  { name: t("commit.types.docs"), value: "docs" },
-  { name: t("commit.types.style"), value: "style" },
-  { name: t("commit.types.refactor"), value: "refactor" },
-  { name: t("commit.types.perf"), value: "perf" },
-  { name: t("commit.types.test"), value: "test" },
-  { name: t("commit.types.chore"), value: "chore" },
-  { name: t("commit.types.revert"), value: "revert" },
-];
+import * as ui from "./ui.js";
 
 export const getCommitCommand = (): CommandModule => ({
   command: "commit",
@@ -28,41 +15,11 @@ export const getCommitCommand = (): CommandModule => ({
         { cwd: process.cwd() },
       );
       if (!statusOutput) {
-        console.log(chalk.yellow(t("commit.error_no_changes_staged")));
+        ui.log.warning(t("commit.error_no_changes_staged"));
         return;
       }
 
-      const answers = await inquirer.prompt([
-        {
-          type: "list",
-          name: "type",
-          message: t("commit.prompt.select_type"),
-          choices: getCommitTypes(),
-        },
-        { type: "input", name: "scope", message: t("commit.prompt.scope") },
-        {
-          type: "input",
-          name: "shortDescription",
-          message: t("commit.prompt.short_description"),
-          validate: (input: string) =>
-            input ? true : "A short description is required.",
-        },
-        {
-          type: "input",
-          name: "longDescription",
-          message: t("commit.prompt.long_description"),
-        },
-        {
-          type: "input",
-          name: "breakingChanges",
-          message: t("commit.prompt.breaking_changes"),
-        },
-        {
-          type: "input",
-          name: "affectedIssues",
-          message: t("commit.prompt.affected_issues"),
-        },
-      ]);
+      const answers = await ui.promptForCommitAnswers();
 
       let commitMessage = `${answers.type}`;
       if (answers.scope) {
@@ -85,10 +42,10 @@ export const getCommitCommand = (): CommandModule => ({
       await runCommand("git", ["commit", "-m", commitMessage], {
         cwd: process.cwd(),
       });
-      console.log(chalk.green(t("commit.success")));
+      ui.log.success(t("commit.success"));
     } catch (error: unknown) {
-      console.error(chalk.red(t("common.unexpected_error")));
-      console.error(chalk.gray(getErrorMessage(error)));
+      ui.log.error(t("common.unexpected_error"));
+      ui.log.gray(getErrorMessage(error));
     }
   },
 });

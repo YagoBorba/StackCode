@@ -1,9 +1,8 @@
-import chalk from "chalk";
-import inquirer from "inquirer";
 import fs from "fs/promises";
 import path from "path";
 import { generateGitignoreContent, generateReadmeContent, } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
+import * as ui from "./ui.js";
 async function getProjectStack() {
     const configPath = path.join(process.cwd(), ".stackcoderc.json");
     try {
@@ -19,16 +18,9 @@ async function handleFileGeneration(options) {
     const filePath = path.join(process.cwd(), options.fileName);
     try {
         await fs.access(filePath);
-        const { overwrite } = await inquirer.prompt([
-            {
-                type: "confirm",
-                name: "overwrite",
-                message: t(options.overwriteMsgKey),
-                default: false,
-            },
-        ]);
+        const overwrite = await ui.promptForConfirmation(t(options.overwriteMsgKey), false);
         if (!overwrite) {
-            console.log(chalk.yellow(t("common.operation_cancelled")));
+            ui.log.warning(t("common.operation_cancelled"));
             return;
         }
     }
@@ -37,7 +29,7 @@ async function handleFileGeneration(options) {
     }
     const content = await options.contentPromise;
     await fs.writeFile(filePath, content);
-    console.log(chalk.green.bold(t(options.successMsgKey)));
+    ui.log.success(t(options.successMsgKey));
 }
 export const getGenerateCommand = () => ({
     command: "generate [filetype]",
@@ -69,19 +61,9 @@ export const getGenerateCommand = () => ({
             }
             return;
         }
-        const { filesToGenerate } = await inquirer.prompt([
-            {
-                type: "checkbox",
-                name: "filesToGenerate",
-                message: t("generate.prompt.interactive_select"),
-                choices: [
-                    { name: "README.md", value: "readme" },
-                    { name: ".gitignore", value: "gitignore" },
-                ],
-            },
-        ]);
+        const filesToGenerate = await ui.promptForFilesToGenerate();
         if (!filesToGenerate || filesToGenerate.length === 0) {
-            console.log(chalk.yellow(t("common.operation_cancelled")));
+            ui.log.warning(t("common.operation_cancelled"));
             return;
         }
         if (filesToGenerate.includes("readme")) {
@@ -103,3 +85,4 @@ export const getGenerateCommand = () => ({
         }
     },
 });
+//# sourceMappingURL=generate.js.map

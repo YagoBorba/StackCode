@@ -1,46 +1,21 @@
 import path from "path";
 import fs from "fs/promises";
 import semver from "semver";
-import chalk from "chalk";
-import inquirer from "inquirer";
 import Configstore from "configstore";
 import { t } from "@stackcode/i18n";
+import * as ui from "./ui.js";
 import { detectVersioningStrategy, findChangedPackages, determinePackageBumps, updatePackageVersion, updateAllVersions, generateChangelog, getRecommendedBump, performReleaseCommit, createGitHubRelease, getCommandOutput, getErrorMessage, } from "@stackcode/core";
 const config = new Configstore("@stackcode/cli", { github_token: "" });
 async function handleGitHubReleaseCreation(tagName, releaseNotes) {
-    const { createRelease } = await inquirer.prompt([
-        {
-            type: "confirm",
-            name: "createRelease",
-            message: t("release.prompt_create_github_release"),
-            default: true,
-        },
-    ]);
-    if (!createRelease)
+    const shouldCreateRelease = await ui.promptToCreateGitHubRelease();
+    if (!shouldCreateRelease)
         return;
     let token = config.get("github_token");
     if (!token) {
-        console.log(chalk.yellow(`\n${t("release.info_github_token_needed")}`));
-        console.log(chalk.blue(t("release.info_github_token_instructions")));
-        const { pat } = await inquirer.prompt([
-            {
-                type: "password",
-                name: "pat",
-                message: t("release.prompt_github_token"),
-                mask: "*",
-            },
-        ]);
-        token = pat;
-        const { saveToken } = await inquirer.prompt([
-            {
-                type: "confirm",
-                name: "saveToken",
-                message: t("release.prompt_save_token"),
-                default: true,
-            },
-        ]);
-        if (saveToken)
+        token = await ui.promptForToken();
+        if (await ui.promptToSaveToken()) {
             config.set("github_token", token);
+        }
     }
     try {
         const remoteUrl = await getCommandOutput("git", ["remote", "get-url", "origin"], { cwd: process.cwd() });
@@ -51,11 +26,12 @@ async function handleGitHubReleaseCreation(tagName, releaseNotes) {
         await createGitHubRelease({ owner, repo, tagName, releaseNotes, token });
     }
     catch (error) {
-        console.error(chalk.red(`\n${t("common.error_generic")}`), chalk.gray(getErrorMessage(error)));
+        ui.log.error(`\n${t("common.error_generic")}`);
         const errorMessage = getErrorMessage(error);
-        if (errorMessage?.toLowerCase().includes("bad credentials")) {
+        ui.log.gray(errorMessage);
+        if (errorMessage.toLowerCase().includes("bad credentials")) {
             config.delete("github_token");
-            console.log(chalk.yellow("Your saved GitHub token was invalid and has been cleared."));
+            ui.log.warning("Your saved GitHub token was invalid and has been cleared.");
         }
     }
 }
@@ -64,59 +40,42 @@ async function handleLockedRelease(monorepoInfo) {
     const currentVersion = monorepoInfo.rootVersion || "0.0.0";
     const newVersion = semver.inc(currentVersion, bumpType);
     if (!newVersion) {
-        console.error(chalk.red(t("release.error_calculating_version")));
+        ui.log.error(t("release.error_calculating_version"));
         return;
     }
-    const { confirm } = await inquirer.prompt([
-        {
-            type: "confirm",
-            name: "confirm",
-            message: t("release.prompt_confirm_release", {
-                currentVersion,
-                newVersion,
-            }),
-            default: true,
-        },
-    ]);
-    if (!confirm)
-        return console.log(chalk.yellow(t("common.operation_cancelled")));
-    console.log(chalk.blue(t("release.step_updating_versions")));
+    const confirm = await ui.promptForLockedRelease(currentVersion, newVersion);
+    if (!confirm) {
+        ui.log.warning(t("common.operation_cancelled"));
+        return;
+    }
+    ui.log.step(t("release.step_updating_versions"));
     await updateAllVersions(monorepoInfo, newVersion);
-    console.log(chalk.blue(t("release.step_generating_changelog")));
+    ui.log.step(t("release.step_generating_changelog"));
     const changelog = await generateChangelog(monorepoInfo);
     const changelogPath = path.join(monorepoInfo.rootDir, "CHANGELOG.md");
     const existing = await fs.readFile(changelogPath, "utf-8").catch(() => "");
     await fs.writeFile(changelogPath, `${changelog}\n${existing}`);
-    console.log(chalk.green.bold(`\n${t("release.success_ready_to_commit")}`));
-    console.log(chalk.yellow(`  ${t("release.next_steps_commit")}`));
+    ui.log.success(`\n${t("release.success_ready_to_commit")}`);
+    ui.log.warning(`  ${t("release.next_steps_commit")}`);
     await handleGitHubReleaseCreation(`v${newVersion}`, changelog);
 }
 async function handleIndependentRelease(monorepoInfo) {
     const changedPackages = await findChangedPackages(monorepoInfo.packages, monorepoInfo.rootDir);
     if (changedPackages.length === 0) {
-        return console.log(chalk.green(t("release.independent_mode_no_changes")));
+        ui.log.success(t("release.independent_mode_no_changes"));
+        return;
     }
     const packagesToUpdate = await determinePackageBumps(changedPackages);
     if (packagesToUpdate.length === 0) {
-        return console.log(chalk.yellow(t("release.independent_mode_no_bumps")));
+        ui.log.warning(t("release.independent_mode_no_bumps"));
+        return;
     }
-    console.log(chalk.yellow(t("release.independent_mode_packages_to_update")));
-    console.table(packagesToUpdate.map((info) => ({
-        Package: info.pkg.name,
-        "Current Version": info.pkg.version,
-        "Bump Type": info.bumpType,
-        "New Version": info.newVersion,
-    })));
-    const { confirm } = await inquirer.prompt([
-        {
-            type: "confirm",
-            name: "confirm",
-            message: t("release.independent_prompt_confirm"),
-            default: true,
-        },
-    ]);
-    if (!confirm)
-        return console.log(chalk.yellow(t("common.operation_cancelled")));
+    ui.displayIndependentReleasePlan(packagesToUpdate);
+    const confirm = await ui.promptForIndependentRelease();
+    if (!confirm) {
+        ui.log.warning(t("common.operation_cancelled"));
+        return;
+    }
     const allChangelogs = [];
     for (const pkgInfo of packagesToUpdate) {
         await updatePackageVersion(pkgInfo);
@@ -130,7 +89,7 @@ async function handleIndependentRelease(monorepoInfo) {
         });
     }
     await performReleaseCommit(packagesToUpdate, monorepoInfo.rootDir);
-    console.log(chalk.green.bold(`\n${t("release.independent_success")}`));
+    ui.log.success(`\n${t("release.independent_success")}`);
     const combinedNotes = allChangelogs
         .map((c) => `${c.header}\n\n${c.content}`)
         .join("\n\n");
@@ -138,7 +97,7 @@ async function handleIndependentRelease(monorepoInfo) {
         packagesToUpdate[0];
     const tagName = `${primaryPackage.pkg.name.split("/")[1] || primaryPackage.pkg.name}@${primaryPackage.newVersion}`;
     await handleGitHubReleaseCreation(tagName, combinedNotes);
-    console.log(chalk.yellow(`  ${t("release.next_steps_push")}`));
+    ui.log.warning(`  ${t("release.next_steps_push")}`);
 }
 export const getReleaseCommand = () => ({
     command: "release",
@@ -146,14 +105,12 @@ export const getReleaseCommand = () => ({
     builder: {},
     handler: async () => {
         try {
-            console.log(chalk.cyan.bold(t("release.start")));
+            ui.log.step(t("release.start"));
             const monorepoInfo = await detectVersioningStrategy(process.cwd());
             if (monorepoInfo.strategy === "unknown") {
                 throw new Error(t("release.error_structure"));
             }
-            console.log(chalk.blue(t("release.detected_strategy", {
-                strategy: chalk.bold(monorepoInfo.strategy),
-            })));
+            ui.log.info(t("release.detected_strategy", { strategy: monorepoInfo.strategy }));
             if (monorepoInfo.strategy === "locked") {
                 await handleLockedRelease(monorepoInfo);
             }
@@ -162,8 +119,10 @@ export const getReleaseCommand = () => ({
             }
         }
         catch (error) {
-            console.error(chalk.red(`\n${t("common.error_unexpected")}`), chalk.gray(getErrorMessage(error)));
+            ui.log.error(`\n${t("common.error_unexpected")}`);
+            ui.log.gray(getErrorMessage(error));
             process.exit(1);
         }
     },
 });
+//# sourceMappingURL=release.js.map

@@ -45,3 +45,4 @@ export const getStartCommand = () => ({
     }),
     handler: startHandler,
 });
+//# sourceMappingURL=start.js.map

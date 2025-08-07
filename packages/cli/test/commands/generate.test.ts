@@ -121,7 +121,7 @@ describe("Generate Command", () => {
     it("should prompt for overwrite if file exists and proceed if confirmed", async () => {
       // Arrange
       mockedFs.access.mockResolvedValue(undefined);
-      mockedInquirer.prompt.mockResolvedValue({ overwrite: true });
+      mockedInquirer.prompt.mockResolvedValue({ confirm: true });
       mockedCore.generateReadmeContent.mockResolvedValue("# Overwritten");
       const argv = { filetype: "readme", _: [], $0: "stc" };
 
@@ -136,7 +136,7 @@ describe("Generate Command", () => {
     it("should cancel if file exists and user denies overwrite", async () => {
       // Arrange
       mockedFs.access.mockResolvedValue(undefined);
-      mockedInquirer.prompt.mockResolvedValue({ overwrite: false });
+      mockedInquirer.prompt.mockResolvedValue({ confirm: false });
       const argv = { filetype: "readme", _: [], $0: "stc" };
 
       // Act
