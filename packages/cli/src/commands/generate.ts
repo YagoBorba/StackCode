@@ -6,7 +6,7 @@ import {
   generateReadmeContent,
 } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
-import * as ui from "./ui.js"; 
+import * as ui from "./ui.js";
 
 async function getProjectStack(): Promise<string> {
   const configPath = path.join(process.cwd(), ".stackcoderc.json");
@@ -28,7 +28,10 @@ async function handleFileGeneration(options: {
   const filePath = path.join(process.cwd(), options.fileName);
   try {
     await fs.access(filePath);
-    const overwrite = await ui.promptForConfirmation(t(options.overwriteMsgKey), false);
+    const overwrite = await ui.promptForConfirmation(
+      t(options.overwriteMsgKey),
+      false,
+    );
     if (!overwrite) {
       ui.log.warning(t("common.operation_cancelled"));
       return;

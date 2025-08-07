@@ -39,10 +39,13 @@ async function handleGitHubReleaseCreation(
 
   try {
     const remoteUrl = await getCommandOutput(
-      "git", ["remote", "get-url", "origin"], { cwd: process.cwd() }
+      "git",
+      ["remote", "get-url", "origin"],
+      { cwd: process.cwd() },
     );
     const match = remoteUrl.match(/github\.com[/:]([\w-]+\/[\w-.]+)/);
-    if (!match) throw new Error("Could not parse GitHub owner/repo from remote URL.");
+    if (!match)
+      throw new Error("Could not parse GitHub owner/repo from remote URL.");
 
     const [owner, repo] = match[1].replace(".git", "").split("/");
     await createGitHubRelease({ owner, repo, tagName, releaseNotes, token });
@@ -53,7 +56,9 @@ async function handleGitHubReleaseCreation(
 
     if (errorMessage.toLowerCase().includes("bad credentials")) {
       config.delete("github_token");
-      ui.log.warning("Your saved GitHub token was invalid and has been cleared.");
+      ui.log.warning(
+        "Your saved GitHub token was invalid and has been cleared.",
+      );
     }
   }
 }
@@ -88,7 +93,10 @@ async function handleLockedRelease(monorepoInfo: MonorepoInfo) {
 }
 
 async function handleIndependentRelease(monorepoInfo: MonorepoInfo) {
-  const changedPackages = await findChangedPackages(monorepoInfo.packages, monorepoInfo.rootDir);
+  const changedPackages = await findChangedPackages(
+    monorepoInfo.packages,
+    monorepoInfo.rootDir,
+  );
   if (changedPackages.length === 0) {
     ui.log.success(t("release.independent_mode_no_changes"));
     return;
@@ -99,7 +107,7 @@ async function handleIndependentRelease(monorepoInfo: MonorepoInfo) {
     ui.log.warning(t("release.independent_mode_no_bumps"));
     return;
   }
-  
+
   ui.displayIndependentReleasePlan(packagesToUpdate);
 
   const confirm = await ui.promptForIndependentRelease();
@@ -149,7 +157,9 @@ export const getReleaseCommand = (): CommandModule => ({
         throw new Error(t("release.error_structure"));
       }
 
-      ui.log.info(t("release.detected_strategy", { strategy: monorepoInfo.strategy }));
+      ui.log.info(
+        t("release.detected_strategy", { strategy: monorepoInfo.strategy }),
+      );
 
       if (monorepoInfo.strategy === "locked") {
         await handleLockedRelease(monorepoInfo);

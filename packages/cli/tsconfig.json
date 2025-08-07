@@ -4,10 +4,7 @@
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],
-  "references": [
-    { "path": "../core" },
-    { "path": "../i18n" }
-  ]
+  "references": [{ "path": "../core" }, { "path": "../i18n" }]
 }

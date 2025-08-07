@@ -1,7 +1,7 @@
-import chalk from 'chalk';
-import inquirer from 'inquirer';
-import { t } from '@stackcode/i18n';
-import { type PackageBumpInfo } from '@stackcode/core';
+import chalk from "chalk";
+import inquirer from "inquirer";
+import { t } from "@stackcode/i18n";
+import { type PackageBumpInfo } from "@stackcode/core";
 
 export const log = {
   info: (message: string) => console.log(chalk.blue(message)),
@@ -12,14 +12,20 @@ export const log = {
   raw: (message: string) => console.log(message),
   table: (data: object[]) => console.table(data),
   gray: (message: string) => console.log(chalk.gray(message)),
-  divider: () => console.log(chalk.gray('----------------------------------------------------')),
+  divider: () =>
+    console.log(
+      chalk.gray("----------------------------------------------------"),
+    ),
 };
 
-export async function promptForConfirmation(message: string, defaultValue = true): Promise<boolean> {
+export async function promptForConfirmation(
+  message: string,
+  defaultValue = true,
+): Promise<boolean> {
   const { confirm } = await inquirer.prompt<{ confirm: boolean }>([
     {
-      type: 'confirm',
-      name: 'confirm',
+      type: "confirm",
+      name: "confirm",
       message,
       default: defaultValue,
     },
@@ -28,115 +34,128 @@ export async function promptForConfirmation(message: string, defaultValue = true
 }
 
 export async function promptToCreateGitHubRelease(): Promise<boolean> {
-  return promptForConfirmation(t('release.prompt_create_github_release'));
+  return promptForConfirmation(t("release.prompt_create_github_release"));
 }
 
 export async function promptForToken(): Promise<string> {
-  log.warning(`\n${t('release.info_github_token_needed')}`);
-  log.info(t('release.info_github_token_instructions'));
+  log.warning(`\n${t("release.info_github_token_needed")}`);
+  log.info(t("release.info_github_token_instructions"));
 
   const { token } = await inquirer.prompt<{ token: string }>([
     {
-      type: 'password',
-      name: 'token',
-      message: t('release.prompt_github_token'),
-      mask: '*',
+      type: "password",
+      name: "token",
+      message: t("release.prompt_github_token"),
+      mask: "*",
     },
   ]);
   return token;
 }
 
 export async function promptToSaveToken(): Promise<boolean> {
-  return promptForConfirmation(t('release.prompt_save_token'));
+  return promptForConfirmation(t("release.prompt_save_token"));
 }
 
-export async function promptForLockedRelease(currentVersion: string, newVersion: string): Promise<boolean> {
-  const message = t('release.prompt_confirm_release', { currentVersion, newVersion });
+export async function promptForLockedRelease(
+  currentVersion: string,
+  newVersion: string,
+): Promise<boolean> {
+  const message = t("release.prompt_confirm_release", {
+    currentVersion,
+    newVersion,
+  });
   return promptForConfirmation(message);
 }
 
-export function displayIndependentReleasePlan(packagesToUpdate: PackageBumpInfo[]): void {
-  log.warning(t('release.independent_mode_packages_to_update'));
+export function displayIndependentReleasePlan(
+  packagesToUpdate: PackageBumpInfo[],
+): void {
+  log.warning(t("release.independent_mode_packages_to_update"));
   log.table(
     packagesToUpdate.map((info) => ({
       Package: info.pkg.name,
-      'Current Version': info.pkg.version,
-      'Bump Type': info.bumpType,
-      'New Version': info.newVersion,
+      "Current Version": info.pkg.version,
+      "Bump Type": info.bumpType,
+      "New Version": info.newVersion,
     })),
   );
 }
 
 export async function promptForIndependentRelease(): Promise<boolean> {
-  return promptForConfirmation(t('release.independent_prompt_confirm'));
+  return promptForConfirmation(t("release.independent_prompt_confirm"));
 }
 
 export async function promptForConfigChoice(): Promise<string> {
-    const { choice } = await inquirer.prompt<{ choice: string }>([
+  const { choice } = await inquirer.prompt<{ choice: string }>([
+    {
+      type: "list",
+      name: "choice",
+      message: t("config.prompt.main"),
+      choices: [
+        { name: t("config.prompt.select_lang"), value: "lang" },
         {
-          type: "list",
-          name: "choice",
-          message: t("config.prompt.main"),
-          choices: [
-            { name: t("config.prompt.select_lang"), value: "lang" },
-            { name: t("config.prompt.toggle_validation"), value: "commitValidation" },
-          ],
+          name: t("config.prompt.toggle_validation"),
+          value: "commitValidation",
         },
-      ]);
-      return choice;
+      ],
+    },
+  ]);
+  return choice;
 }
 
 export async function promptForLanguage(): Promise<string> {
-    const { lang } = await inquirer.prompt<{ lang: string }>([
-        {
-          type: "list",
-          name: "lang",
-          message: t("config.prompt.select_lang"),
-          choices: [
-            { name: "English", value: "en" },
-            { name: "Português", value: "pt" },
-          ],
-        },
-      ]);
-      return lang;
+  const { lang } = await inquirer.prompt<{ lang: string }>([
+    {
+      type: "list",
+      name: "lang",
+      message: t("config.prompt.select_lang"),
+      choices: [
+        { name: "English", value: "en" },
+        { name: "Português", value: "pt" },
+      ],
+    },
+  ]);
+  return lang;
 }
 
 export async function promptToEnableValidation(): Promise<boolean> {
-    const { enable } = await inquirer.prompt<{ enable: boolean }>([
-        {
-          type: "confirm",
-          name: "enable",
-          message: t("config.prompt.toggle_validation"),
-          default: true,
-        },
-      ]);
-      return enable;
+  const { enable } = await inquirer.prompt<{ enable: boolean }>([
+    {
+      type: "confirm",
+      name: "enable",
+      message: t("config.prompt.toggle_validation"),
+      default: true,
+    },
+  ]);
+  return enable;
 }
 
 export async function promptForFilesToGenerate(): Promise<string[]> {
-  const { filesToGenerate } = await inquirer.prompt<{ filesToGenerate: string[] }>([
+  const { filesToGenerate } = await inquirer.prompt<{
+    filesToGenerate: string[];
+  }>([
     {
-      type: 'checkbox',
-      name: 'filesToGenerate',
-      message: t('generate.prompt.interactive_select'),
+      type: "checkbox",
+      name: "filesToGenerate",
+      message: t("generate.prompt.interactive_select"),
       choices: [
-        { name: 'README.md', value: 'readme' },
-        { name: '.gitignore', value: 'gitignore' },
+        { name: "README.md", value: "readme" },
+        { name: ".gitignore", value: "gitignore" },
       ],
     },
   ]);
   return filesToGenerate;
 }
 
-export async function promptForGitAction(): Promise<'start' | 'finish'> {
-  const { action } = await inquirer.prompt<{ action: 'start' | 'finish' }>([
+export async function promptForGitAction(): Promise<"start" | "finish"> {
+  const { action } = await inquirer.prompt<{ action: "start" | "finish" }>([
     {
-      type: 'list',
-      name: 'action',
-      message: t('git.prompt_interactive_action'),
+      type: "list",
+      name: "action",
+      message: t("git.prompt_interactive_action"),
       choices: [
-        { name: t('git.action_start'), value: 'start' },
-        { name: t('git.action_finish'), value: 'finish' },
+        { name: t("git.action_start"), value: "start" },
+        { name: t("git.action_finish"), value: "finish" },
       ],
     },
   ]);
@@ -146,10 +165,11 @@ export async function promptForGitAction(): Promise<'start' | 'finish'> {
 export async function promptForBranchName(): Promise<string> {
   const { branchName } = await inquirer.prompt<{ branchName: string }>([
     {
-      type: 'input',
-      name: 'branchName',
-      message: t('git.prompt_branch_name'),
-      validate: (input: string) => !!input || 'O nome da branch não pode ser vazio.',
+      type: "input",
+      name: "branchName",
+      message: t("git.prompt_branch_name"),
+      validate: (input: string) =>
+        !!input || "O nome da branch não pode ser vazio.",
     },
   ]);
   return branchName;
@@ -158,10 +178,10 @@ export async function promptForBranchName(): Promise<string> {
 export async function promptForBranchType(): Promise<string> {
   const { branchType } = await inquirer.prompt<{ branchType: string }>([
     {
-      type: 'list',
-      name: 'branchType',
-      message: t('git.prompt_branch_type'),
-      choices: ['feature', 'fix', 'hotfix', 'chore'],
+      type: "list",
+      name: "branchType",
+      message: t("git.prompt_branch_type"),
+      choices: ["feature", "fix", "hotfix", "chore"],
     },
   ]);
   return branchType;
@@ -171,43 +191,61 @@ export interface InitAnswers {
   projectName: string;
   description: string;
   authorName: string;
-  stack: 'node-ts';
-  features: ('docker' | 'husky')[];
+  stack: "node-ts";
+  features: ("docker" | "husky")[];
   commitValidation?: boolean;
 }
 
 export async function promptForInitAnswers(): Promise<InitAnswers> {
   return inquirer.prompt<InitAnswers>([
     {
-      type: 'input', name: 'projectName', message: t('init.prompt.project_name'),
-      validate: (input: string) => !!input || t('init.prompt.project_name_error'),
+      type: "input",
+      name: "projectName",
+      message: t("init.prompt.project_name"),
+      validate: (input: string) =>
+        !!input || t("init.prompt.project_name_error"),
     },
     {
-      type: 'input', name: 'description', message: t('init.prompt.description'),
-      default: 'A new project generated by StackCode.',
-    },
-    { type: 'input', name: 'authorName', message: t('init.prompt.author_name') },
-    {
-      type: 'list', name: 'stack', message: t('init.prompt.stack'),
-      choices: [{ name: 'Node.js + TypeScript', value: 'node-ts' }],
+      type: "input",
+      name: "description",
+      message: t("init.prompt.description"),
+      default: "A new project generated by StackCode.",
     },
     {
-      type: 'checkbox', name: 'features', message: t('init.prompt.features'),
+      type: "input",
+      name: "authorName",
+      message: t("init.prompt.author_name"),
+    },
+    {
+      type: "list",
+      name: "stack",
+      message: t("init.prompt.stack"),
+      choices: [{ name: "Node.js + TypeScript", value: "node-ts" }],
+    },
+    {
+      type: "checkbox",
+      name: "features",
+      message: t("init.prompt.features"),
       choices: [
-        { name: 'Docker support', value: 'docker', checked: true },
-        { name: 'Husky for commit linting', value: 'husky', checked: true },
+        { name: "Docker support", value: "docker", checked: true },
+        { name: "Husky for commit linting", value: "husky", checked: true },
       ],
     },
     {
-      type: 'confirm', name: 'commitValidation', message: t('init.prompt.commit_validation'),
-      default: true, when: (answers) => answers.features.includes('husky'),
-    }
+      type: "confirm",
+      name: "commitValidation",
+      message: t("init.prompt.commit_validation"),
+      default: true,
+      when: (answers) => answers.features.includes("husky"),
+    },
   ]);
 }
 
-export async function promptForOverwriteProject(projectName: string): Promise<boolean> {
-    const message = chalk.yellow(t('init.prompt.overwrite', { projectName }));
-    return promptForConfirmation(message, false);
+export async function promptForOverwriteProject(
+  projectName: string,
+): Promise<boolean> {
+  const message = chalk.yellow(t("init.prompt.overwrite", { projectName }));
+  return promptForConfirmation(message, false);
 }
 
 export interface CommitAnswers {

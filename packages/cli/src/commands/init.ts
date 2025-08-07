@@ -12,7 +12,7 @@ import {
   type ProjectOptions,
 } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
-import * as ui from "./ui.js"; 
+import * as ui from "./ui.js";
 
 export const getInitCommand = (): CommandModule => ({
   command: "init",

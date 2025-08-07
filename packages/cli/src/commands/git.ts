@@ -2,7 +2,7 @@ import { CommandModule, Argv } from "yargs";
 import { getStartCommand, createBranch } from "./git_sub/start.js";
 import { getFinishCommand, finishHandler } from "./git_sub/finish.js";
 import { t } from "@stackcode/i18n";
-import * as ui from "./ui.js"; 
+import * as ui from "./ui.js";
 
 export const getGitCommand = (): CommandModule => ({
   command: "git",
