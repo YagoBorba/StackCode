@@ -2,10 +2,9 @@ import type { CommandModule } from "yargs";
 import path from "path";
 import fs from "fs/promises";
 import semver from "semver";
-import chalk from "chalk";
-import inquirer from "inquirer";
 import Configstore from "configstore";
 import { t } from "@stackcode/i18n";
+import * as ui from "./ui.js";
 import {
   MonorepoInfo,
   detectVersioningStrategy,
@@ -27,70 +26,34 @@ async function handleGitHubReleaseCreation(
   tagName: string,
   releaseNotes: string,
 ) {
-  const { createRelease } = await inquirer.prompt([
-    {
-      type: "confirm",
-      name: "createRelease",
-      message: t("release.prompt_create_github_release"),
-      default: true,
-    },
-  ]);
-
-  if (!createRelease) return;
+  const shouldCreateRelease = await ui.promptToCreateGitHubRelease();
+  if (!shouldCreateRelease) return;
 
   let token = config.get("github_token");
-
   if (!token) {
-    console.log(chalk.yellow(`\n${t("release.info_github_token_needed")}`));
-    console.log(chalk.blue(t("release.info_github_token_instructions")));
-
-    const { pat } = await inquirer.prompt([
-      {
-        type: "password",
-        name: "pat",
-        message: t("release.prompt_github_token"),
-        mask: "*",
-      },
-    ]);
-    token = pat;
-
-    const { saveToken } = await inquirer.prompt([
-      {
-        type: "confirm",
-        name: "saveToken",
-        message: t("release.prompt_save_token"),
-        default: true,
-      },
-    ]);
-
-    if (saveToken) config.set("github_token", token);
+    token = await ui.promptForToken();
+    if (await ui.promptToSaveToken()) {
+      config.set("github_token", token);
+    }
   }
 
   try {
     const remoteUrl = await getCommandOutput(
-      "git",
-      ["remote", "get-url", "origin"],
-      { cwd: process.cwd() },
+      "git", ["remote", "get-url", "origin"], { cwd: process.cwd() }
     );
     const match = remoteUrl.match(/github\.com[/:]([\w-]+\/[\w-.]+)/);
-    if (!match)
-      throw new Error("Could not parse GitHub owner/repo from remote URL.");
+    if (!match) throw new Error("Could not parse GitHub owner/repo from remote URL.");
 
     const [owner, repo] = match[1].replace(".git", "").split("/");
     await createGitHubRelease({ owner, repo, tagName, releaseNotes, token });
   } catch (error: unknown) {
-    console.error(
-      chalk.red(`\n${t("common.error_generic")}`),
-      chalk.gray(getErrorMessage(error)),
-    );
+    ui.log.error(`\n${t("common.error_generic")}`);
     const errorMessage = getErrorMessage(error);
-    if (errorMessage?.toLowerCase().includes("bad credentials")) {
+    ui.log.gray(errorMessage);
+
+    if (errorMessage.toLowerCase().includes("bad credentials")) {
       config.delete("github_token");
-      console.log(
-        chalk.yellow(
-          "Your saved GitHub token was invalid and has been cleared.",
-        ),
-      );
+      ui.log.warning("Your saved GitHub token was invalid and has been cleared.");
     }
   }
 }
@@ -100,72 +63,50 @@ async function handleLockedRelease(monorepoInfo: MonorepoInfo) {
   const currentVersion = monorepoInfo.rootVersion || "0.0.0";
   const newVersion = semver.inc(currentVersion, bumpType as semver.ReleaseType);
   if (!newVersion) {
-    console.error(chalk.red(t("release.error_calculating_version")));
+    ui.log.error(t("release.error_calculating_version"));
     return;
   }
 
-  const { confirm } = await inquirer.prompt([
-    {
-      type: "confirm",
-      name: "confirm",
-      message: t("release.prompt_confirm_release", {
-        currentVersion,
-        newVersion,
-      }),
-      default: true,
-    },
-  ]);
-  if (!confirm)
-    return console.log(chalk.yellow(t("common.operation_cancelled")));
+  const confirm = await ui.promptForLockedRelease(currentVersion, newVersion);
+  if (!confirm) {
+    ui.log.warning(t("common.operation_cancelled"));
+    return;
+  }
 
-  console.log(chalk.blue(t("release.step_updating_versions")));
+  ui.log.step(t("release.step_updating_versions"));
   await updateAllVersions(monorepoInfo, newVersion);
 
-  console.log(chalk.blue(t("release.step_generating_changelog")));
+  ui.log.step(t("release.step_generating_changelog"));
   const changelog = await generateChangelog(monorepoInfo);
   const changelogPath = path.join(monorepoInfo.rootDir, "CHANGELOG.md");
   const existing = await fs.readFile(changelogPath, "utf-8").catch(() => "");
   await fs.writeFile(changelogPath, `${changelog}\n${existing}`);
 
-  console.log(chalk.green.bold(`\n${t("release.success_ready_to_commit")}`));
-  console.log(chalk.yellow(`  ${t("release.next_steps_commit")}`));
+  ui.log.success(`\n${t("release.success_ready_to_commit")}`);
+  ui.log.warning(`  ${t("release.next_steps_commit")}`);
   await handleGitHubReleaseCreation(`v${newVersion}`, changelog);
 }
 
 async function handleIndependentRelease(monorepoInfo: MonorepoInfo) {
-  const changedPackages = await findChangedPackages(
-    monorepoInfo.packages,
-    monorepoInfo.rootDir,
-  );
+  const changedPackages = await findChangedPackages(monorepoInfo.packages, monorepoInfo.rootDir);
   if (changedPackages.length === 0) {
-    return console.log(chalk.green(t("release.independent_mode_no_changes")));
+    ui.log.success(t("release.independent_mode_no_changes"));
+    return;
   }
 
   const packagesToUpdate = await determinePackageBumps(changedPackages);
   if (packagesToUpdate.length === 0) {
-    return console.log(chalk.yellow(t("release.independent_mode_no_bumps")));
+    ui.log.warning(t("release.independent_mode_no_bumps"));
+    return;
   }
+  
+  ui.displayIndependentReleasePlan(packagesToUpdate);
 
-  console.log(chalk.yellow(t("release.independent_mode_packages_to_update")));
-  console.table(
-    packagesToUpdate.map((info) => ({
-      Package: info.pkg.name,
-      "Current Version": info.pkg.version,
-      "Bump Type": info.bumpType,
-      "New Version": info.newVersion,
-    })),
-  );
-
-  const { confirm } = await inquirer.prompt([
-    {
-      type: "confirm",
-      name: "confirm",
-      message: t("release.independent_prompt_confirm"),
-      default: true,
-    },
-  ]);
-  if (!confirm)
-    return console.log(chalk.yellow(t("common.operation_cancelled")));
+  const confirm = await ui.promptForIndependentRelease();
+  if (!confirm) {
+    ui.log.warning(t("common.operation_cancelled"));
+    return;
+  }
 
   const allChangelogs: { header: string; content: string }[] = [];
   for (const pkgInfo of packagesToUpdate) {
@@ -181,7 +122,7 @@ async function handleIndependentRelease(monorepoInfo: MonorepoInfo) {
   }
 
   await performReleaseCommit(packagesToUpdate, monorepoInfo.rootDir);
-  console.log(chalk.green.bold(`\n${t("release.independent_success")}`));
+  ui.log.success(`\n${t("release.independent_success")}`);
 
   const combinedNotes = allChangelogs
     .map((c) => `${c.header}\n\n${c.content}`)
@@ -192,7 +133,7 @@ async function handleIndependentRelease(monorepoInfo: MonorepoInfo) {
   const tagName = `${primaryPackage.pkg.name.split("/")[1] || primaryPackage.pkg.name}@${primaryPackage.newVersion}`;
   await handleGitHubReleaseCreation(tagName, combinedNotes);
 
-  console.log(chalk.yellow(`  ${t("release.next_steps_push")}`));
+  ui.log.warning(`  ${t("release.next_steps_push")}`);
 }
 
 export const getReleaseCommand = (): CommandModule => ({
@@ -201,20 +142,14 @@ export const getReleaseCommand = (): CommandModule => ({
   builder: {},
   handler: async () => {
     try {
-      console.log(chalk.cyan.bold(t("release.start")));
+      ui.log.step(t("release.start"));
       const monorepoInfo = await detectVersioningStrategy(process.cwd());
 
       if (monorepoInfo.strategy === "unknown") {
         throw new Error(t("release.error_structure"));
       }
 
-      console.log(
-        chalk.blue(
-          t("release.detected_strategy", {
-            strategy: chalk.bold(monorepoInfo.strategy),
-          }),
-        ),
-      );
+      ui.log.info(t("release.detected_strategy", { strategy: monorepoInfo.strategy }));
 
       if (monorepoInfo.strategy === "locked") {
         await handleLockedRelease(monorepoInfo);
@@ -222,10 +157,8 @@ export const getReleaseCommand = (): CommandModule => ({
         await handleIndependentRelease(monorepoInfo);
       }
     } catch (error: unknown) {
-      console.error(
-        chalk.red(`\n${t("common.error_unexpected")}`),
-        chalk.gray(getErrorMessage(error)),
-      );
+      ui.log.error(`\n${t("common.error_unexpected")}`);
+      ui.log.gray(getErrorMessage(error));
       process.exit(1);
     }
   },

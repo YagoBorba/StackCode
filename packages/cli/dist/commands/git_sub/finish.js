@@ -36,3 +36,4 @@ export const getFinishCommand = () => ({
     describe: t("git.finish_feature.description"),
     handler: finishHandler,
 });
+//# sourceMappingURL=finish.js.map

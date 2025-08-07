@@ -182,3 +182,4 @@ export async function performReleaseCommit(packages, projectRoot) {
         await runCommand("git", ["tag", tagName], { cwd: projectRoot });
     }
 }
+//# sourceMappingURL=release.js.map

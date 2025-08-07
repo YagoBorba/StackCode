@@ -14,3 +14,4 @@ export function validateCommitMessage(message) {
     }
     return CONVENTIONAL_COMMIT_REGEX.test(message);
 }
+//# sourceMappingURL=validator.js.map

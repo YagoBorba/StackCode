@@ -18,7 +18,7 @@ export async function generateGitignoreContent(technologies) {
             const header = `# --- ${tech.charAt(0).toUpperCase() + tech.slice(1)} ---`;
             contentParts.push(header, templateContent.trim(), "");
         }
-        catch (error) {
+        catch {
             console.warn(`[Warning] Gitignore template for '${tech}' not found. Skipping.`);
         }
     }
@@ -32,3 +32,4 @@ export async function generateReadmeContent() {
     const templatePath = path.resolve(__dirname, "templates/readme/default.tpl");
     return fs.readFile(templatePath, "utf-8");
 }
+//# sourceMappingURL=generators.js.map

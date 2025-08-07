@@ -9,3 +9,4 @@ export { validateCommitMessage } from "./validator.js";
 export * from "./github.js";
 export * from "./types.js";
 export { detectVersioningStrategy, getRecommendedBump, updateAllVersions, generateChangelog, findChangedPackages, determinePackageBumps, updatePackageVersion, performReleaseCommit, } from "./release.js";
+//# sourceMappingURL=index.js.map

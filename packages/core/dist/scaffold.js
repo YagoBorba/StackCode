@@ -48,7 +48,8 @@ npx stackcode validate "$1"
     try {
         await fs.chmod(hookFile, "755");
     }
-    catch (e) {
+    catch {
         console.warn(`Could not make commit-msg hook executable. This might be an issue on non-Unix systems.`);
     }
 }
+//# sourceMappingURL=scaffold.js.map

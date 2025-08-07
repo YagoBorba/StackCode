@@ -1,7 +1,7 @@
 import { CommandModule } from "yargs";
 import { t } from "@stackcode/i18n";
 import { validateCommitMessage } from "@stackcode/core";
-import chalk from "chalk";
+import * as ui from "./ui.js";
 
 export const getValidateCommand = (): CommandModule => ({
   command: "validate <message>",
@@ -16,9 +16,9 @@ export const getValidateCommand = (): CommandModule => ({
   handler: (argv) => {
     const message = argv.message as string;
     if (validateCommitMessage(message)) {
-      console.log(chalk.green(`✔ ${t("validate.success")}`));
+      ui.log.success(`✔ ${t("validate.success")}`);
     } else {
-      console.error(chalk.red(`✖ ${t("validate.error_invalid")}`));
+      ui.log.error(`✖ ${t("validate.error_invalid")}`);
       process.exit(1);
     }
   },
