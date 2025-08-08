@@ -30,7 +30,7 @@ export class ProjectViewProvider implements vscode.TreeDataProvider<ProjectItem>
         return treeItem;
     }
 
-    getChildren(element?: ProjectItem): Thenable<ProjectItem[]> {
+    getChildren(element?: ProjectItem): Promise<ProjectItem[]> {
         if (!element) {
             return Promise.resolve(this.getProjectInfo());
         }

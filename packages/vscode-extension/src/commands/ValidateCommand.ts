@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { BaseCommand } from './BaseCommand';
+import { ProgressCallback } from '../types';
 
 export class ValidateCommand extends BaseCommand {
     async execute(): Promise<void> {
@@ -14,7 +15,7 @@ export class ValidateCommand extends BaseCommand {
                 location: vscode.ProgressLocation.Notification,
                 title: 'Validating project structure',
                 cancellable: false
-            }, async (progress) => {
+            }, async (progress: ProgressCallback) => {
                 progress.report({ increment: 0, message: 'Running validation...' });
 
                 // Use StackCode CLI for validation

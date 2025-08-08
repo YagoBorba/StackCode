@@ -1,27 +1,43 @@
-import * as vscode from 'vscode';
-
-export class DashboardProvider implements vscode.WebviewViewProvider {
-    public static readonly viewType = 'stackcode.dashboard';
-    private _view?: vscode.WebviewView;
-
-    constructor(private readonly _extensionUri: vscode.Uri) {}
-
-    public resolveWebviewView(
-        webviewView: vscode.WebviewView,
-        _context: vscode.WebviewViewResolveContext,
-        _token: vscode.CancellationToken,
-    ) {
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DashboardProvider = void 0;
+const vscode = __importStar(require("vscode"));
+class DashboardProvider {
+    constructor(_extensionUri) {
+        this._extensionUri = _extensionUri;
+    }
+    resolveWebviewView(webviewView, _context, _token) {
         this._view = webviewView;
-
         webviewView.webview.options = {
             enableScripts: true,
             localResourceRoots: [this._extensionUri]
         };
-
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
-
         // Handle messages from webview
-        webviewView.webview.onDidReceiveMessage((data: { type: string }) => {
+        webviewView.webview.onDidReceiveMessage((data) => {
             switch (data.type) {
                 case 'init':
                     vscode.commands.executeCommand('stackcode.init');
@@ -44,18 +60,15 @@ export class DashboardProvider implements vscode.WebviewViewProvider {
             }
         });
     }
-
-    public show() {
+    show() {
         if (this._view) {
             this._view.show?.(true);
         }
     }
-
     dispose() {
         // Cleanup if needed
     }
-
-    private _getHtmlForWebview(_webview: vscode.Webview) {
+    _getHtmlForWebview(_webview) {
         return `<!DOCTYPE html>
         <html lang="en">
         <head>
@@ -169,3 +182,6 @@ export class DashboardProvider implements vscode.WebviewViewProvider {
         </html>`;
     }
 }
+exports.DashboardProvider = DashboardProvider;
+DashboardProvider.viewType = 'stackcode.dashboard';
+//# sourceMappingURL=DashboardProvider.js.map

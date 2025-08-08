@@ -148,11 +148,12 @@
       ]
     },
     "views": {
-      "explorer": [
+      "stackcode": [
         {
           "id": "stackcode.projectView",
-          "name": "StackCode",
-          "when": "workbenchState != empty"
+          "name": "Project Overview",
+          "when": "workbenchState != empty",
+          "icon": "$(project)"
         }
       ]
     },
@@ -195,7 +196,12 @@
         },
         "stackcode.git.defaultBranchType": {
           "type": "string",
-          "enum": ["feature", "bugfix", "hotfix", "release"],
+          "enum": [
+            "feature",
+            "bugfix",
+            "hotfix",
+            "release"
+          ],
           "default": "feature",
           "description": "Default branch type for new branches"
         },
@@ -215,12 +221,12 @@
     "test": "jest"
   },
   "devDependencies": {
-    "@types/node": "^16.x",
-    "@types/vscode": "^1.74.0",
     "@types/jest": "^29.5.0",
+    "@types/node": "^16.18.126",
+    "@types/vscode": "^1.102.0",
+    "@vscode/vsce": "^2.19.0",
     "jest": "^29.5.0",
-    "typescript": "^4.9.4",
-    "@vscode/vsce": "^2.19.0"
+    "typescript": "^4.9.5"
   },
   "dependencies": {
     "@stackcode/core": "^1.0.3",

@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { BaseCommand } from './BaseCommand';
+import { ProgressCallback } from '../types';
 
 export class ReleaseCommand extends BaseCommand {
     async execute(): Promise<void> {
@@ -23,7 +24,7 @@ export class ReleaseCommand extends BaseCommand {
                 location: vscode.ProgressLocation.Notification,
                 title: 'Creating release',
                 cancellable: false
-            }, async (progress) => {
+            }, async (progress: ProgressCallback) => {
                 progress.report({ increment: 0, message: 'Preparing release...' });
 
                 // Use StackCode CLI for release
