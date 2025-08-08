@@ -21,3 +21,9 @@ test/**
 ../../**
 **/tsconfig.*
 **/.tsbuildinfo
+
+# Adicione essas linhas
+dist/
+node_modules/
+src/webview-ui/
+!dist/webview-ui/

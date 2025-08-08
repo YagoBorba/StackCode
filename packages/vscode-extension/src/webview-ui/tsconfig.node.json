@@ -1,0 +1,14 @@
+// packages/vscode-extension/src/webview-ui/tsconfig.node.json
+
+{
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    // Altere esta linha de 'bundler' para 'NodeNext' ou 'bundler'
+    // 'bundler' é o mais recomendado para ambientes de build modernos como Vite.
+    "moduleResolution": "bundler", 
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["vite.config.ts"]
+}

@@ -153,7 +153,9 @@ export class FileMonitor implements vscode.Disposable {
         }
       }
     } catch (error) {
-      console.log("Error checking project structure:", error);
+      // Use proper VS Code logging instead of console.log
+      const outputChannel = vscode.window.createOutputChannel("StackCode");
+      outputChannel.appendLine(`Error checking project structure: ${error}`);
     }
   }
 

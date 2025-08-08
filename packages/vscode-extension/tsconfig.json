@@ -1,10 +1,11 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    // VS Code Extension specific overrides
     "module": "CommonJS",
     "target": "ES2020",
     "outDir": "out",
-    "lib": ["ES2020"],
+    "lib": ["ES2020", "DOM"], // Add DOM for console and other browser APIs
     "sourceMap": true,
     "rootDir": "src",
     "strict": true,
@@ -12,8 +13,11 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "types": ["jest", "node", "vscode"]
+    "types": ["jest", "node", "vscode"],
+    // Override base config for VS Code extensions
+    "declaration": false, // Not needed for extensions
+    "composite": false    // Not needed for extensions
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "out"]
+  "exclude": ["node_modules", "out", "**/*.test.ts"]
 }
