@@ -1,13 +1,249 @@
 {
-  "name": "vscode-extension",
+  "name": "stackcode-vscode",
+  "displayName": "StackCode",
+  "description": "Complete development assistant with project scaffolding, Git workflow, and real-time best practices enforcement",
   "version": "1.0.3",
-  "main": "index.js",
-  "private": true,
-  "scripts": {
-    "test": "echo \"✅ No tests for this package\""
+  "publisher": "YagoBorba",
+  "engines": {
+    "vscode": "^1.74.0"
   },
-  "keywords": [],
+  "categories": [
+    "Other",
+    "SCM Providers",
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "stackcode.init",
+        "title": "Initialize New Project",
+        "category": "StackCode",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "stackcode.generate.readme",
+        "title": "Generate README.md",
+        "category": "StackCode",
+        "icon": "$(file-text)"
+      },
+      {
+        "command": "stackcode.generate.gitignore",
+        "title": "Generate .gitignore",
+        "category": "StackCode",
+        "icon": "$(git-branch)"
+      },
+      {
+        "command": "stackcode.git.start",
+        "title": "Start New Feature Branch",
+        "category": "StackCode",
+        "icon": "$(git-branch)"
+      },
+      {
+        "command": "stackcode.git.finish",
+        "title": "Finish Current Branch",
+        "category": "StackCode",
+        "icon": "$(git-merge)"
+      },
+      {
+        "command": "stackcode.commit",
+        "title": "Create Conventional Commit",
+        "category": "StackCode",
+        "icon": "$(git-commit)"
+      },
+      {
+        "command": "stackcode.validate",
+        "title": "Validate Project Structure",
+        "category": "StackCode",
+        "icon": "$(check)"
+      },
+      {
+        "command": "stackcode.release",
+        "title": "Create Release",
+        "category": "StackCode",
+        "icon": "$(tag)"
+      },
+      {
+        "command": "stackcode.config",
+        "title": "Open Configuration",
+        "category": "StackCode",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "stackcode.dashboard",
+        "title": "Open StackCode Dashboard",
+        "category": "StackCode",
+        "icon": "$(dashboard)"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "stackcode.init",
+          "when": "explorerResourceIsFolder",
+          "group": "stackcode@1"
+        },
+        {
+          "command": "stackcode.generate.readme",
+          "when": "explorerResourceIsFolder",
+          "group": "stackcode@2"
+        },
+        {
+          "command": "stackcode.generate.gitignore",
+          "when": "explorerResourceIsFolder",
+          "group": "stackcode@3"
+        }
+      ],
+      "scm/title": [
+        {
+          "command": "stackcode.git.start",
+          "when": "scmProvider == git",
+          "group": "navigation@1"
+        },
+        {
+          "command": "stackcode.git.finish",
+          "when": "scmProvider == git",
+          "group": "navigation@2"
+        },
+        {
+          "command": "stackcode.commit",
+          "when": "scmProvider == git",
+          "group": "navigation@3"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "stackcode.init"
+        },
+        {
+          "command": "stackcode.generate.readme"
+        },
+        {
+          "command": "stackcode.generate.gitignore"
+        },
+        {
+          "command": "stackcode.git.start"
+        },
+        {
+          "command": "stackcode.git.finish"
+        },
+        {
+          "command": "stackcode.commit"
+        },
+        {
+          "command": "stackcode.validate"
+        },
+        {
+          "command": "stackcode.release"
+        },
+        {
+          "command": "stackcode.config"
+        },
+        {
+          "command": "stackcode.dashboard"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "stackcode.projectView",
+          "name": "StackCode",
+          "when": "workbenchState != empty"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "stackcode",
+          "title": "StackCode",
+          "icon": "$(layers)"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "StackCode",
+      "properties": {
+        "stackcode.notifications.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable proactive notifications and suggestions"
+        },
+        "stackcode.notifications.branchCheck": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show notifications when working on main/develop branch"
+        },
+        "stackcode.notifications.commitCheck": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show notifications for unconventional commit messages"
+        },
+        "stackcode.autoGenerate.readme": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically suggest README.md generation for new projects"
+        },
+        "stackcode.autoGenerate.gitignore": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically suggest .gitignore generation for new projects"
+        },
+        "stackcode.git.defaultBranchType": {
+          "type": "string",
+          "enum": ["feature", "bugfix", "hotfix", "release"],
+          "default": "feature",
+          "description": "Default branch type for new branches"
+        },
+        "stackcode.dashboard.autoOpen": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically open StackCode dashboard on startup"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/node": "^16.x",
+    "@types/vscode": "^1.74.0",
+    "@types/jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "typescript": "^4.9.4",
+    "@vscode/vsce": "^2.19.0"
+  },
+  "dependencies": {
+    "@stackcode/core": "^1.0.3",
+    "@stackcode/i18n": "^1.0.3"
+  },
+  "keywords": [
+    "git",
+    "workflow",
+    "scaffolding",
+    "project-management",
+    "best-practices",
+    "notifications",
+    "conventional-commits",
+    "gitflow"
+  ],
   "author": "Yago Borba",
   "license": "ISC",
-  "description": ""
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YagoBorba/StackCode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YagoBorba/StackCode/issues"
+  },
+  "homepage": "https://github.com/YagoBorba/StackCode#readme"
 }
