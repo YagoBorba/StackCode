@@ -1,19 +1,24 @@
+// packages/vscode-extension/src/webview-ui/vite.config.ts
+
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import path from 'path';
 
-// https://vitejs.dev/config/
 export default defineConfig({
+  root: path.resolve(__dirname), 
+  
+  // Configuração do CSS com PostCSS
+  css: {
+    postcss: path.resolve(__dirname, 'postcss.config.js'),
+  },
+
   plugins: [react()],
+  
   build: {
-    // Gera os artefatos de build na pasta 'dist/webview-ui'
-    // dentro do pacote da extensão, para não poluir a raiz.
-    outDir: '../../dist/webview-ui',
+    outDir: path.resolve(__dirname, '..', '..', 'dist', 'webview-ui'),
+    manifest: true,
     rollupOptions: {
-      output: {
-        entryFileNames: `assets/[name].js`,
-        chunkFileNames: `assets/[name].js`,
-        assetFileNames: `assets/[name].[ext]`,
-      },
+      // ...
     },
   },
 });

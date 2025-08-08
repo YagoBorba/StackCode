@@ -25,7 +25,10 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "onStartupFinished"
+    "onStartupFinished",
+    "onView:stackcode.dashboard",
+    "onView:stackcode.projectView",
+    "*"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -162,9 +165,14 @@
     "views": {
       "stackcode": [
         {
+          "id": "stackcode.dashboard",
+          "name": "Dashboard",
+          "type": "webview",
+          "icon": "$(dashboard)"
+        },
+        {
           "id": "stackcode.projectView",
           "name": "Project Overview",
-          "when": "workbenchState != empty",
           "icon": "$(project)"
         }
       ]
@@ -226,6 +234,7 @@
     }
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
     "@types/jest": "^29.5.14",
     "@types/node": "^16.18.126",
     "@types/react": "^19.1.9",

@@ -30,7 +30,9 @@ let releaseCommand: ReleaseCommand;
 let configCommand: ConfigCommand;
 
 export function activate(context: vscode.ExtensionContext) {
-  console.log("StackCode extension is now active!");
+  console.log("[StackCode] Extension is now active!");
+  console.log("[StackCode] Workspace folders:", vscode.workspace.workspaceFolders?.length || 0);
+  console.log("[StackCode] Extension path:", context.extensionPath);
 
   // Initialize configuration manager
   configManager = new ConfigurationManager();
@@ -43,7 +45,7 @@ export function activate(context: vscode.ExtensionContext) {
   fileMonitor = new FileMonitor(proactiveManager, configManager);
 
   // Initialize providers
-  dashboardProvider = new DashboardProvider(context.extensionUri);
+  dashboardProvider = new DashboardProvider(context);
   projectViewProvider = new ProjectViewProvider(context.workspaceState);
 
   // Initialize commands
@@ -115,6 +117,30 @@ export function activate(context: vscode.ExtensionContext) {
     // Project view commands
     vscode.commands.registerCommand("stackcode.projectView.refresh", () =>
       projectViewProvider.refresh(),
+    ),
+
+    // Webview commands
+    vscode.commands.registerCommand("webviewReady", () => {
+      console.log("[StackCode] Webview is ready!");
+      // Pode enviar dados iniciais aqui se necessário
+    }),
+    vscode.commands.registerCommand("stackcode.webview.init", () =>
+      initCommand.execute(),
+    ),
+    vscode.commands.registerCommand("stackcode.webview.generate.readme", () =>
+      generateCommand.generateReadme(),
+    ),
+    vscode.commands.registerCommand("stackcode.webview.generate.gitignore", () =>
+      generateCommand.generateGitignore(),
+    ),
+    vscode.commands.registerCommand("stackcode.webview.git.start", () =>
+      gitCommand.startBranch(),
+    ),
+    vscode.commands.registerCommand("stackcode.webview.commit", () =>
+      commitCommand.execute(),
+    ),
+    vscode.commands.registerCommand("stackcode.webview.validate", () =>
+      validateCommand.execute(),
     ),
   ];
 

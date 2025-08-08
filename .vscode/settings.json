@@ -1,0 +1,19 @@
+{
+  "files.associations": {
+    "*.json": "jsonc",
+    "tsconfig*.json": "jsonc", 
+    "launch.json": "jsonc",
+    "tasks.json": "jsonc",
+    "package.json": "jsonc",
+    ".vscode/*.json": "jsonc"
+  },
+  "json.schemaDownload.enable": true,
+  "jsonc.validate.enable": true,
+  "json.validate.enable": true,
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  }
+}

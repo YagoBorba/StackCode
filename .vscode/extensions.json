@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "ms-vscode.vscode-json"
+  ],
+  "unwantedRecommendations": [
+    "equinusocio.vsc-material-theme-icons"
+  ]
+}
