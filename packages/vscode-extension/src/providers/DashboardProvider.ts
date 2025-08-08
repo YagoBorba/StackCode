@@ -8,7 +8,9 @@ export class DashboardProvider implements vscode.WebviewViewProvider {
 
     public resolveWebviewView(
         webviewView: vscode.WebviewView,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         _context: vscode.WebviewViewResolveContext,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars  
         _token: vscode.CancellationToken,
     ) {
         this._view = webviewView;
@@ -55,6 +57,7 @@ export class DashboardProvider implements vscode.WebviewViewProvider {
         // Cleanup if needed
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private _getHtmlForWebview(_webview: vscode.Webview) {
         return `<!DOCTYPE html>
         <html lang="en">
