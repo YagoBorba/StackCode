@@ -1,5 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { GitBranch, CheckCircle, AlertTriangle, Clock, Zap } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import {
+  GitBranch,
+  CheckCircle,
+  AlertTriangle,
+  Clock,
+  Zap,
+} from "lucide-react";
 
 interface StatusBarProps {
   currentBranch?: string;
@@ -9,10 +15,10 @@ interface StatusBarProps {
 }
 
 const StatusBar: React.FC<StatusBarProps> = ({
-  currentBranch = 'main',
+  currentBranch = "main",
   hasChanges = false,
-  lastAction = 'Ready',
-  onQuickAction
+  lastAction = "Ready",
+  onQuickAction,
 }) => {
   const [time, setTime] = useState(new Date());
 
@@ -25,9 +31,10 @@ const StatusBar: React.FC<StatusBarProps> = ({
   }, []);
 
   const getStatusColor = () => {
-    if (hasChanges) return 'text-yellow-400';
-    if (currentBranch === 'main' || currentBranch === 'master') return 'text-red-400';
-    return 'text-green-400';
+    if (hasChanges) return "text-yellow-400";
+    if (currentBranch === "main" || currentBranch === "master")
+      return "text-red-400";
+    return "text-green-400";
   };
 
   const getStatusIcon = () => {
@@ -55,7 +62,7 @@ const StatusBar: React.FC<StatusBarProps> = ({
       <div className="flex items-center gap-4">
         {/* Quick Actions */}
         <button
-          onClick={() => onQuickAction?.('stackcode.commit')}
+          onClick={() => onQuickAction?.("stackcode.commit")}
           className="flex items-center gap-1 px-2 py-1 rounded bg-blue-600 hover:bg-blue-700 transition-colors text-white text-xs"
         >
           <Zap className="w-3 h-3" />
@@ -63,9 +70,7 @@ const StatusBar: React.FC<StatusBarProps> = ({
         </button>
 
         {/* Time */}
-        <div className="text-slate-400">
-          {time.toLocaleTimeString()}
-        </div>
+        <div className="text-slate-400">{time.toLocaleTimeString()}</div>
       </div>
     </div>
   );

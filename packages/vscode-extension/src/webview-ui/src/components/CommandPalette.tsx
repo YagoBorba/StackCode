@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
   Search,
   Command,
@@ -9,8 +9,8 @@ import {
   Book,
   FolderOpen,
   GitCommit,
-  BarChart3
-} from 'lucide-react';
+  BarChart3,
+} from "lucide-react";
 
 interface CommandItem {
   id: string;
@@ -31,103 +31,103 @@ interface CommandPaletteProps {
 const CommandPalette: React.FC<CommandPaletteProps> = ({
   isOpen,
   onClose,
-  onCommand
+  onCommand,
 }) => {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const commands: CommandItem[] = [
     {
-      id: 'init',
-      title: 'Initialize Project',
-      description: 'Set up StackCode scaffolding for your project',
+      id: "init",
+      title: "Initialize Project",
+      description: "Set up StackCode scaffolding for your project",
       icon: <FolderOpen className="w-4 h-4" />,
-      command: 'stackcode.init',
-      category: 'Project',
-      keywords: ['init', 'setup', 'scaffold', 'create']
+      command: "stackcode.init",
+      category: "Project",
+      keywords: ["init", "setup", "scaffold", "create"],
     },
     {
-      id: 'generate-readme',
-      title: 'Generate README',
-      description: 'Create a comprehensive README.md file',
+      id: "generate-readme",
+      title: "Generate README",
+      description: "Create a comprehensive README.md file",
       icon: <Book className="w-4 h-4" />,
-      command: 'stackcode.generate.readme',
-      category: 'Generate',
-      keywords: ['readme', 'documentation', 'docs', 'generate']
+      command: "stackcode.generate.readme",
+      category: "Generate",
+      keywords: ["readme", "documentation", "docs", "generate"],
     },
     {
-      id: 'generate-gitignore',
-      title: 'Generate .gitignore',
-      description: 'Create .gitignore based on project type',
+      id: "generate-gitignore",
+      title: "Generate .gitignore",
+      description: "Create .gitignore based on project type",
       icon: <GitBranch className="w-4 h-4" />,
-      command: 'stackcode.generate.gitignore',
-      category: 'Generate',
-      keywords: ['gitignore', 'ignore', 'git', 'generate']
+      command: "stackcode.generate.gitignore",
+      category: "Generate",
+      keywords: ["gitignore", "ignore", "git", "generate"],
     },
     {
-      id: 'start-feature',
-      title: 'Start Feature Branch',
-      description: 'Begin a new feature using GitFlow',
+      id: "start-feature",
+      title: "Start Feature Branch",
+      description: "Begin a new feature using GitFlow",
       icon: <GitBranch className="w-4 h-4" />,
-      command: 'stackcode.git.start',
-      category: 'Git',
-      keywords: ['feature', 'branch', 'git', 'start', 'flow']
+      command: "stackcode.git.start",
+      category: "Git",
+      keywords: ["feature", "branch", "git", "start", "flow"],
     },
     {
-      id: 'commit',
-      title: 'Smart Commit',
-      description: 'Make a conventional commit with validation',
+      id: "commit",
+      title: "Smart Commit",
+      description: "Make a conventional commit with validation",
       icon: <GitCommit className="w-4 h-4" />,
-      command: 'stackcode.commit',
-      category: 'Git',
-      keywords: ['commit', 'conventional', 'message', 'git']
+      command: "stackcode.commit",
+      category: "Git",
+      keywords: ["commit", "conventional", "message", "git"],
     },
     {
-      id: 'validate',
-      title: 'Validate Project',
-      description: 'Check project structure and best practices',
+      id: "validate",
+      title: "Validate Project",
+      description: "Check project structure and best practices",
       icon: <Shield className="w-4 h-4" />,
-      command: 'stackcode.validate',
-      category: 'Tools',
-      keywords: ['validate', 'check', 'best practices', 'lint']
+      command: "stackcode.validate",
+      category: "Tools",
+      keywords: ["validate", "check", "best practices", "lint"],
     },
     {
-      id: 'release',
-      title: 'Create Release',
-      description: 'Create a new release with automated versioning',
+      id: "release",
+      title: "Create Release",
+      description: "Create a new release with automated versioning",
       icon: <Package className="w-4 h-4" />,
-      command: 'stackcode.release',
-      category: 'Release',
-      keywords: ['release', 'version', 'publish', 'deploy']
+      command: "stackcode.release",
+      category: "Release",
+      keywords: ["release", "version", "publish", "deploy"],
     },
     {
-      id: 'config',
-      title: 'Configuration',
-      description: 'Configure StackCode settings',
+      id: "config",
+      title: "Configuration",
+      description: "Configure StackCode settings",
       icon: <Settings className="w-4 h-4" />,
-      command: 'stackcode.config',
-      category: 'Settings',
-      keywords: ['config', 'settings', 'preferences', 'setup']
+      command: "stackcode.config",
+      category: "Settings",
+      keywords: ["config", "settings", "preferences", "setup"],
     },
     {
-      id: 'dashboard',
-      title: 'Show Dashboard',
-      description: 'Open the interactive StackCode dashboard',
+      id: "dashboard",
+      title: "Show Dashboard",
+      description: "Open the interactive StackCode dashboard",
       icon: <BarChart3 className="w-4 h-4" />,
-      command: 'stackcode.dashboard',
-      category: 'View',
-      keywords: ['dashboard', 'overview', 'stats', 'view']
-    }
+      command: "stackcode.dashboard",
+      category: "View",
+      keywords: ["dashboard", "overview", "stats", "view"],
+    },
   ];
 
-  const filteredCommands = commands.filter(command => {
+  const filteredCommands = commands.filter((command) => {
     const searchTerm = query.toLowerCase();
     return (
       command.title.toLowerCase().includes(searchTerm) ||
       command.description.toLowerCase().includes(searchTerm) ||
       command.category.toLowerCase().includes(searchTerm) ||
-      command.keywords.some(keyword => keyword.includes(searchTerm))
+      command.keywords.some((keyword) => keyword.includes(searchTerm))
     );
   });
 
@@ -143,25 +143,25 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     switch (e.key) {
-      case 'ArrowDown':
+      case "ArrowDown":
         e.preventDefault();
-        setSelectedIndex(prev => 
-          prev < filteredCommands.length - 1 ? prev + 1 : 0
+        setSelectedIndex((prev) =>
+          prev < filteredCommands.length - 1 ? prev + 1 : 0,
         );
         break;
-      case 'ArrowUp':
+      case "ArrowUp":
         e.preventDefault();
-        setSelectedIndex(prev => 
-          prev > 0 ? prev - 1 : filteredCommands.length - 1
+        setSelectedIndex((prev) =>
+          prev > 0 ? prev - 1 : filteredCommands.length - 1,
         );
         break;
-      case 'Enter':
+      case "Enter":
         e.preventDefault();
         if (filteredCommands[selectedIndex]) {
           handleCommand(filteredCommands[selectedIndex].command);
         }
         break;
-      case 'Escape':
+      case "Escape":
         e.preventDefault();
         onClose();
         break;
@@ -171,7 +171,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({
   const handleCommand = (command: string) => {
     onCommand(command);
     onClose();
-    setQuery('');
+    setQuery("");
   };
 
   if (!isOpen) return null;
@@ -213,8 +213,8 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({
                   onClick={() => handleCommand(command.command)}
                   className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors ${
                     index === selectedIndex
-                      ? 'bg-blue-600/20 border border-blue-500/30'
-                      : 'hover:bg-slate-700/50'
+                      ? "bg-blue-600/20 border border-blue-500/30"
+                      : "hover:bg-slate-700/50"
                   }`}
                 >
                   <div className="flex-shrink-0 text-slate-400">

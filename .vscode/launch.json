@@ -8,7 +8,9 @@
       "name": "Run VSCode Extension",
       "type": "extensionHost",
       "request": "launch",
-      "args": ["--extensionDevelopmentPath=${workspaceFolder}/packages/vscode-extension"],
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode-extension"
+      ],
       "outFiles": ["${workspaceFolder}/packages/vscode-extension/out/**/*.js"],
       "preLaunchTask": "npm: compile:ext"
     },

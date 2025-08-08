@@ -1,7 +1,7 @@
 {
   "files.associations": {
     "*.json": "jsonc",
-    "tsconfig*.json": "jsonc", 
+    "tsconfig*.json": "jsonc",
     "launch.json": "jsonc",
     "tasks.json": "jsonc",
     "package.json": "jsonc",

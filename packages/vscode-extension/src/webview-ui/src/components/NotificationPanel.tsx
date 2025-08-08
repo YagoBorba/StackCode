@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   X,
   CheckCircle,
   AlertTriangle,
   Info,
   AlertCircle,
-  Lightbulb
-} from 'lucide-react';
+  Lightbulb,
+} from "lucide-react";
 
 interface Notification {
   id: string;
-  type: 'info' | 'warning' | 'error' | 'success' | 'tip';
+  type: "info" | "warning" | "error" | "success" | "tip";
   title: string;
   message: string;
   actions?: Array<{
@@ -31,23 +31,25 @@ interface NotificationPanelProps {
 const NotificationPanel: React.FC<NotificationPanelProps> = ({
   notifications,
   onDismiss,
-  onAction
+  onAction,
 }) => {
-  const [visibleNotifications, setVisibleNotifications] = useState<Notification[]>([]);
+  const [visibleNotifications, setVisibleNotifications] = useState<
+    Notification[]
+  >([]);
 
   useEffect(() => {
-    setVisibleNotifications(notifications.filter(n => !n.dismissed));
+    setVisibleNotifications(notifications.filter((n) => !n.dismissed));
   }, [notifications]);
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'success':
+      case "success":
         return <CheckCircle className="w-5 h-5 text-green-400" />;
-      case 'warning':
+      case "warning":
         return <AlertTriangle className="w-5 h-5 text-yellow-400" />;
-      case 'error':
+      case "error":
         return <AlertCircle className="w-5 h-5 text-red-400" />;
-      case 'tip':
+      case "tip":
         return <Lightbulb className="w-5 h-5 text-blue-400" />;
       default:
         return <Info className="w-5 h-5 text-blue-400" />;
@@ -56,21 +58,21 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
 
   const getNotificationBorder = (type: string) => {
     switch (type) {
-      case 'success':
-        return 'border-l-green-400';
-      case 'warning':
-        return 'border-l-yellow-400';
-      case 'error':
-        return 'border-l-red-400';
-      case 'tip':
-        return 'border-l-blue-400';
+      case "success":
+        return "border-l-green-400";
+      case "warning":
+        return "border-l-yellow-400";
+      case "error":
+        return "border-l-red-400";
+      case "tip":
+        return "border-l-blue-400";
       default:
-        return 'border-l-slate-400';
+        return "border-l-slate-400";
     }
   };
 
   const handleDismiss = (id: string) => {
-    setVisibleNotifications(prev => prev.filter(n => n.id !== id));
+    setVisibleNotifications((prev) => prev.filter((n) => n.id !== id));
     onDismiss(id);
   };
 
@@ -94,7 +96,7 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
             <div className="flex-shrink-0 mt-0.5">
               {getNotificationIcon(notification.type)}
             </div>
-            
+
             <div className="flex-1 min-w-0">
               <h4 className="text-sm font-semibold text-white mb-1">
                 {notification.title}
@@ -102,17 +104,19 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
               <p className="text-sm text-slate-300 leading-relaxed">
                 {notification.message}
               </p>
-              
+
               {notification.actions && notification.actions.length > 0 && (
                 <div className="flex gap-2 mt-3">
                   {notification.actions.map((action, index) => (
                     <button
                       key={index}
-                      onClick={() => handleAction(action.action, notification.id)}
+                      onClick={() =>
+                        handleAction(action.action, notification.id)
+                      }
                       className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
                         action.primary
-                          ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                          : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
+                          ? "bg-blue-600 hover:bg-blue-700 text-white"
+                          : "bg-slate-700 hover:bg-slate-600 text-slate-300"
                       }`}
                     >
                       {action.label}
@@ -120,12 +124,12 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
                   ))}
                 </div>
               )}
-              
+
               <div className="text-xs text-slate-500 mt-2">
                 {notification.timestamp.toLocaleTimeString()}
               </div>
             </div>
-            
+
             <button
               onClick={() => handleDismiss(notification.id)}
               className="flex-shrink-0 text-slate-400 hover:text-white transition-colors"

@@ -3,7 +3,7 @@
 export default {
   plugins: {
     // CORREÇÃO: Usamos o novo pacote aqui.
-    '@tailwindcss/postcss': {}, 
+    "@tailwindcss/postcss": {},
     autoprefixer: {},
   },
-}
+};

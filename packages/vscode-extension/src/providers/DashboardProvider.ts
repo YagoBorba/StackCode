@@ -2,171 +2,204 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 
-export class DashboardProvider implements vscode.WebviewViewProvider, vscode.Disposable {
-    public static readonly viewType = "stackcode.dashboard";
-    private _view?: vscode.WebviewView;
-    private readonly _extensionUri: vscode.Uri;
-    private _disposables: vscode.Disposable[] = [];
+export class DashboardProvider
+  implements vscode.WebviewViewProvider, vscode.Disposable
+{
+  public static readonly viewType = "stackcode.dashboard";
+  private _view?: vscode.WebviewView;
+  private readonly _extensionUri: vscode.Uri;
+  private _disposables: vscode.Disposable[] = [];
 
-    constructor(context: vscode.ExtensionContext) {
-        this._extensionUri = context.extensionUri;
-    }
+  constructor(context: vscode.ExtensionContext) {
+    this._extensionUri = context.extensionUri;
+  }
 
-    public resolveWebviewView(
-        webviewView: vscode.WebviewView,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        context: vscode.WebviewViewResolveContext,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars  
-        token: vscode.CancellationToken,
-    ) {
-        this._view = webviewView;
+  public resolveWebviewView(
+    webviewView: vscode.WebviewView,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    context: vscode.WebviewViewResolveContext,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    token: vscode.CancellationToken,
+  ) {
+    this._view = webviewView;
 
-        webviewView.webview.options = {
-            enableScripts: true,
-            localResourceRoots: [vscode.Uri.joinPath(this._extensionUri, 'dist')],
-        };
+    webviewView.webview.options = {
+      enableScripts: true,
+      localResourceRoots: [vscode.Uri.joinPath(this._extensionUri, "dist")],
+    };
 
-        webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
-        webviewView.webview.onDidReceiveMessage(
-            async (data: { type: string; payload?: unknown }) => {
-                console.log(`[StackCode] Received command from webview: ${data.type}`);
-                
-                try {
-                    // Tratar comandos específicos do webview
-                    switch (data.type) {
-                        case 'webviewReady':
-                            console.log('[StackCode] Webview reported ready, sending initial data');
-                            this.updateProjectStats();
-                            return;
-                        
-                        case 'refreshStats':
-                            this.updateProjectStats();
-                            return;
-                            
-                        default:
-                            // Executar comando normal do VS Code
-                            await vscode.commands.executeCommand(data.type, data.payload);
-                    }
-                } catch (error) {
-                    console.error(`[StackCode] Error executing command ${data.type}:`, error);
-                    this.sendMessage({
-                        type: 'commandError',
-                        payload: { command: data.type, error: error instanceof Error ? error.message : 'Unknown error' }
-                    });
-                }
+    webviewView.webview.onDidReceiveMessage(
+      async (data: { type: string; payload?: unknown }) => {
+        console.log(`[StackCode] Received command from webview: ${data.type}`);
+
+        try {
+          // Tratar comandos específicos do webview
+          switch (data.type) {
+            case "webviewReady":
+              console.log(
+                "[StackCode] Webview reported ready, sending initial data",
+              );
+              this.updateProjectStats();
+              return;
+
+            case "refreshStats":
+              this.updateProjectStats();
+              return;
+
+            default:
+              // Executar comando normal do VS Code
+              await vscode.commands.executeCommand(data.type, data.payload);
+          }
+        } catch (error) {
+          console.error(
+            `[StackCode] Error executing command ${data.type}:`,
+            error,
+          );
+          this.sendMessage({
+            type: "commandError",
+            payload: {
+              command: data.type,
+              error: error instanceof Error ? error.message : "Unknown error",
             },
-            undefined,
-            this._disposables
-        );
+          });
+        }
+      },
+      undefined,
+      this._disposables,
+    );
 
-        // WebviewView doesn't have onDidBecomeVisible, so we'll update stats immediately
-        this.updateProjectStats();
+    // WebviewView doesn't have onDidBecomeVisible, so we'll update stats immediately
+    this.updateProjectStats();
+  }
+
+  public sendMessage(message: { type: string; payload?: unknown }) {
+    if (this._view) {
+      this._view.webview.postMessage(message);
+    }
+  }
+
+  public show() {
+    if (this._view) {
+      this._view.show?.(true);
+    } else {
+      // If view is not created yet, trigger the creation by executing the show command
+      vscode.commands.executeCommand("workbench.view.extension.stackcode");
+    }
+  }
+
+  private async updateProjectStats() {
+    if (!this._view) {
+      console.log("[StackCode] No view available for stats update");
+      return;
     }
 
-    public sendMessage(message: { type: string; payload?: unknown }) {
-        if (this._view) {
-            this._view.webview.postMessage(message);
-        }
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    console.log(
+      "[StackCode] Workspace folders:",
+      workspaceFolders?.length || 0,
+    );
+    console.log("[StackCode] Workspace name:", vscode.workspace.name);
+    console.log(
+      "[StackCode] Workspace file:",
+      vscode.workspace.workspaceFile?.toString(),
+    );
+
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+      console.log(
+        "[StackCode] No workspace folders found, using alternative detection",
+      );
+
+      // Fallback: usar informações do contexto da extensão
+      const extensionWorkspace = path.dirname(
+        path.dirname(path.dirname(this._extensionUri.fsPath)),
+      );
+      console.log("[StackCode] Extension workspace path:", extensionWorkspace);
+
+      this.sendMessage({
+        type: "updateStats",
+        payload: {
+          files: 0,
+          workspaceName: "StackCode (Debug)",
+          workspacePath: extensionWorkspace,
+          mode: "development",
+        },
+      });
+      return;
     }
 
-    public show() {
-        if (this._view) {
-            this._view.show?.(true);
-        } else {
-            // If view is not created yet, trigger the creation by executing the show command
-            vscode.commands.executeCommand('workbench.view.extension.stackcode');
-        }
+    try {
+      const files = await vscode.workspace.findFiles(
+        "**/*",
+        "**/node_modules/**",
+        1000,
+      );
+      console.log("[StackCode] Found files:", files.length);
+
+      this.sendMessage({
+        type: "updateStats",
+        payload: {
+          files: files.length,
+          workspaceName: workspaceFolders[0].name,
+          workspacePath: workspaceFolders[0].uri.fsPath,
+          mode: "production",
+        },
+      });
+    } catch (e) {
+      console.error("[StackCode] Error fetching project stats:", e);
+      this.sendMessage({
+        type: "updateStats",
+        payload: { files: 0, error: "Failed to scan files" },
+      });
     }
+  }
 
-    private async updateProjectStats() {
-        if (!this._view) {
-            console.log('[StackCode] No view available for stats update');
-            return;
-        }
+  private _getHtmlForWebview(webview: vscode.Webview): string {
+    const nonce = getNonce();
+    const buildPath = vscode.Uri.joinPath(
+      this._extensionUri,
+      "dist",
+      "webview-ui",
+    );
 
-        const workspaceFolders = vscode.workspace.workspaceFolders;
-        console.log('[StackCode] Workspace folders:', workspaceFolders?.length || 0);
-        console.log('[StackCode] Workspace name:', vscode.workspace.name);
-        console.log('[StackCode] Workspace file:', vscode.workspace.workspaceFile?.toString());
-        
-        if (!workspaceFolders || workspaceFolders.length === 0) {
-            console.log('[StackCode] No workspace folders found, using alternative detection');
-            
-            // Fallback: usar informações do contexto da extensão
-            const extensionWorkspace = path.dirname(path.dirname(path.dirname(this._extensionUri.fsPath)));
-            console.log('[StackCode] Extension workspace path:', extensionWorkspace);
-            
-            this.sendMessage({ 
-                type: 'updateStats', 
-                payload: { 
-                    files: 0, 
-                    workspaceName: 'StackCode (Debug)',
-                    workspacePath: extensionWorkspace,
-                    mode: 'development'
-                } 
-            });
-            return;
-        }
+    // Lê o manifest.json do Vite
+    const manifestPath = path.join(buildPath.fsPath, ".vite", "manifest.json");
 
-        try {
-            const files = await vscode.workspace.findFiles('**/*', '**/node_modules/**', 1000);
-            console.log('[StackCode] Found files:', files.length);
-            
-            this.sendMessage({
-                type: 'updateStats',
-                payload: { 
-                    files: files.length,
-                    workspaceName: workspaceFolders[0].name,
-                    workspacePath: workspaceFolders[0].uri.fsPath,
-                    mode: 'production'
-                },
-            });
-        } catch (e) {
-            console.error("[StackCode] Error fetching project stats:", e);
-            this.sendMessage({ 
-                type: 'updateStats', 
-                payload: { files: 0, error: 'Failed to scan files' } 
-            });
-        }
-    }
+    console.log("[StackCode] Build path:", buildPath.fsPath);
+    console.log("[StackCode] Manifest path:", manifestPath);
+    console.log("[StackCode] Manifest exists:", fs.existsSync(manifestPath));
 
-    private _getHtmlForWebview(webview: vscode.Webview): string {
-        const nonce = getNonce();
-        const buildPath = vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview-ui');
-        
-        // Lê o manifest.json do Vite
-        const manifestPath = path.join(buildPath.fsPath, '.vite', 'manifest.json');
-        
-        console.log('[StackCode] Build path:', buildPath.fsPath);
-        console.log('[StackCode] Manifest path:', manifestPath);
-        console.log('[StackCode] Manifest exists:', fs.existsSync(manifestPath));
-        
-        try {
-            const manifestContent = fs.readFileSync(manifestPath, 'utf-8');
-            const manifest = JSON.parse(manifestContent);
-            console.log('[StackCode] Manifest content:', manifest);
+    try {
+      const manifestContent = fs.readFileSync(manifestPath, "utf-8");
+      const manifest = JSON.parse(manifestContent);
+      console.log("[StackCode] Manifest content:", manifest);
 
-            // Pega os arquivos do manifest do Vite
-            const indexEntry = manifest['index.html'];
-            const scriptFile = indexEntry.file;
-            const cssFiles = indexEntry.css || [];
+      // Pega os arquivos do manifest do Vite
+      const indexEntry = manifest["index.html"];
+      const scriptFile = indexEntry.file;
+      const cssFiles = indexEntry.css || [];
 
-            const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(buildPath, scriptFile));
-            const cssUris = cssFiles.map((cssFile: string) => 
-                webview.asWebviewUri(vscode.Uri.joinPath(buildPath, cssFile))
-            );
+      const scriptUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(buildPath, scriptFile),
+      );
+      const cssUris = cssFiles.map((cssFile: string) =>
+        webview.asWebviewUri(vscode.Uri.joinPath(buildPath, cssFile)),
+      );
 
-            console.log('[StackCode] Script URI:', scriptUri.toString());
-            console.log('[StackCode] CSS URIs:', cssUris.map((uri: vscode.Uri) => uri.toString()));
+      console.log("[StackCode] Script URI:", scriptUri.toString());
+      console.log(
+        "[StackCode] CSS URIs:",
+        cssUris.map((uri: vscode.Uri) => uri.toString()),
+      );
 
-            return `<!DOCTYPE html>
+      return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval'; img-src ${webview.cspSource} https: data:; connect-src ${webview.cspSource};">
-    ${cssUris.map((uri: vscode.Uri) => `<link href="${uri}" rel="stylesheet">`).join('\n    ')}
+    ${cssUris.map((uri: vscode.Uri) => `<link href="${uri}" rel="stylesheet">`).join("\n    ")}
     <title>StackCode Dashboard</title>
 </head>
 <body>
@@ -199,10 +232,10 @@ export class DashboardProvider implements vscode.WebviewViewProvider, vscode.Dis
     </script>
 </body>
 </html>`;
-        } catch (error) {
-            console.error("[StackCode] Error reading manifest:", error);
-            // Fallback melhorado para desenvolvimento
-            return `<!DOCTYPE html>
+    } catch (error) {
+      console.error("[StackCode] Error reading manifest:", error);
+      // Fallback melhorado para desenvolvimento
+      return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -248,32 +281,33 @@ export class DashboardProvider implements vscode.WebviewViewProvider, vscode.Dis
             <br><br>
             Execute: <code>npm run build:ui</code>
             <br><br>
-            Erro: ${error instanceof Error ? error.message : 'Manifest não encontrado'}
+            Erro: ${error instanceof Error ? error.message : "Manifest não encontrado"}
         </div>
         <p>Status da extensão: ✅ Ativa</p>
-        <p>Workspace: ${vscode.workspace.workspaceFolders?.[0]?.name || 'Nenhum'}</p>
+        <p>Workspace: ${vscode.workspace.workspaceFolders?.[0]?.name || "Nenhum"}</p>
     </div>
 </body>
 </html>`;
-        }
     }
+  }
 
-    // CORREÇÃO: Adicionando o método dispose para conformidade.
-    public dispose() {
-        while (this._disposables.length) {
-            const x = this._disposables.pop();
-            if (x) {
-                x.dispose();
-            }
-        }
+  // CORREÇÃO: Adicionando o método dispose para conformidade.
+  public dispose() {
+    while (this._disposables.length) {
+      const x = this._disposables.pop();
+      if (x) {
+        x.dispose();
+      }
     }
+  }
 }
 
 function getNonce() {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 32; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
+  let text = "";
+  const possible =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for (let i = 0; i < 32; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
 }

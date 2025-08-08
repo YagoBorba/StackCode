@@ -31,7 +31,10 @@ let configCommand: ConfigCommand;
 
 export function activate(context: vscode.ExtensionContext) {
   console.log("[StackCode] Extension is now active!");
-  console.log("[StackCode] Workspace folders:", vscode.workspace.workspaceFolders?.length || 0);
+  console.log(
+    "[StackCode] Workspace folders:",
+    vscode.workspace.workspaceFolders?.length || 0,
+  );
   console.log("[StackCode] Extension path:", context.extensionPath);
 
   // Initialize configuration manager
@@ -130,8 +133,9 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("stackcode.webview.generate.readme", () =>
       generateCommand.generateReadme(),
     ),
-    vscode.commands.registerCommand("stackcode.webview.generate.gitignore", () =>
-      generateCommand.generateGitignore(),
+    vscode.commands.registerCommand(
+      "stackcode.webview.generate.gitignore",
+      () => generateCommand.generateGitignore(),
     ),
     vscode.commands.registerCommand("stackcode.webview.git.start", () =>
       gitCommand.startBranch(),
