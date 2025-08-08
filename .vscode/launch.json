@@ -1,0 +1,29 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run VSCode Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode-extension"
+      ],
+      "outFiles": ["${workspaceFolder}/packages/vscode-extension/out/**/*.js"],
+      "preLaunchTask": "npm: compile:ext"
+    },
+    {
+      "name": "Extension Tests",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode-extension",
+        "--extensionTestsPath=${workspaceFolder}/packages/vscode-extension/out/test"
+      ],
+      "outFiles": ["${workspaceFolder}/packages/vscode-extension/out/**/*.js"],
+      "preLaunchTask": "npm: compile:ext"
+    }
+  ]
+}

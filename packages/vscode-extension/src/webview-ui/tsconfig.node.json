@@ -1,0 +1,11 @@
+// ARQUIVO-ALVO: packages/vscode-extension/src/webview-ui/tsconfig.node.json
+{
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler", // <<< ESTA É A LINHA MAIS IMPORTANTE
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["vite.config.ts", "postcss.config.js", "tailwind.config.js"] // Adicionei os outros arquivos de config aqui por boa prática
+}

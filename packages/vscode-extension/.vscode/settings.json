@@ -1,0 +1,12 @@
+{
+  "files.associations": {
+    "*.json": "jsonc",
+    "tsconfig*.json": "jsonc",
+    "launch.json": "jsonc",
+    "tasks.json": "jsonc",
+    "package.json": "jsonc"
+  },
+  "json.schemaDownload.enable": true,
+  "jsonc.validate.enable": true,
+  "typescript.preferences.includePackageJsonAutoImports": "on"
+}
