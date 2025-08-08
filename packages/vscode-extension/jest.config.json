@@ -1,0 +1,15 @@
+{
+  "preset": "ts-jest",
+  "testEnvironment": "node",
+  "rootDir": ".",
+  "testMatch": ["<rootDir>/src/test/**/*.test.ts"],
+  "testPathIgnorePatterns": ["/node_modules/", "/out/", "../../"],
+  "collectCoverageFrom": ["src/**/*.ts", "!src/test/**"],
+  "moduleFileExtensions": ["ts", "js", "json"],
+  "transform": {
+    "^.+\\.ts$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^vscode$": "<rootDir>/src/test/__mocks__/vscode.ts"
+  }
+}
