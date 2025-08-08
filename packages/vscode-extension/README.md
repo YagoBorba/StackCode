@@ -25,16 +25,19 @@ All StackCode CLI commands are available directly in VS Code:
 The extension actively monitors your development workflow and provides contextual suggestions:
 
 #### Branch Management
+
 - **Main Branch Detection**: "You are working on the main branch. Would you like to create a new branch for this feature?"
 - **Automatic Branch Creation**: Guided workflow for creating feature/bugfix/hotfix branches
 - **Branch Naming Conventions**: Enforces consistent naming patterns
 
-#### Commit Message Assistance  
+#### Commit Message Assistance
+
 - **Conventional Commit Detection**: "We detected you are trying to commit without a conventional message. Would you like help formatting it?"
 - **Interactive Message Builder**: Step-by-step commit message creation
 - **Real-time Validation**: Checks commit messages in real-time
 
 #### Project Structure
+
 - **Missing Files Detection**: Suggests creating README.md, .gitignore when missing
 - **File Generation**: Quick generation of project files with appropriate templates
 - **Best Practices Check**: Full project audit with actionable suggestions
@@ -42,7 +45,7 @@ The extension actively monitors your development workflow and provides contextua
 ### 🎛️ Commands
 
 - `StackCode: Create New Branch` - Interactive branch creation wizard
-- `StackCode: Format Commit Message` - Conventional commit message builder  
+- `StackCode: Format Commit Message` - Conventional commit message builder
 - `StackCode: Check Best Practices` - Full project best practices audit
 
 ### ⚙️ Configuration
@@ -58,24 +61,28 @@ The extension actively monitors your development workflow and provides contextua
 ## Example Notifications
 
 ### Branch Warning
+
 ```
 ⚠️ You are working on the main branch. Would you like to create a new feature branch?
 [Create Branch] [Continue] [Don't Show Again]
 ```
 
 ### Commit Message Help
+
 ```
 💬 We detected you are trying to commit without a conventional message. Would you like help formatting it?
 [Format Message] [Continue] [Learn More]
 ```
 
 ### File Suggestions
+
 ```
 📁 Your project is missing some important files: README.md, .gitignore. Would you like to generate them?
 [Generate Files] [Not Now] [Don't Show Again]
 ```
 
 ### Welcome Message
+
 ```
 🚀 StackCode is now active! Get proactive suggestions to improve your development workflow.
 [Learn More] [Settings]

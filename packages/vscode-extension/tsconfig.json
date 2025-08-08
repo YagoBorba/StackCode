@@ -11,8 +11,9 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["jest", "node", "vscode"]
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.test.ts", "out"]
+  "exclude": ["node_modules", "out"]
 }

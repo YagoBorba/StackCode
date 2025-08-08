@@ -10,13 +10,15 @@ Once the StackCode extension is installed and activated, it will automatically s
 
 **Scenario**: You're working directly on the `main`, `master`, or `develop` branch.
 
-**Notification**: 
+**Notification**:
+
 ```
 ⚠️ You are working on the main branch. Would you like to create a new feature branch?
 [Create Branch] [Continue] [Don't Show Again]
 ```
 
 **Actions**:
+
 - **Create Branch**: Opens an interactive dialog to create a new branch
 - **Continue**: Dismisses the notification for this session
 - **Don't Show Again**: Permanently disables branch check notifications
@@ -26,12 +28,14 @@ Once the StackCode extension is installed and activated, it will automatically s
 **Scenario**: You're about to commit without following conventional commit format.
 
 **Notification**:
+
 ```
 💬 We detected you are trying to commit without a conventional message. Would you like help formatting it?
 [Format Message] [Continue] [Learn More]
 ```
 
 **Actions**:
+
 - **Format Message**: Opens commit message builder
 - **Continue**: Allows you to proceed with your current message
 - **Learn More**: Opens conventional commits documentation
@@ -41,6 +45,7 @@ Once the StackCode extension is installed and activated, it will automatically s
 **Scenario**: Your project is missing important files like README.md or .gitignore.
 
 **Notification**:
+
 ```
 📁 Your project is missing some important files: README.md, .gitignore. Would you like to generate them?
 [Generate Files] [Not Now] [Don't Show Again]
@@ -91,6 +96,7 @@ Example output: `feat(auth): add user login functionality`
 ## Configuration
 
 ### Access Settings
+
 - Open VS Code settings
 - Search for "stackcode"
 - Or edit `settings.json` directly
@@ -101,10 +107,10 @@ Example output: `feat(auth): add user login functionality`
 {
   // Enable/disable all proactive notifications
   "stackcode.notifications.enabled": true,
-  
+
   // Show notifications when working on main/develop branch
   "stackcode.notifications.branchCheck": true,
-  
+
   // Show notifications for unconventional commit messages
   "stackcode.notifications.commitCheck": true
 }
@@ -134,6 +140,7 @@ The extension encourages GitFlow workflow:
 ### Extension Not Showing Notifications
 
 1. Check if notifications are enabled:
+
    ```json
    "stackcode.notifications.enabled": true
    ```

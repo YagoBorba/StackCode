@@ -5,7 +5,7 @@
   "version": "1.0.3",
   "publisher": "YagoBorba",
   "engines": {
-    "vscode": "^1.74.0"
+    "vscode": "^1.85.0"
   },
   "categories": [
     "Other",
@@ -221,11 +221,12 @@
     "test": "jest"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.0",
+    "@types/jest": "^29.5.14",
     "@types/node": "^16.18.126",
-    "@types/vscode": "^1.102.0",
+    "@types/vscode": "^1.85.0",
     "@vscode/vsce": "^2.19.0",
     "jest": "^29.5.0",
+    "ts-jest": "^29.4.1",
     "typescript": "^4.9.5"
   },
   "dependencies": {
