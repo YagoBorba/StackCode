@@ -68,7 +68,6 @@ class ConfigCommand extends BaseCommand_1.BaseCommand {
                 }
             }
             else if (action.label === (0, i18n_1.t)("vscode.config.create_project_config")) {
-                // Use StackCode CLI for config creation
                 const command = `npx @stackcode/cli config init`;
                 await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
                 this.showSuccess((0, i18n_1.t)("vscode.config.project_configuration_initialized"));

@@ -2,7 +2,7 @@ import { CommandModule } from "yargs";
 import { getErrorMessage } from "@stackcode/core";
 import { fetchRepositoryIssues } from "@stackcode/core";
 import { Octokit } from "@octokit/rest";
-import { t } from "@stackcode/i18n";
+import { t, initI18n } from "@stackcode/i18n";
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -46,7 +46,7 @@ class CLIAuthManager {
         return fs.readFileSync(this.tokenPath, "utf-8").trim();
       }
     } catch (error) {
-      console.error("Error reading token:", error);
+      console.error(t("github.auth.error_reading_token"), error);
     }
     return null;
   }
@@ -57,7 +57,7 @@ class CLIAuthManager {
         fs.unlinkSync(this.tokenPath);
       }
     } catch (error) {
-      console.error("Error removing token:", error);
+      console.error(t("github.auth.error_removing_token"), error);
     }
   }
 
@@ -131,34 +131,37 @@ function getAuthCommand(): CommandModule<{}, AuthArgs> {
           type: "boolean",
           describe: t("github.auth.status") || "Check authentication status",
         })
-        .example("$0 github auth --login", "Set up GitHub authentication")
-        .example("$0 github auth --token ghp_xxx", "Set token directly")
-        .example("$0 github auth --status", "Check authentication status"),
+        .example("$0 github auth --login", "Configurar autenticação do GitHub")
+        .example("$0 github auth --token ghp_xxx", "Definir token diretamente")
+        .example("$0 github auth --status", "Verificar status da autenticação"),
 
     async handler(args: AuthArgs) {
+      // Ensure i18n is initialized
+      await initI18n();
+      
       const authManager = new CLIAuthManager();
 
       try {
         if (args.logout) {
           authManager.removeToken();
-          console.log("✅ GitHub authentication removed");
+          console.log(`✅ ${t("github.auth.authentication_removed")}`);
           return;
         }
 
         if (args.status) {
           const token = authManager.getToken();
           if (!token) {
-            console.log("❌ Not authenticated with GitHub");
-            console.log("Run 'stackcode github auth --login' to authenticate");
+            console.log(`❌ ${t("github.auth.not_authenticated")}`);
+            console.log(t("github.auth.run_login"));
             return;
           }
 
           const isValid = await authManager.validateToken(token);
           if (isValid) {
-            console.log("✅ GitHub authentication is valid");
+            console.log(`✅ ${t("github.auth.authentication_valid")}`);
           } else {
-            console.log("❌ GitHub token is invalid or expired");
-            console.log("Run 'stackcode github auth --login' to re-authenticate");
+            console.log(`❌ ${t("github.auth.token_invalid")}`);
+            console.log(t("github.auth.run_login"));
           }
           return;
         }
@@ -166,33 +169,33 @@ function getAuthCommand(): CommandModule<{}, AuthArgs> {
         if (args.token) {
           const isValid = await authManager.validateToken(args.token);
           if (!isValid) {
-            console.error("❌ Invalid GitHub token");
+            console.error(`❌ ${t("github.auth.token_invalid_error")}`);
             process.exit(1);
           }
 
           authManager.saveToken(args.token);
-          console.log("✅ GitHub token saved successfully");
+          console.log(`✅ ${t("github.auth.token_saved")}`);
           return;
         }
 
         if (args.login) {
-          console.log("🔐 GitHub Authentication Setup");
+          console.log(`🔐 ${t("github.auth.setup_title")}`);
           console.log("");
-          console.log("To authenticate with GitHub:");
-          console.log("1. Go to https://github.com/settings/tokens");
-          console.log("2. Click 'Generate new token' → 'Generate new token (classic)'");
-          console.log("3. Add note: 'StackCode CLI'");
-          console.log("4. Select scopes: 'repo', 'user:email'");
-          console.log("5. Click 'Generate token'");
-          console.log("6. Run: stackcode github auth --token YOUR_TOKEN");
+          console.log(t("github.auth.setup_instructions"));
+          console.log(t("github.auth.setup_step1"));
+          console.log(t("github.auth.setup_step2"));
+          console.log(t("github.auth.setup_step3"));
+          console.log(t("github.auth.setup_step4"));
+          console.log(t("github.auth.setup_step5"));
+          console.log(t("github.auth.setup_step6"));
           console.log("");
-          console.log("Or use the VS Code extension for easier OAuth authentication.");
+          console.log(t("github.auth.setup_alternative"));
           return;
         }
 
-        console.log("Use --login, --token, --status, or --logout");
+        console.log(t("github.auth.use_options"));
       } catch (error) {
-        console.error("GitHub auth error:", getErrorMessage(error));
+        console.error(`${t("github.auth.auth_error")} ${getErrorMessage(error)}`);
         process.exit(1);
       }
     },
@@ -235,19 +238,22 @@ function getIssuesCommand(): CommandModule<{}, IssuesArgs> {
           default: 30,
           describe: t("github.issues.limit") || "Number of issues to fetch",
         })
-        .example("$0 github issues", "List issues from current repository")
-        .example("$0 github issues --repo owner/repo", "List issues from specific repository")
-        .example("$0 github issues --assignee me", "List my assigned issues") as any,
+        .example("$0 github issues", "Listar issues do repositório atual")
+        .example("$0 github issues --repo owner/repo", "Listar issues de repositório específico")
+        .example("$0 github issues --assignee me", "Listar minhas issues atribuídas") as any,
 
     async handler(args: IssuesArgs) {
+      // Ensure i18n is initialized
+      await initI18n();
+      
       const authManager = new CLIAuthManager();
 
       try {
         // Verificar autenticação
         const token = authManager.getToken();
         if (!token) {
-          console.error("❌ Not authenticated with GitHub");
-          console.error("Run 'stackcode github auth --login' to authenticate");
+          console.error(`❌ ${t("github.auth.not_authenticated")}`);
+          console.error(t("github.auth.run_login"));
           process.exit(1);
         }
 
@@ -256,21 +262,21 @@ function getIssuesCommand(): CommandModule<{}, IssuesArgs> {
         if (args.repo) {
           const parts = args.repo.split("/");
           if (parts.length !== 2) {
-            console.error("❌ Repository must be in format 'owner/repo'");
+            console.error(`❌ ${t("github.issues.repository_format_error")}`);
             process.exit(1);
           }
           [owner, repo] = parts;
         } else {
           const currentRepo = getCurrentRepository();
           if (!currentRepo) {
-            console.error("❌ No GitHub repository detected");
-            console.error("Run this command from a Git repository or use --repo option");
+            console.error(`❌ ${t("github.issues.no_repository_detected")}`);
+            console.error(t("github.issues.run_from_git_repo"));
             process.exit(1);
           }
           ({ owner, repo } = currentRepo);
         }
 
-        console.log(`📋 Fetching issues from ${owner}/${repo}...`);
+        console.log(`📋 ${t("github.issues.fetching")} ${owner}/${repo}...`);
 
         // Buscar issues
         const octokit = new Octokit({ auth: token });
@@ -285,11 +291,11 @@ function getIssuesCommand(): CommandModule<{}, IssuesArgs> {
 
         // Exibir resultados
         if (issues.length === 0) {
-          console.log(`✅ No ${args.state} issues found in ${owner}/${repo}`);
+          console.log(`✅ ${t("github.issues.no_issues_found")} ${owner}/${repo}`);
           return;
         }
 
-        console.log(`\n📄 Found ${issues.length} ${args.state} issues:\n`);
+        console.log(`\n📄 ${t("github.issues.found_issues")} ${issues.length} ${args.state} ${t("github.issues.issues")}:\n`);
 
         issues.forEach((issue) => {
           console.log(`#${issue.number} ${issue.title}`);
@@ -302,7 +308,7 @@ function getIssuesCommand(): CommandModule<{}, IssuesArgs> {
           
           if (issue.assignees.length > 0) {
             const assignees = issue.assignees.map(a => a.login).join(", ");
-            console.log(`   👥 Assigned to: ${assignees}`);
+            console.log(`   👥 ${t("github.issues.assigned_to")} ${assignees}`);
           }
           
           console.log(`   🔗 ${issue.html_url}`);
@@ -310,7 +316,7 @@ function getIssuesCommand(): CommandModule<{}, IssuesArgs> {
         });
 
       } catch (error) {
-        console.error("Error fetching issues:", getErrorMessage(error));
+        console.error(`${t("github.issues.error_fetching")} ${getErrorMessage(error)}`);
         process.exit(1);
       }
     },

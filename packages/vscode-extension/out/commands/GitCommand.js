@@ -93,7 +93,6 @@ class GitCommand extends BaseCommand_1.BaseCommand {
                     increment: 0,
                     message: (0, i18n_1.t)("vscode.git.switching_to_develop"),
                 });
-                // Use StackCode CLI for git operations
                 const command = `npx @stackcode/cli git start ${branchName} --type=${branchType.label}`;
                 progress.report({
                     increment: 50,
@@ -120,7 +119,6 @@ class GitCommand extends BaseCommand_1.BaseCommand {
                 this.showError((0, i18n_1.t)("vscode.common.no_workspace_folder"));
                 return;
             }
-            // Get current branch name
             const gitExtension = vscode.extensions.getExtension("vscode.git");
             let currentBranch = "current branch";
             if (gitExtension && gitExtension.isActive) {
@@ -151,7 +149,6 @@ class GitCommand extends BaseCommand_1.BaseCommand {
                     increment: 0,
                     message: (0, i18n_1.t)("vscode.git.pushing_branch"),
                 });
-                // Use StackCode CLI for git operations
                 const command = `npx @stackcode/cli git finish`;
                 progress.report({
                     increment: 50,

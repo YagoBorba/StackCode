@@ -31,7 +31,6 @@ const path = __importStar(require("path"));
 class InitCommand extends BaseCommand_1.BaseCommand {
     async execute() {
         try {
-            // Prompt for project details
             const projectName = await vscode.window.showInputBox({
                 prompt: (0, i18n_1.t)("vscode.init.enter_project_name"),
                 placeHolder: (0, i18n_1.t)("vscode.init.my_awesome_project"),
@@ -72,7 +71,6 @@ class InitCommand extends BaseCommand_1.BaseCommand {
             if (!stack) {
                 return;
             }
-            // Get workspace folder or ask for project location
             const workspaceFolder = this.getCurrentWorkspaceFolder();
             let projectPath;
             if (workspaceFolder) {
@@ -90,7 +88,6 @@ class InitCommand extends BaseCommand_1.BaseCommand {
                 }
                 projectPath = path.join(folderUris[0].fsPath, projectName);
             }
-            // Check if directory exists
             try {
                 await vscode.workspace.fs.stat(vscode.Uri.file(projectPath));
                 const overwrite = await this.confirmAction((0, i18n_1.t)("vscode.init.directory_exists_overwrite", { projectName }), (0, i18n_1.t)("vscode.init.overwrite"));
@@ -101,7 +98,6 @@ class InitCommand extends BaseCommand_1.BaseCommand {
             catch {
                 // Directory doesn't exist, which is fine
             }
-            // Show progress
             vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
                 title: (0, i18n_1.t)("vscode.init.initializing_project", { projectName }),
@@ -111,7 +107,6 @@ class InitCommand extends BaseCommand_1.BaseCommand {
                     increment: 0,
                     message: (0, i18n_1.t)("vscode.init.setting_up_structure"),
                 });
-                // Use StackCode CLI for initialization
                 const command = `npx @stackcode/cli init --name="${projectName}" --description="${description}" --author="${authorName}" --stack="${stack.label}" --path="${projectPath}"`;
                 progress.report({
                     increment: 50,
@@ -123,7 +118,6 @@ class InitCommand extends BaseCommand_1.BaseCommand {
                     message: (0, i18n_1.t)("vscode.init.project_initialized_successfully"),
                 });
             });
-            // Ask if user wants to open the new project
             const openProject = await vscode.window.showInformationMessage((0, i18n_1.t)("vscode.init.project_created_successfully", { projectName }), (0, i18n_1.t)("vscode.init.open_project"), (0, i18n_1.t)("vscode.init.later"));
             if (openProject === (0, i18n_1.t)("vscode.init.open_project")) {
                 const uri = vscode.Uri.file(projectPath);
@@ -136,7 +130,6 @@ class InitCommand extends BaseCommand_1.BaseCommand {
     }
     async getGitUserName() {
         try {
-            // Try to get git user name from workspace
             const terminal = vscode.window.createTerminal({ name: "temp" });
             terminal.sendText("git config user.name");
             terminal.dispose();

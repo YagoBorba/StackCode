@@ -48,7 +48,6 @@ class ReleaseCommand extends BaseCommand_1.BaseCommand {
                     increment: 0,
                     message: (0, i18n_1.t)("vscode.release.preparing_release"),
                 });
-                // Use StackCode CLI for release
                 const command = `npx @stackcode/cli release`;
                 progress.report({
                     increment: 50,

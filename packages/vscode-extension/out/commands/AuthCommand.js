@@ -68,7 +68,6 @@ class AuthCommand extends BaseCommand_1.BaseCommand {
         }
         catch (error) {
             console.error("[AuthCommand] Login failed:", error);
-            // Error handling já é feito no GitHubAuthService
         }
     }
     /**
@@ -88,7 +87,6 @@ class AuthCommand extends BaseCommand_1.BaseCommand {
         }
         catch (error) {
             console.error("[AuthCommand] Logout failed:", error);
-            // Error handling já é feito no GitHubAuthService
         }
     }
     /**

@@ -7,7 +7,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
-    "build": "tsc",
+    "build": "tsc && mkdir -p dist && cp -r src/locales dist/locales",
     "test": "echo \"✅ No tests for this package\""
   },
   "keywords": [
