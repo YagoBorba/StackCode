@@ -6,6 +6,24 @@
     "no": "Não",
     "error_demand_command": "Você precisa especificar pelo menos um comando."
   },
+  "github": {
+    "description": "Comandos de integração com GitHub",
+    "auth": {
+      "description": "Gerenciar autenticação do GitHub",
+      "token": "Definir token de acesso pessoal do GitHub",
+      "login": "Configurar autenticação do GitHub",
+      "logout": "Remover autenticação do GitHub",
+      "status": "Verificar status da autenticação"
+    },
+    "issues": {
+      "description": "Listar issues do repositório",
+      "repo": "Repositório (dono/repo)",
+      "state": "Estado da issue",
+      "assignee": "Filtrar por responsável",
+      "labels": "Filtrar por labels (separadas por vírgula)",
+      "limit": "Número de issues para buscar"
+    }
+  },
   "commit": {
     "command_description": "Inicia uistente interativo para criar uma mensagem de commit convencional.",
     "success": "✔ Commit criado com sucesso!",

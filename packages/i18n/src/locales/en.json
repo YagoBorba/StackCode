@@ -6,6 +6,24 @@
     "no": "No",
     "error_demand_command": "You need to specify at least one command."
   },
+  "github": {
+    "description": "GitHub integration commands",
+    "auth": {
+      "description": "Manage GitHub authentication",
+      "token": "Set GitHub personal access token",
+      "login": "Set up GitHub authentication",
+      "logout": "Remove GitHub authentication",
+      "status": "Check authentication status"
+    },
+    "issues": {
+      "description": "List repository issues",
+      "repo": "Repository (owner/repo)",
+      "state": "Issue state",
+      "assignee": "Filter by assignee",
+      "labels": "Filter by labels (comma-separated)",
+      "limit": "Number of issues to fetch"
+    }
+  },
   "commit": {
     "command_description": "Starts an interactive wizard to create a conventional commit message.",
     "success": "✔ Commit created successfully!",
