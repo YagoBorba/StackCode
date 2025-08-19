@@ -28,22 +28,33 @@ export class ReleaseCommand extends BaseCommand {
           cancellable: false,
         },
         async (progress: ProgressCallback) => {
-          progress.report({ increment: 0, message: t("vscode.release.preparing_release") });
+          progress.report({
+            increment: 0,
+            message: t("vscode.release.preparing_release"),
+          });
 
           // Use StackCode CLI for release
           const command = `npx @stackcode/cli release`;
 
-          progress.report({ increment: 50, message: t("vscode.release.creating_release_message") });
+          progress.report({
+            increment: 50,
+            message: t("vscode.release.creating_release_message"),
+          });
 
           await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
 
-          progress.report({ increment: 100, message: t("vscode.release.release_created") });
+          progress.report({
+            increment: 100,
+            message: t("vscode.release.release_created"),
+          });
         },
       );
 
       this.showSuccess(t("vscode.release.release_process_started"));
     } catch (error) {
-      this.showError(t("vscode.release.failed_create_release", { error: String(error) }));
+      this.showError(
+        t("vscode.release.failed_create_release", { error: String(error) }),
+      );
     }
   }
 }

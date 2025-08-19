@@ -19,7 +19,10 @@ export class ValidateCommand extends BaseCommand {
           cancellable: false,
         },
         async (progress: ProgressCallback) => {
-          progress.report({ increment: 0, message: t("vscode.validate.running_validation") });
+          progress.report({
+            increment: 0,
+            message: t("vscode.validate.running_validation"),
+          });
 
           // Use StackCode CLI for validation
           const command = `npx @stackcode/cli validate`;
@@ -31,15 +34,18 @@ export class ValidateCommand extends BaseCommand {
 
           await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
 
-          progress.report({ increment: 100, message: t("vscode.validate.validation_completed") });
+          progress.report({
+            increment: 100,
+            message: t("vscode.validate.validation_completed"),
+          });
         },
       );
 
-      this.showSuccess(
-        t("vscode.validate.project_validation_completed"),
-      );
+      this.showSuccess(t("vscode.validate.project_validation_completed"));
     } catch (error) {
-      this.showError(t("vscode.validate.failed_validate_project", { error: String(error) }));
+      this.showError(
+        t("vscode.validate.failed_validate_project", { error: String(error) }),
+      );
     }
   }
 }

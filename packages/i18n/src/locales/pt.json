@@ -217,7 +217,7 @@
     },
     "init": {
       "enter_project_name": "Digite o nome do projeto",
-      "enter_project_description": "Digite a descrição do projeto", 
+      "enter_project_description": "Digite a descrição do projeto",
       "enter_author_name": "Digite o nome do autor",
       "project_initialized_successfully": "Projeto inicializado com sucesso!",
       "project_created_successfully": "Projeto {projectName} foi criado com sucesso! Gostaria de abri-lo?",
@@ -240,7 +240,7 @@
         "node_ts": "Node.js com TypeScript",
         "react": "Aplicação React",
         "vue": "Aplicação Vue.js",
-        "angular": "Aplicação Angular", 
+        "angular": "Aplicação Angular",
         "python": "Projeto Python",
         "java": "Projeto Java",
         "go": "Projeto Go",

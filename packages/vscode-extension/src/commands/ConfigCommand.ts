@@ -49,9 +49,7 @@ export class ConfigCommand extends BaseCommand {
           const document = await vscode.workspace.openTextDocument(configPath);
           await vscode.window.showTextDocument(document);
         } catch {
-          this.showError(
-            t("vscode.config.stackcoderc_not_found"),
-          );
+          this.showError(t("vscode.config.stackcoderc_not_found"));
         }
       } else if (action.label === t("vscode.config.create_project_config")) {
         // Use StackCode CLI for config creation
@@ -60,7 +58,9 @@ export class ConfigCommand extends BaseCommand {
         this.showSuccess(t("vscode.config.project_configuration_initialized"));
       }
     } catch (error) {
-      this.showError(t("vscode.config.failed_open_configuration", { error: String(error) }));
+      this.showError(
+        t("vscode.config.failed_open_configuration", { error: String(error) }),
+      );
     }
   }
 }

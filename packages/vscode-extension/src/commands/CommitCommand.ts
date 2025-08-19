@@ -17,7 +17,9 @@ export class CommitCommand extends BaseCommand {
 
       this.showSuccess(t("vscode.commit.commit_dialog_opened"));
     } catch (error) {
-      this.showError(t("vscode.commit.failed_open_commit_dialog", { error: String(error) }));
+      this.showError(
+        t("vscode.commit.failed_open_commit_dialog", { error: String(error) }),
+      );
     }
   }
 }

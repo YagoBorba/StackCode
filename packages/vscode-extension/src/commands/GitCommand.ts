@@ -48,7 +48,10 @@ export class GitCommand extends BaseCommand {
 
       const branchType = await vscode.window.showQuickPick(
         [
-          { label: "feature", description: t("vscode.git.feature_description") },
+          {
+            label: "feature",
+            description: t("vscode.git.feature_description"),
+          },
           { label: "bugfix", description: t("vscode.git.bugfix_description") },
           { label: "hotfix", description: t("vscode.git.hotfix_description") },
           { label: "chore", description: t("vscode.git.chore_description") },
@@ -71,11 +74,16 @@ export class GitCommand extends BaseCommand {
       vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
-          title: t("vscode.git.creating_branch", { branchName: `${branchType.label}/${branchName}` }),
+          title: t("vscode.git.creating_branch", {
+            branchName: `${branchType.label}/${branchName}`,
+          }),
           cancellable: false,
         },
         async (progress: ProgressCallback) => {
-          progress.report({ increment: 0, message: t("vscode.git.switching_to_develop") });
+          progress.report({
+            increment: 0,
+            message: t("vscode.git.switching_to_develop"),
+          });
 
           // Use StackCode CLI for git operations
           const command = `npx @stackcode/cli git start ${branchName} --type=${branchType.label}`;
@@ -95,10 +103,14 @@ export class GitCommand extends BaseCommand {
       );
 
       this.showSuccess(
-        t("vscode.git.new_branch_created", { branchName: `${branchType.label}/${branchName}` }),
+        t("vscode.git.new_branch_created", {
+          branchName: `${branchType.label}/${branchName}`,
+        }),
       );
     } catch (error) {
-      this.showError(t("vscode.git.failed_create_branch", { error: String(error) }));
+      this.showError(
+        t("vscode.git.failed_create_branch", { error: String(error) }),
+      );
     }
   }
 
@@ -139,16 +151,24 @@ export class GitCommand extends BaseCommand {
       vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
-          title: t("vscode.git.finishing_branch", { branchName: currentBranch }),
+          title: t("vscode.git.finishing_branch", {
+            branchName: currentBranch,
+          }),
           cancellable: false,
         },
         async (progress: ProgressCallback) => {
-          progress.report({ increment: 0, message: t("vscode.git.pushing_branch") });
+          progress.report({
+            increment: 0,
+            message: t("vscode.git.pushing_branch"),
+          });
 
           // Use StackCode CLI for git operations
           const command = `npx @stackcode/cli git finish`;
 
-          progress.report({ increment: 50, message: t("vscode.git.opening_pr") });
+          progress.report({
+            increment: 50,
+            message: t("vscode.git.opening_pr"),
+          });
 
           await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
 
@@ -159,9 +179,13 @@ export class GitCommand extends BaseCommand {
         },
       );
 
-      this.showSuccess(t("vscode.git.branch_has_been_finished", { currentBranch }));
+      this.showSuccess(
+        t("vscode.git.branch_has_been_finished", { currentBranch }),
+      );
     } catch (error) {
-      this.showError(t("vscode.git.failed_finish_branch", { error: String(error) }));
+      this.showError(
+        t("vscode.git.failed_finish_branch", { error: String(error) }),
+      );
     }
   }
 }

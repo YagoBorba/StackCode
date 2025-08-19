@@ -79,7 +79,10 @@ export class GenerateCommand extends BaseCommand {
           // Use StackCode CLI for generation
           const command = `npx @stackcode/cli generate readme`;
 
-          progress.report({ increment: 50, message: t("vscode.generate.running_generator") });
+          progress.report({
+            increment: 50,
+            message: t("vscode.generate.running_generator"),
+          });
 
           await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
 
@@ -103,7 +106,9 @@ export class GenerateCommand extends BaseCommand {
         await vscode.window.showTextDocument(document);
       }
     } catch (error) {
-      this.showError(t("vscode.generate.failed_generate_readme", { error: String(error) }));
+      this.showError(
+        t("vscode.generate.failed_generate_readme", { error: String(error) }),
+      );
     }
   }
 
@@ -142,9 +147,15 @@ export class GenerateCommand extends BaseCommand {
           { label: "java", description: t("vscode.init.stacks.java") },
           { label: "go", description: t("vscode.init.stacks.go") },
           { label: "php", description: t("vscode.init.stacks.php") },
-          { label: "flutter", description: t("vscode.generate.stacks.flutter") },
+          {
+            label: "flutter",
+            description: t("vscode.generate.stacks.flutter"),
+          },
           { label: "swift", description: t("vscode.generate.stacks.swift") },
-          { label: "android", description: t("vscode.generate.stacks.android") },
+          {
+            label: "android",
+            description: t("vscode.generate.stacks.android"),
+          },
         ],
         {
           placeHolder: t("vscode.generate.select_project_type_gitignore"),
@@ -170,7 +181,10 @@ export class GenerateCommand extends BaseCommand {
           // Use StackCode CLI for generation
           const command = `npx @stackcode/cli generate gitignore --type="${projectType.label}"`;
 
-          progress.report({ increment: 50, message: t("vscode.generate.running_generator") });
+          progress.report({
+            increment: 50,
+            message: t("vscode.generate.running_generator"),
+          });
 
           await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
 
@@ -194,7 +208,11 @@ export class GenerateCommand extends BaseCommand {
         await vscode.window.showTextDocument(document);
       }
     } catch (error) {
-      this.showError(t("vscode.generate.failed_generate_gitignore", { error: String(error) }));
+      this.showError(
+        t("vscode.generate.failed_generate_gitignore", {
+          error: String(error),
+        }),
+      );
     }
   }
 }

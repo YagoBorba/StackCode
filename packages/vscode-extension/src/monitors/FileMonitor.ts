@@ -132,7 +132,9 @@ export class FileMonitor implements vscode.Disposable {
 
       if (missingFiles.length > 0 && Math.random() < 0.3) {
         // Show suggestion 30% of the time
-        const message = t("vscode.common.project_missing_files", { missingFiles: missingFiles.join(", ") });
+        const message = t("vscode.common.project_missing_files", {
+          missingFiles: missingFiles.join(", "),
+        });
 
         const action = await vscode.window.showInformationMessage(
           message,
@@ -153,10 +155,14 @@ export class FileMonitor implements vscode.Disposable {
           );
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Use proper VS Code logging instead of console.log
       const outputChannel = vscode.window.createOutputChannel("StackCode");
-      outputChannel.appendLine(t("vscode.common.error_checking_project_structure", { error: String(error) }));
+      outputChannel.appendLine(
+        t("vscode.common.error_checking_project_structure", {
+          error: String(error),
+        }),
+      );
     }
   }
 

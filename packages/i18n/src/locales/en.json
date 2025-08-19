@@ -239,7 +239,7 @@
       "stacks": {
         "node_ts": "Node.js with TypeScript",
         "react": "React application",
-        "vue": "Vue.js application", 
+        "vue": "Vue.js application",
         "angular": "Angular application",
         "python": "Python project",
         "java": "Java project",
@@ -263,7 +263,7 @@
       "overwrite": "Overwrite",
       "generating_readme": "Generating README.md",
       "setting_up_readme": "Setting up README structure...",
-      "running_generator": "Running generator...", 
+      "running_generator": "Running generator...",
       "readme_created": "README.md created!",
       "generating_gitignore": "Generating .gitignore",
       "setting_up_gitignore": "Setting up .gitignore structure...",

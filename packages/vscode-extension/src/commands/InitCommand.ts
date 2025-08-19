@@ -134,7 +134,9 @@ export class InitCommand extends BaseCommand {
         await vscode.commands.executeCommand("vscode.openFolder", uri, true);
       }
     } catch (error) {
-      this.showError(t("vscode.init.failed_initialize_project", { error: String(error) }));
+      this.showError(
+        t("vscode.init.failed_initialize_project", { error: String(error) }),
+      );
     }
   }
 
