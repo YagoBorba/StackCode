@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { BaseCommand } from "./BaseCommand";
 import { ProgressCallback } from "../types";
+import { t } from "@stackcode/i18n";
 import * as path from "path";
 
 export class GenerateCommand extends BaseCommand {
@@ -9,19 +10,19 @@ export class GenerateCommand extends BaseCommand {
       [
         {
           label: "README.md",
-          description: "Generate a comprehensive README file",
+          description: t("vscode.generate.readme_description"),
         },
         {
           label: ".gitignore",
-          description: "Generate a .gitignore file based on project type",
+          description: t("vscode.generate.gitignore_description"),
         },
         {
-          label: "Both",
-          description: "Generate both README.md and .gitignore",
+          label: t("vscode.generate.both"),
+          description: t("vscode.generate.both_description"),
         },
       ],
       {
-        placeHolder: "What would you like to generate?",
+        placeHolder: t("vscode.generate.what_would_you_like_generate"),
       },
     );
 
@@ -33,7 +34,7 @@ export class GenerateCommand extends BaseCommand {
       await this.generateReadme();
     } else if (option.label === ".gitignore") {
       await this.generateGitignore();
-    } else if (option.label === "Both") {
+    } else if (option.label === t("vscode.generate.both")) {
       await this.generateReadme();
       await this.generateGitignore();
     }
@@ -43,7 +44,7 @@ export class GenerateCommand extends BaseCommand {
     try {
       const workspaceFolder = this.getCurrentWorkspaceFolder();
       if (!workspaceFolder) {
-        this.showError("No workspace folder found");
+        this.showError(t("vscode.common.no_workspace_folder"));
         return;
       }
 
@@ -53,8 +54,8 @@ export class GenerateCommand extends BaseCommand {
       try {
         await vscode.workspace.fs.stat(vscode.Uri.file(readmePath));
         const overwrite = await this.confirmAction(
-          "README.md already exists. Do you want to overwrite it?",
-          "Overwrite",
+          t("vscode.generate.readme_exists_overwrite"),
+          t("vscode.generate.overwrite"),
         );
         if (!overwrite) {
           return;
@@ -66,43 +67,43 @@ export class GenerateCommand extends BaseCommand {
       vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
-          title: "Generating README.md",
+          title: t("vscode.generate.generating_readme"),
           cancellable: false,
         },
         async (progress: ProgressCallback) => {
           progress.report({
             increment: 0,
-            message: "Analyzing project structure...",
+            message: t("vscode.generate.setting_up_readme"),
           });
 
           // Use StackCode CLI for generation
           const command = `npx @stackcode/cli generate readme`;
 
-          progress.report({ increment: 50, message: "Generating content..." });
+          progress.report({ increment: 50, message: t("vscode.generate.running_generator") });
 
           await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
 
           progress.report({
             increment: 100,
-            message: "README.md generated successfully!",
+            message: t("vscode.generate.readme_created"),
           });
         },
       );
 
-      this.showSuccess("README.md has been generated successfully!");
+      this.showSuccess(t("vscode.generate.readme_has_been_generated"));
 
       // Ask if user wants to open the file
       const openFile = await vscode.window.showInformationMessage(
-        "Would you like to open the generated README.md?",
-        "Open File",
+        t("vscode.generate.would_you_like_open_readme"),
+        t("vscode.generate.open_file"),
       );
 
-      if (openFile === "Open File") {
+      if (openFile === t("vscode.generate.open_file")) {
         const document = await vscode.workspace.openTextDocument(readmePath);
         await vscode.window.showTextDocument(document);
       }
     } catch (error) {
-      this.showError(`Failed to generate README.md: ${error}`);
+      this.showError(t("vscode.generate.failed_generate_readme", { error: String(error) }));
     }
   }
 
@@ -110,7 +111,7 @@ export class GenerateCommand extends BaseCommand {
     try {
       const workspaceFolder = this.getCurrentWorkspaceFolder();
       if (!workspaceFolder) {
-        this.showError("No workspace folder found");
+        this.showError(t("vscode.common.no_workspace_folder"));
         return;
       }
 
@@ -120,8 +121,8 @@ export class GenerateCommand extends BaseCommand {
       try {
         await vscode.workspace.fs.stat(vscode.Uri.file(gitignorePath));
         const overwrite = await this.confirmAction(
-          ".gitignore already exists. Do you want to overwrite it?",
-          "Overwrite",
+          t("vscode.generate.gitignore_exists_overwrite"),
+          t("vscode.generate.overwrite"),
         );
         if (!overwrite) {
           return;
@@ -133,20 +134,20 @@ export class GenerateCommand extends BaseCommand {
       // Ask for project type
       const projectType = await vscode.window.showQuickPick(
         [
-          { label: "node-ts", description: "Node.js with TypeScript" },
-          { label: "react", description: "React application" },
-          { label: "vue", description: "Vue.js application" },
-          { label: "angular", description: "Angular application" },
-          { label: "python", description: "Python project" },
-          { label: "java", description: "Java project" },
-          { label: "go", description: "Go project" },
-          { label: "php", description: "PHP project" },
-          { label: "flutter", description: "Flutter project" },
-          { label: "swift", description: "Swift project" },
-          { label: "android", description: "Android project" },
+          { label: "node-ts", description: t("vscode.init.stacks.node_ts") },
+          { label: "react", description: t("vscode.init.stacks.react") },
+          { label: "vue", description: t("vscode.init.stacks.vue") },
+          { label: "angular", description: t("vscode.init.stacks.angular") },
+          { label: "python", description: t("vscode.init.stacks.python") },
+          { label: "java", description: t("vscode.init.stacks.java") },
+          { label: "go", description: t("vscode.init.stacks.go") },
+          { label: "php", description: t("vscode.init.stacks.php") },
+          { label: "flutter", description: t("vscode.generate.stacks.flutter") },
+          { label: "swift", description: t("vscode.generate.stacks.swift") },
+          { label: "android", description: t("vscode.generate.stacks.android") },
         ],
         {
-          placeHolder: "Select project type for .gitignore",
+          placeHolder: t("vscode.generate.select_project_type_gitignore"),
         },
       );
 
@@ -157,43 +158,43 @@ export class GenerateCommand extends BaseCommand {
       vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
-          title: "Generating .gitignore",
+          title: t("vscode.generate.generating_gitignore"),
           cancellable: false,
         },
         async (progress: ProgressCallback) => {
           progress.report({
             increment: 0,
-            message: "Generating .gitignore content...",
+            message: t("vscode.generate.setting_up_gitignore"),
           });
 
           // Use StackCode CLI for generation
           const command = `npx @stackcode/cli generate gitignore --type="${projectType.label}"`;
 
-          progress.report({ increment: 50, message: "Creating file..." });
+          progress.report({ increment: 50, message: t("vscode.generate.running_generator") });
 
           await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
 
           progress.report({
             increment: 100,
-            message: ".gitignore generated successfully!",
+            message: t("vscode.generate.gitignore_created"),
           });
         },
       );
 
-      this.showSuccess(".gitignore has been generated successfully!");
+      this.showSuccess(t("vscode.generate.gitignore_has_been_generated"));
 
       // Ask if user wants to open the file
       const openFile = await vscode.window.showInformationMessage(
-        "Would you like to open the generated .gitignore?",
-        "Open File",
+        t("vscode.generate.would_you_like_open_gitignore"),
+        t("vscode.generate.open_file"),
       );
 
-      if (openFile === "Open File") {
+      if (openFile === t("vscode.generate.open_file")) {
         const document = await vscode.workspace.openTextDocument(gitignorePath);
         await vscode.window.showTextDocument(document);
       }
     } catch (error) {
-      this.showError(`Failed to generate .gitignore: ${error}`);
+      this.showError(t("vscode.generate.failed_generate_gitignore", { error: String(error) }));
     }
   }
 }

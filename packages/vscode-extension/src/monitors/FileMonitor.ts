@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { ProactiveNotificationManager } from "../notifications/ProactiveNotificationManager";
 import { ConfigurationManager } from "../config/ConfigurationManager";
+import { t } from "@stackcode/i18n";
 
 export class FileMonitor implements vscode.Disposable {
   private proactiveManager: ProactiveNotificationManager;
@@ -131,36 +132,36 @@ export class FileMonitor implements vscode.Disposable {
 
       if (missingFiles.length > 0 && Math.random() < 0.3) {
         // Show suggestion 30% of the time
-        const message = `📁 Your project is missing some important files: ${missingFiles.join(", ")}. Would you like to generate them?`;
+        const message = t("vscode.common.project_missing_files", { missingFiles: missingFiles.join(", ") });
 
         const action = await vscode.window.showInformationMessage(
           message,
-          "Generate Files",
-          "Not Now",
-          "Don't Show Again",
+          t("vscode.common.generate_files"),
+          t("vscode.common.not_now"),
+          t("vscode.common.dont_show_again"),
         );
 
-        if (action === "Generate Files") {
+        if (action === t("vscode.common.generate_files")) {
           // TODO: Implement file generation
           vscode.window.showInformationMessage(
-            "File generation will be available soon!",
+            t("vscode.common.file_generation_available_soon"),
           );
-        } else if (action === "Don't Show Again") {
+        } else if (action === t("vscode.common.dont_show_again")) {
           await this.configManager.updateConfiguration(
             "notifications.enabled",
             false,
           );
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       // Use proper VS Code logging instead of console.log
       const outputChannel = vscode.window.createOutputChannel("StackCode");
-      outputChannel.appendLine(`Error checking project structure: ${error}`);
+      outputChannel.appendLine(t("vscode.common.error_checking_project_structure", { error: String(error) }));
     }
   }
 
   dispose(): void {
-    this.disposables.forEach((d) => d.dispose());
+    this.disposables.forEach((d: vscode.Disposable) => d.dispose());
     this.disposables = [];
     this.processedFiles.clear();
   }

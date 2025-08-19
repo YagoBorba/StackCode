@@ -1,32 +1,33 @@
 import * as vscode from "vscode";
 import { BaseCommand } from "./BaseCommand";
+import { t } from "@stackcode/i18n";
 
 export class ConfigCommand extends BaseCommand {
   async execute(): Promise<void> {
     try {
       const workspaceFolder = this.getCurrentWorkspaceFolder();
       if (!workspaceFolder) {
-        this.showError("No workspace folder found");
+        this.showError(t("vscode.common.no_workspace_folder"));
         return;
       }
 
       const action = await vscode.window.showQuickPick(
         [
           {
-            label: "Open StackCode Settings",
-            description: "Configure StackCode extension settings",
+            label: t("vscode.config.open_stackcode_settings"),
+            description: t("vscode.config.open_stackcode_settings_description"),
           },
           {
-            label: "Open Project Config",
-            description: "Edit .stackcoderc.json file",
+            label: t("vscode.config.open_project_config"),
+            description: t("vscode.config.open_project_config_description"),
           },
           {
-            label: "Create Project Config",
-            description: "Create a new .stackcoderc.json file",
+            label: t("vscode.config.create_project_config"),
+            description: t("vscode.config.create_project_config_description"),
           },
         ],
         {
-          placeHolder: "What would you like to configure?",
+          placeHolder: t("vscode.config.what_would_you_like_configure"),
         },
       );
 
@@ -34,12 +35,12 @@ export class ConfigCommand extends BaseCommand {
         return;
       }
 
-      if (action.label === "Open StackCode Settings") {
+      if (action.label === t("vscode.config.open_stackcode_settings")) {
         vscode.commands.executeCommand(
           "workbench.action.openSettings",
           "stackcode",
         );
-      } else if (action.label === "Open Project Config") {
+      } else if (action.label === t("vscode.config.open_project_config")) {
         const configPath = vscode.Uri.joinPath(
           workspaceFolder.uri,
           ".stackcoderc.json",
@@ -49,17 +50,17 @@ export class ConfigCommand extends BaseCommand {
           await vscode.window.showTextDocument(document);
         } catch {
           this.showError(
-            '.stackcoderc.json file not found. Use "Create Project Config" to create one.',
+            t("vscode.config.stackcoderc_not_found"),
           );
         }
-      } else if (action.label === "Create Project Config") {
+      } else if (action.label === t("vscode.config.create_project_config")) {
         // Use StackCode CLI for config creation
         const command = `npx @stackcode/cli config init`;
         await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
-        this.showSuccess("Project configuration initialized!");
+        this.showSuccess(t("vscode.config.project_configuration_initialized"));
       }
     } catch (error) {
-      this.showError(`Failed to open configuration: ${error}`);
+      this.showError(t("vscode.config.failed_open_configuration", { error: String(error) }));
     }
   }
 }
