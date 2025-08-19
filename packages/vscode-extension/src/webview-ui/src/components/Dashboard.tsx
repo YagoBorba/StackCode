@@ -16,11 +16,51 @@ import {
   Users,
   Code,
 } from "lucide-react";
+import IssuesPanel from "./IssuesPanel";
+
+// Interfaces para Issues do GitHub
+interface GitHubIssue {
+  id: number;
+  number: number;
+  title: string;
+  body: string | null;
+  state: "open" | "closed";
+  html_url: string;
+  user: {
+    login: string;
+    avatar_url: string;
+  };
+  assignees: Array<{
+    login: string;
+    avatar_url: string;
+  }>;
+  labels: Array<{
+    name: string;
+    color: string;
+    description: string | null;
+  }>;
+  created_at: string;
+  updated_at: string;
+  closed_at: string | null;
+}
+
+interface IssuesState {
+  issues: GitHubIssue[];
+  loading: boolean;
+  error: string | null;
+  needsAuth: boolean;
+  timestamp?: string;
+}
 
 interface DashboardProps {
   vscode?: {
     postMessage: (message: { type: string; payload?: unknown }) => void;
   };
+  currentBranch?: string;
+  hasChanges?: boolean;
+  issues?: IssuesState;
+  onRefreshIssues?: () => void;
+  onLogin?: () => void;
 }
 
 interface ProjectStats {
@@ -41,7 +81,14 @@ interface ActivityItem {
   icon: React.ReactNode;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ vscode }) => {
+const Dashboard: React.FC<DashboardProps> = ({ 
+  vscode, 
+  currentBranch = "main",
+  hasChanges = false,
+  issues,
+  onRefreshIssues,
+  onLogin 
+}) => {
   const [stats] = useState<ProjectStats>({
     files: 23,
     branches: 5,
@@ -298,6 +345,15 @@ const Dashboard: React.FC<DashboardProps> = ({ vscode }) => {
               </div>
             </div>
           </div>
+
+          {/* GitHub Issues */}
+          {issues && onRefreshIssues && onLogin && (
+            <IssuesPanel
+              issuesState={issues}
+              onRefresh={onRefreshIssues}
+              onLogin={onLogin}
+            />
+          )}
 
           {/* Recent Activity */}
           <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">

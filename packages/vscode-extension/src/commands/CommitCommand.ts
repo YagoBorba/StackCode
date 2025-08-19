@@ -10,7 +10,6 @@ export class CommitCommand extends BaseCommand {
         return;
       }
 
-      // Use StackCode CLI for commit
       const command = `npx @stackcode/cli commit`;
 
       await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);

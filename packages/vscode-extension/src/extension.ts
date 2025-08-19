@@ -10,8 +10,11 @@ import { CommitCommand } from "./commands/CommitCommand";
 import { ValidateCommand } from "./commands/ValidateCommand";
 import { ReleaseCommand } from "./commands/ReleaseCommand";
 import { ConfigCommand } from "./commands/ConfigCommand";
+import { AuthCommand } from "./commands/AuthCommand";
 import { DashboardProvider } from "./providers/DashboardProvider";
 import { ProjectViewProvider } from "./providers/ProjectViewProvider";
+import { GitHubAuthService } from "./services/GitHubAuthService";
+import { GitHubIssuesService } from "./services/GitHubIssuesService";
 
 let proactiveManager: ProactiveNotificationManager;
 let gitMonitor: GitMonitor;
@@ -19,6 +22,8 @@ let fileMonitor: FileMonitor;
 let configManager: ConfigurationManager;
 let dashboardProvider: DashboardProvider;
 let projectViewProvider: ProjectViewProvider;
+let gitHubAuthService: GitHubAuthService;
+let gitHubIssuesService: GitHubIssuesService;
 
 // Command instances
 let initCommand: InitCommand;
@@ -28,8 +33,9 @@ let commitCommand: CommitCommand;
 let validateCommand: ValidateCommand;
 let releaseCommand: ReleaseCommand;
 let configCommand: ConfigCommand;
+let authCommand: AuthCommand;
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   console.log("[StackCode] Extension is now active!");
   console.log(
     "[StackCode] Workspace folders:",
@@ -40,6 +46,12 @@ export function activate(context: vscode.ExtensionContext) {
   // Initialize configuration manager
   configManager = new ConfigurationManager();
 
+  // Initialize GitHub authentication service
+  gitHubAuthService = new GitHubAuthService(context);
+
+  // Initialize GitHub issues service
+  gitHubIssuesService = new GitHubIssuesService(gitHubAuthService, gitMonitor);
+
   // Initialize notification manager
   proactiveManager = new ProactiveNotificationManager(configManager);
 
@@ -47,8 +59,8 @@ export function activate(context: vscode.ExtensionContext) {
   gitMonitor = new GitMonitor(proactiveManager, configManager);
   fileMonitor = new FileMonitor(proactiveManager, configManager);
 
-  // Initialize providers
-  dashboardProvider = new DashboardProvider(context);
+  // Initialize providers (after services are ready)
+  dashboardProvider = new DashboardProvider(context, gitHubIssuesService, gitHubAuthService);
   projectViewProvider = new ProjectViewProvider(context.workspaceState);
 
   // Initialize commands
@@ -59,6 +71,7 @@ export function activate(context: vscode.ExtensionContext) {
   validateCommand = new ValidateCommand();
   releaseCommand = new ReleaseCommand();
   configCommand = new ConfigCommand();
+  authCommand = new AuthCommand(gitHubAuthService);
 
   // Register webview providers
   context.subscriptions.push(
@@ -104,6 +117,12 @@ export function activate(context: vscode.ExtensionContext) {
     ),
     vscode.commands.registerCommand("stackcode.dashboard", () =>
       dashboardProvider.show(),
+    ),
+    vscode.commands.registerCommand("stackcode.auth.login", () =>
+      authCommand.executeLogin(),
+    ),
+    vscode.commands.registerCommand("stackcode.auth.logout", () =>
+      authCommand.executeLogout(),
     ),
 
     // Legacy commands for backward compatibility
@@ -155,7 +174,11 @@ export function activate(context: vscode.ExtensionContext) {
     fileMonitor,
     proactiveManager,
     dashboardProvider,
+    gitHubAuthService,
   );
+
+  // Initialize GitHub authentication
+  await gitHubAuthService.initializeFromStorage();
 
   // Start monitoring
   gitMonitor.startMonitoring();

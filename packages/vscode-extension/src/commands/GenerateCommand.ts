@@ -50,7 +50,6 @@ export class GenerateCommand extends BaseCommand {
 
       const readmePath = path.join(workspaceFolder.uri.fsPath, "README.md");
 
-      // Check if README already exists
       try {
         await vscode.workspace.fs.stat(vscode.Uri.file(readmePath));
         const overwrite = await this.confirmAction(
@@ -76,7 +75,6 @@ export class GenerateCommand extends BaseCommand {
             message: t("vscode.generate.setting_up_readme"),
           });
 
-          // Use StackCode CLI for generation
           const command = `npx @stackcode/cli generate readme`;
 
           progress.report({
@@ -95,7 +93,6 @@ export class GenerateCommand extends BaseCommand {
 
       this.showSuccess(t("vscode.generate.readme_has_been_generated"));
 
-      // Ask if user wants to open the file
       const openFile = await vscode.window.showInformationMessage(
         t("vscode.generate.would_you_like_open_readme"),
         t("vscode.generate.open_file"),
@@ -122,7 +119,6 @@ export class GenerateCommand extends BaseCommand {
 
       const gitignorePath = path.join(workspaceFolder.uri.fsPath, ".gitignore");
 
-      // Check if .gitignore already exists
       try {
         await vscode.workspace.fs.stat(vscode.Uri.file(gitignorePath));
         const overwrite = await this.confirmAction(
@@ -136,7 +132,6 @@ export class GenerateCommand extends BaseCommand {
         // File doesn't exist, which is fine
       }
 
-      // Ask for project type
       const projectType = await vscode.window.showQuickPick(
         [
           { label: "node-ts", description: t("vscode.init.stacks.node_ts") },
@@ -178,7 +173,6 @@ export class GenerateCommand extends BaseCommand {
             message: t("vscode.generate.setting_up_gitignore"),
           });
 
-          // Use StackCode CLI for generation
           const command = `npx @stackcode/cli generate gitignore --type="${projectType.label}"`;
 
           progress.report({
@@ -197,7 +191,6 @@ export class GenerateCommand extends BaseCommand {
 
       this.showSuccess(t("vscode.generate.gitignore_has_been_generated"));
 
-      // Ask if user wants to open the file
       const openFile = await vscode.window.showInformationMessage(
         t("vscode.generate.would_you_like_open_gitignore"),
         t("vscode.generate.open_file"),

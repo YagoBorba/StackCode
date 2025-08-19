@@ -2,6 +2,13 @@ import * as vscode from "vscode";
 import { ProactiveNotificationManager } from "../notifications/ProactiveNotificationManager";
 import { ConfigurationManager } from "../config/ConfigurationManager";
 
+export interface GitHubRepository {
+  owner: string;
+  repo: string;
+  fullName: string;
+  remoteUrl: string;
+}
+
 export class GitMonitor implements vscode.Disposable {
   private proactiveManager: ProactiveNotificationManager;
   private configManager: ConfigurationManager;
@@ -199,6 +206,92 @@ export class GitMonitor implements vscode.Disposable {
           vscode.commands.executeCommand("workbench.view.scm");
         }
       });
+  }
+
+  /**
+   * Detecta o repositório GitHub atual baseado no remote origin
+   */
+  public async getCurrentGitHubRepository(): Promise<GitHubRepository | null> {
+    try {
+      const git = vscode.extensions.getExtension("vscode.git")?.exports;
+      if (!git) {
+        console.warn("[GitMonitor] Git extension not available");
+        return null;
+      }
+
+      const gitAPI = git.getAPI(1);
+      if (!gitAPI || gitAPI.repositories.length === 0) {
+        console.warn("[GitMonitor] No git repositories found");
+        return null;
+      }
+
+      const repository = gitAPI.repositories[0];
+      const remotes = repository.state.remotes;
+
+      // Procurar pelo remote 'origin'
+      const originRemote = remotes.find((remote: any) => remote.name === "origin");
+      if (!originRemote) {
+        console.warn("[GitMonitor] No origin remote found");
+        return null;
+      }
+
+      const remoteUrl = originRemote.fetchUrl || originRemote.pushUrl;
+      if (!remoteUrl) {
+        console.warn("[GitMonitor] No remote URL found");
+        return null;
+      }
+
+      // Parse do GitHub URL
+      const githubRepo = this.parseGitHubUrl(remoteUrl);
+      if (!githubRepo) {
+        console.warn("[GitMonitor] Remote is not a GitHub repository:", remoteUrl);
+        return null;
+      }
+
+      console.log("[GitMonitor] Current GitHub repository:", githubRepo.fullName);
+      return githubRepo;
+    } catch (error) {
+      console.error("[GitMonitor] Failed to get current GitHub repository:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Parse URLs do GitHub em diferentes formatos
+   */
+  private parseGitHubUrl(url: string): GitHubRepository | null {
+    try {
+      // Remove .git suffix se existir
+      const cleanUrl = url.replace(/\.git$/, "");
+
+      // Regex para diferentes formatos de URL do GitHub
+      const patterns = [
+        // HTTPS: https://github.com/owner/repo
+        /^https:\/\/github\.com\/([^\/]+)\/([^\/]+)$/,
+        // SSH: git@github.com:owner/repo
+        /^git@github\.com:([^\/]+)\/([^\/]+)$/,
+        // SSH alternative: ssh://git@github.com/owner/repo
+        /^ssh:\/\/git@github\.com\/([^\/]+)\/([^\/]+)$/,
+      ];
+
+      for (const pattern of patterns) {
+        const match = cleanUrl.match(pattern);
+        if (match) {
+          const [, owner, repo] = match;
+          return {
+            owner,
+            repo,
+            fullName: `${owner}/${repo}`,
+            remoteUrl: url,
+          };
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error("[GitMonitor] Failed to parse GitHub URL:", error);
+      return null;
+    }
   }
 
   dispose(): void {

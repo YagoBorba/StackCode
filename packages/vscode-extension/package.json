@@ -92,6 +92,18 @@
         "title": "Open StackCode Dashboard",
         "category": "StackCode",
         "icon": "$(dashboard)"
+      },
+      {
+        "command": "stackcode.auth.login",
+        "title": "Login to GitHub",
+        "category": "StackCode",
+        "icon": "$(github)"
+      },
+      {
+        "command": "stackcode.auth.logout",
+        "title": "Logout from GitHub",
+        "category": "StackCode",
+        "icon": "$(sign-out)"
       }
     ],
     "menus": {
