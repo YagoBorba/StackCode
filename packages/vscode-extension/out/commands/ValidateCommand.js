@@ -47,37 +47,50 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ValidateCommand = void 0;
 const vscode = __importStar(require("vscode"));
 const BaseCommand_1 = require("./BaseCommand");
+const i18n_1 = require("@stackcode/i18n");
 class ValidateCommand extends BaseCommand_1.BaseCommand {
   async execute() {
     try {
       const workspaceFolder = this.getCurrentWorkspaceFolder();
       if (!workspaceFolder) {
-        this.showError("No workspace folder found");
+        this.showError((0, i18n_1.t)("vscode.common.no_workspace_folder"));
         return;
       }
       vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
-          title: "Validating project structure",
+          title: (0, i18n_1.t)("vscode.validate.validating_project_structure"),
           cancellable: false,
         },
         async (progress) => {
-          progress.report({ increment: 0, message: "Running validation..." });
+          progress.report({
+            increment: 0,
+            message: (0, i18n_1.t)("vscode.validate.running_validation"),
+          });
           // Use StackCode CLI for validation
           const command = `npx @stackcode/cli validate`;
           progress.report({
             increment: 50,
-            message: "Checking project structure...",
+            message: (0, i18n_1.t)(
+              "vscode.validate.checking_project_structure",
+            ),
           });
           await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
-          progress.report({ increment: 100, message: "Validation completed!" });
+          progress.report({
+            increment: 100,
+            message: (0, i18n_1.t)("vscode.validate.validation_completed"),
+          });
         },
       );
       this.showSuccess(
-        "Project validation completed! Check terminal for results.",
+        (0, i18n_1.t)("vscode.validate.project_validation_completed"),
       );
     } catch (error) {
-      this.showError(`Failed to validate project: ${error}`);
+      this.showError(
+        (0, i18n_1.t)("vscode.validate.failed_validate_project", {
+          error: String(error),
+        }),
+      );
     }
   }
 }

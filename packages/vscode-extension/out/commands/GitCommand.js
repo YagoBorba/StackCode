@@ -47,15 +47,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GitCommand = void 0;
 const vscode = __importStar(require("vscode"));
 const BaseCommand_1 = require("./BaseCommand");
+const i18n_1 = require("@stackcode/i18n");
 class GitCommand extends BaseCommand_1.BaseCommand {
   async execute() {
     const action = await vscode.window.showQuickPick(
       [
-        { label: "start", description: "Start a new feature branch" },
-        { label: "finish", description: "Finish current branch" },
+        {
+          label: "start",
+          description: (0, i18n_1.t)("vscode.git.start_description"),
+        },
+        {
+          label: "finish",
+          description: (0, i18n_1.t)("vscode.git.finish_description"),
+        },
       ],
       {
-        placeHolder: "Select Git action",
+        placeHolder: (0, i18n_1.t)("vscode.git.select_git_action"),
       },
     );
     if (!action) {
@@ -70,14 +77,14 @@ class GitCommand extends BaseCommand_1.BaseCommand {
   async startBranch() {
     try {
       const branchName = await vscode.window.showInputBox({
-        prompt: "Enter the name for the new branch",
-        placeHolder: "new-feature",
+        prompt: (0, i18n_1.t)("vscode.git.enter_branch_name"),
+        placeHolder: (0, i18n_1.t)("vscode.git.new_feature"),
         validateInput: (value) => {
           if (!value) {
-            return "Branch name is required";
+            return (0, i18n_1.t)("vscode.git.branch_name_required");
           }
           if (!/^[a-zA-Z0-9/_-]+$/.test(value)) {
-            return "Branch name can only contain letters, numbers, hyphens, underscores and slashes";
+            return (0, i18n_1.t)("vscode.git.branch_name_invalid");
           }
           return null;
         },
@@ -87,13 +94,25 @@ class GitCommand extends BaseCommand_1.BaseCommand {
       }
       const branchType = await vscode.window.showQuickPick(
         [
-          { label: "feature", description: "A new feature branch" },
-          { label: "bugfix", description: "A bug fix branch" },
-          { label: "hotfix", description: "A hotfix branch" },
-          { label: "release", description: "A release branch" },
+          {
+            label: "feature",
+            description: (0, i18n_1.t)("vscode.git.feature_description"),
+          },
+          {
+            label: "bugfix",
+            description: (0, i18n_1.t)("vscode.git.bugfix_description"),
+          },
+          {
+            label: "hotfix",
+            description: (0, i18n_1.t)("vscode.git.hotfix_description"),
+          },
+          {
+            label: "chore",
+            description: (0, i18n_1.t)("vscode.git.chore_description"),
+          },
         ],
         {
-          placeHolder: "Select branch type",
+          placeHolder: (0, i18n_1.t)("vscode.git.select_branch_type"),
         },
       );
       if (!branchType) {
@@ -101,42 +120,53 @@ class GitCommand extends BaseCommand_1.BaseCommand {
       }
       const workspaceFolder = this.getCurrentWorkspaceFolder();
       if (!workspaceFolder) {
-        this.showError("No workspace folder found");
+        this.showError((0, i18n_1.t)("vscode.common.no_workspace_folder"));
         return;
       }
       vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
-          title: `Creating ${branchType.label} branch: ${branchName}`,
+          title: (0, i18n_1.t)("vscode.git.creating_branch", {
+            branchName: `${branchType.label}/${branchName}`,
+          }),
           cancellable: false,
         },
         async (progress) => {
-          progress.report({ increment: 0, message: "Creating branch..." });
+          progress.report({
+            increment: 0,
+            message: (0, i18n_1.t)("vscode.git.switching_to_develop"),
+          });
           // Use StackCode CLI for git operations
           const command = `npx @stackcode/cli git start ${branchName} --type=${branchType.label}`;
           progress.report({
             increment: 50,
-            message: "Switching to new branch...",
+            message: (0, i18n_1.t)("vscode.git.creating_new_branch"),
           });
           await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
           progress.report({
             increment: 100,
-            message: "Branch created successfully!",
+            message: (0, i18n_1.t)("vscode.git.branch_created_successfully"),
           });
         },
       );
       this.showSuccess(
-        `Branch ${branchType.label}/${branchName} has been created and checked out!`,
+        (0, i18n_1.t)("vscode.git.new_branch_created", {
+          branchName: `${branchType.label}/${branchName}`,
+        }),
       );
     } catch (error) {
-      this.showError(`Failed to create branch: ${error}`);
+      this.showError(
+        (0, i18n_1.t)("vscode.git.failed_create_branch", {
+          error: String(error),
+        }),
+      );
     }
   }
   async finishBranch() {
     try {
       const workspaceFolder = this.getCurrentWorkspaceFolder();
       if (!workspaceFolder) {
-        this.showError("No workspace folder found");
+        this.showError((0, i18n_1.t)("vscode.common.no_workspace_folder"));
         return;
       }
       // Get current branch name
@@ -155,8 +185,10 @@ class GitCommand extends BaseCommand_1.BaseCommand {
         }
       }
       const confirm = await this.confirmAction(
-        `Are you sure you want to finish ${currentBranch}? This will merge it back to the base branch.`,
-        "Finish Branch",
+        (0, i18n_1.t)("vscode.git.are_you_sure_finish_branch", {
+          currentBranch,
+        }),
+        (0, i18n_1.t)("vscode.git.finish_branch"),
       );
       if (!confirm) {
         return;
@@ -164,24 +196,38 @@ class GitCommand extends BaseCommand_1.BaseCommand {
       vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
-          title: `Finishing branch: ${currentBranch}`,
+          title: (0, i18n_1.t)("vscode.git.finishing_branch", {
+            branchName: currentBranch,
+          }),
           cancellable: false,
         },
         async (progress) => {
-          progress.report({ increment: 0, message: "Merging branch..." });
+          progress.report({
+            increment: 0,
+            message: (0, i18n_1.t)("vscode.git.pushing_branch"),
+          });
           // Use StackCode CLI for git operations
           const command = `npx @stackcode/cli git finish`;
-          progress.report({ increment: 50, message: "Cleaning up..." });
+          progress.report({
+            increment: 50,
+            message: (0, i18n_1.t)("vscode.git.opening_pr"),
+          });
           await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
           progress.report({
             increment: 100,
-            message: "Branch finished successfully!",
+            message: (0, i18n_1.t)("vscode.git.branch_finished_successfully"),
           });
         },
       );
-      this.showSuccess(`Branch ${currentBranch} has been finished and merged!`);
+      this.showSuccess(
+        (0, i18n_1.t)("vscode.git.branch_has_been_finished", { currentBranch }),
+      );
     } catch (error) {
-      this.showError(`Failed to finish branch: ${error}`);
+      this.showError(
+        (0, i18n_1.t)("vscode.git.failed_finish_branch", {
+          error: String(error),
+        }),
+      );
     }
   }
 }

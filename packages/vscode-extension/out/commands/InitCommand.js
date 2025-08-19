@@ -47,20 +47,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.InitCommand = void 0;
 const vscode = __importStar(require("vscode"));
 const BaseCommand_1 = require("./BaseCommand");
+const i18n_1 = require("@stackcode/i18n");
 const path = __importStar(require("path"));
 class InitCommand extends BaseCommand_1.BaseCommand {
   async execute() {
     try {
       // Prompt for project details
       const projectName = await vscode.window.showInputBox({
-        prompt: "Enter project name",
-        placeHolder: "my-awesome-project",
+        prompt: (0, i18n_1.t)("vscode.init.enter_project_name"),
+        placeHolder: (0, i18n_1.t)("vscode.init.my_awesome_project"),
         validateInput: (value) => {
           if (!value) {
-            return "Project name is required";
+            return (0, i18n_1.t)("vscode.init.project_name_required");
           }
           if (!/^[a-zA-Z0-9-_]+$/.test(value)) {
-            return "Project name can only contain letters, numbers, hyphens and underscores";
+            return (0, i18n_1.t)("vscode.init.project_name_invalid");
           }
           return null;
         },
@@ -69,27 +70,48 @@ class InitCommand extends BaseCommand_1.BaseCommand {
         return;
       }
       const description = await vscode.window.showInputBox({
-        prompt: "Enter project description",
-        placeHolder: "A brief description of your project",
+        prompt: (0, i18n_1.t)("vscode.init.enter_project_description"),
+        placeHolder: (0, i18n_1.t)("vscode.init.brief_description"),
       });
       const authorName = await vscode.window.showInputBox({
-        prompt: "Enter author name",
-        placeHolder: "Your Name",
+        prompt: (0, i18n_1.t)("vscode.init.enter_author_name"),
+        placeHolder: (0, i18n_1.t)("vscode.init.your_name"),
         value: await this.getGitUserName(),
       });
       const stack = await vscode.window.showQuickPick(
         [
-          { label: "node-ts", description: "Node.js with TypeScript" },
-          { label: "react", description: "React application" },
-          { label: "vue", description: "Vue.js application" },
-          { label: "angular", description: "Angular application" },
-          { label: "python", description: "Python project" },
-          { label: "java", description: "Java project" },
-          { label: "go", description: "Go project" },
-          { label: "php", description: "PHP project" },
+          {
+            label: "node-ts",
+            description: (0, i18n_1.t)("vscode.init.stacks.node_ts"),
+          },
+          {
+            label: "react",
+            description: (0, i18n_1.t)("vscode.init.stacks.react"),
+          },
+          {
+            label: "vue",
+            description: (0, i18n_1.t)("vscode.init.stacks.vue"),
+          },
+          {
+            label: "angular",
+            description: (0, i18n_1.t)("vscode.init.stacks.angular"),
+          },
+          {
+            label: "python",
+            description: (0, i18n_1.t)("vscode.init.stacks.python"),
+          },
+          {
+            label: "java",
+            description: (0, i18n_1.t)("vscode.init.stacks.java"),
+          },
+          { label: "go", description: (0, i18n_1.t)("vscode.init.stacks.go") },
+          {
+            label: "php",
+            description: (0, i18n_1.t)("vscode.init.stacks.php"),
+          },
         ],
         {
-          placeHolder: "Select project stack",
+          placeHolder: (0, i18n_1.t)("vscode.init.select_project_stack"),
         },
       );
       if (!stack) {
@@ -105,7 +127,7 @@ class InitCommand extends BaseCommand_1.BaseCommand {
           canSelectFolders: true,
           canSelectFiles: false,
           canSelectMany: false,
-          openLabel: "Select Project Location",
+          openLabel: (0, i18n_1.t)("vscode.init.select_project_location"),
         });
         if (!folderUris || folderUris.length === 0) {
           return;
@@ -116,8 +138,10 @@ class InitCommand extends BaseCommand_1.BaseCommand {
       try {
         await vscode.workspace.fs.stat(vscode.Uri.file(projectPath));
         const overwrite = await this.confirmAction(
-          `Directory ${projectName} already exists. Do you want to overwrite it?`,
-          "Overwrite",
+          (0, i18n_1.t)("vscode.init.directory_exists_overwrite", {
+            projectName,
+          }),
+          (0, i18n_1.t)("vscode.init.overwrite"),
         );
         if (!overwrite) {
           return;
@@ -129,39 +153,49 @@ class InitCommand extends BaseCommand_1.BaseCommand {
       vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
-          title: `Initializing project ${projectName}`,
+          title: (0, i18n_1.t)("vscode.init.initializing_project", {
+            projectName,
+          }),
           cancellable: false,
         },
         async (progress) => {
           progress.report({
             increment: 0,
-            message: "Setting up project structure...",
+            message: (0, i18n_1.t)("vscode.init.setting_up_structure"),
           });
           // Use StackCode CLI for initialization
           const command = `npx @stackcode/cli init --name="${projectName}" --description="${description}" --author="${authorName}" --stack="${stack.label}" --path="${projectPath}"`;
           progress.report({
             increment: 50,
-            message: "Running StackCode CLI...",
+            message: (0, i18n_1.t)("vscode.init.running_stackcode_cli"),
           });
           await this.runTerminalCommand(command);
           progress.report({
             increment: 100,
-            message: "Project initialized successfully!",
+            message: (0, i18n_1.t)(
+              "vscode.init.project_initialized_successfully",
+            ),
           });
         },
       );
       // Ask if user wants to open the new project
       const openProject = await vscode.window.showInformationMessage(
-        `Project ${projectName} has been created successfully! Would you like to open it?`,
-        "Open Project",
-        "Later",
+        (0, i18n_1.t)("vscode.init.project_created_successfully", {
+          projectName,
+        }),
+        (0, i18n_1.t)("vscode.init.open_project"),
+        (0, i18n_1.t)("vscode.init.later"),
       );
-      if (openProject === "Open Project") {
+      if (openProject === (0, i18n_1.t)("vscode.init.open_project")) {
         const uri = vscode.Uri.file(projectPath);
         await vscode.commands.executeCommand("vscode.openFolder", uri, true);
       }
     } catch (error) {
-      this.showError(`Failed to initialize project: ${error}`);
+      this.showError(
+        (0, i18n_1.t)("vscode.init.failed_initialize_project", {
+          error: String(error),
+        }),
+      );
     }
   }
   async getGitUserName() {

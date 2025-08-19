@@ -47,17 +47,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReleaseCommand = void 0;
 const vscode = __importStar(require("vscode"));
 const BaseCommand_1 = require("./BaseCommand");
+const i18n_1 = require("@stackcode/i18n");
 class ReleaseCommand extends BaseCommand_1.BaseCommand {
   async execute() {
     try {
       const workspaceFolder = this.getCurrentWorkspaceFolder();
       if (!workspaceFolder) {
-        this.showError("No workspace folder found");
+        this.showError((0, i18n_1.t)("vscode.common.no_workspace_folder"));
         return;
       }
       const confirm = await this.confirmAction(
-        "Are you sure you want to create a new release? This will tag the current commit and publish the release.",
-        "Create Release",
+        (0, i18n_1.t)("vscode.release.are_you_sure_create_release"),
+        (0, i18n_1.t)("vscode.release.create_release"),
       );
       if (!confirm) {
         return;
@@ -65,21 +66,34 @@ class ReleaseCommand extends BaseCommand_1.BaseCommand {
       vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
-          title: "Creating release",
+          title: (0, i18n_1.t)("vscode.release.creating_release"),
           cancellable: false,
         },
         async (progress) => {
-          progress.report({ increment: 0, message: "Preparing release..." });
+          progress.report({
+            increment: 0,
+            message: (0, i18n_1.t)("vscode.release.preparing_release"),
+          });
           // Use StackCode CLI for release
           const command = `npx @stackcode/cli release`;
-          progress.report({ increment: 50, message: "Creating release..." });
+          progress.report({
+            increment: 50,
+            message: (0, i18n_1.t)("vscode.release.creating_release_message"),
+          });
           await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
-          progress.report({ increment: 100, message: "Release created!" });
+          progress.report({
+            increment: 100,
+            message: (0, i18n_1.t)("vscode.release.release_created"),
+          });
         },
       );
-      this.showSuccess("Release process started! Check terminal for progress.");
+      this.showSuccess((0, i18n_1.t)("vscode.release.release_process_started"));
     } catch (error) {
-      this.showError(`Failed to create release: ${error}`);
+      this.showError(
+        (0, i18n_1.t)("vscode.release.failed_create_release", {
+          error: String(error),
+        }),
+      );
     }
   }
 }

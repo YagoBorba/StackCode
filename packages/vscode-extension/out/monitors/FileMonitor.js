@@ -46,6 +46,7 @@ var __importStar =
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FileMonitor = void 0;
 const vscode = __importStar(require("vscode"));
+const i18n_1 = require("@stackcode/i18n");
 class FileMonitor {
   constructor(proactiveManager, configManager) {
     this.disposables = [];
@@ -141,19 +142,21 @@ class FileMonitor {
       }
       if (missingFiles.length > 0 && Math.random() < 0.3) {
         // Show suggestion 30% of the time
-        const message = `📁 Your project is missing some important files: ${missingFiles.join(", ")}. Would you like to generate them?`;
+        const message = (0, i18n_1.t)("vscode.common.project_missing_files", {
+          missingFiles: missingFiles.join(", "),
+        });
         const action = await vscode.window.showInformationMessage(
           message,
-          "Generate Files",
-          "Not Now",
-          "Don't Show Again",
+          (0, i18n_1.t)("vscode.common.generate_files"),
+          (0, i18n_1.t)("vscode.common.not_now"),
+          (0, i18n_1.t)("vscode.common.dont_show_again"),
         );
-        if (action === "Generate Files") {
+        if (action === (0, i18n_1.t)("vscode.common.generate_files")) {
           // TODO: Implement file generation
           vscode.window.showInformationMessage(
-            "File generation will be available soon!",
+            (0, i18n_1.t)("vscode.common.file_generation_available_soon"),
           );
-        } else if (action === "Don't Show Again") {
+        } else if (action === (0, i18n_1.t)("vscode.common.dont_show_again")) {
           await this.configManager.updateConfiguration(
             "notifications.enabled",
             false,
@@ -163,7 +166,11 @@ class FileMonitor {
     } catch (error) {
       // Use proper VS Code logging instead of console.log
       const outputChannel = vscode.window.createOutputChannel("StackCode");
-      outputChannel.appendLine(`Error checking project structure: ${error}`);
+      outputChannel.appendLine(
+        (0, i18n_1.t)("vscode.common.error_checking_project_structure", {
+          error: String(error),
+        }),
+      );
     }
   }
   dispose() {

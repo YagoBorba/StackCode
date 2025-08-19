@@ -47,42 +47,55 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConfigCommand = void 0;
 const vscode = __importStar(require("vscode"));
 const BaseCommand_1 = require("./BaseCommand");
+const i18n_1 = require("@stackcode/i18n");
 class ConfigCommand extends BaseCommand_1.BaseCommand {
   async execute() {
     try {
       const workspaceFolder = this.getCurrentWorkspaceFolder();
       if (!workspaceFolder) {
-        this.showError("No workspace folder found");
+        this.showError((0, i18n_1.t)("vscode.common.no_workspace_folder"));
         return;
       }
       const action = await vscode.window.showQuickPick(
         [
           {
-            label: "Open StackCode Settings",
-            description: "Configure StackCode extension settings",
+            label: (0, i18n_1.t)("vscode.config.open_stackcode_settings"),
+            description: (0, i18n_1.t)(
+              "vscode.config.open_stackcode_settings_description",
+            ),
           },
           {
-            label: "Open Project Config",
-            description: "Edit .stackcoderc.json file",
+            label: (0, i18n_1.t)("vscode.config.open_project_config"),
+            description: (0, i18n_1.t)(
+              "vscode.config.open_project_config_description",
+            ),
           },
           {
-            label: "Create Project Config",
-            description: "Create a new .stackcoderc.json file",
+            label: (0, i18n_1.t)("vscode.config.create_project_config"),
+            description: (0, i18n_1.t)(
+              "vscode.config.create_project_config_description",
+            ),
           },
         ],
         {
-          placeHolder: "What would you like to configure?",
+          placeHolder: (0, i18n_1.t)(
+            "vscode.config.what_would_you_like_configure",
+          ),
         },
       );
       if (!action) {
         return;
       }
-      if (action.label === "Open StackCode Settings") {
+      if (
+        action.label === (0, i18n_1.t)("vscode.config.open_stackcode_settings")
+      ) {
         vscode.commands.executeCommand(
           "workbench.action.openSettings",
           "stackcode",
         );
-      } else if (action.label === "Open Project Config") {
+      } else if (
+        action.label === (0, i18n_1.t)("vscode.config.open_project_config")
+      ) {
         const configPath = vscode.Uri.joinPath(
           workspaceFolder.uri,
           ".stackcoderc.json",
@@ -91,18 +104,24 @@ class ConfigCommand extends BaseCommand_1.BaseCommand {
           const document = await vscode.workspace.openTextDocument(configPath);
           await vscode.window.showTextDocument(document);
         } catch {
-          this.showError(
-            '.stackcoderc.json file not found. Use "Create Project Config" to create one.',
-          );
+          this.showError((0, i18n_1.t)("vscode.config.stackcoderc_not_found"));
         }
-      } else if (action.label === "Create Project Config") {
+      } else if (
+        action.label === (0, i18n_1.t)("vscode.config.create_project_config")
+      ) {
         // Use StackCode CLI for config creation
         const command = `npx @stackcode/cli config init`;
         await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
-        this.showSuccess("Project configuration initialized!");
+        this.showSuccess(
+          (0, i18n_1.t)("vscode.config.project_configuration_initialized"),
+        );
       }
     } catch (error) {
-      this.showError(`Failed to open configuration: ${error}`);
+      this.showError(
+        (0, i18n_1.t)("vscode.config.failed_open_configuration", {
+          error: String(error),
+        }),
+      );
     }
   }
 }
