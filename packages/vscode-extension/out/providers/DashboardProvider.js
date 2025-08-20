@@ -49,9 +49,11 @@ const vscode = __importStar(require("vscode"));
 const path = __importStar(require("path"));
 const fs = __importStar(require("fs"));
 class DashboardProvider {
-  constructor(context) {
+  constructor(context, issuesService, authService) {
     this._disposables = [];
     this._extensionUri = context.extensionUri;
+    this._issuesService = issuesService;
+    this._authService = authService;
   }
   resolveWebviewView(
     webviewView,
@@ -77,9 +79,19 @@ class DashboardProvider {
                 "[StackCode] Webview reported ready, sending initial data",
               );
               this.updateProjectStats();
+              // Buscar issues automaticamente se autenticado
+              if (this._authService?.isAuthenticated) {
+                await this.updateIssues();
+              }
               return;
             case "refreshStats":
               this.updateProjectStats();
+              return;
+            case "fetchIssues":
+              await this.updateIssues();
+              return;
+            case "refreshIssues":
+              await this.updateIssues(true);
               return;
             default:
               // Executar comando normal do VS Code
@@ -116,6 +128,53 @@ class DashboardProvider {
     } else {
       // If view is not created yet, trigger the creation by executing the show command
       vscode.commands.executeCommand("workbench.view.extension.stackcode");
+    }
+  }
+  async updateIssues(forceRefresh = false) {
+    try {
+      if (!this._issuesService || !this._authService) {
+        console.warn("[DashboardProvider] Issues service not available");
+        return;
+      }
+      // Verificar se está autenticado
+      if (!this._authService.isAuthenticated) {
+        this.sendMessage({
+          type: "updateIssues",
+          payload: {
+            issues: [],
+            error: "Not authenticated with GitHub",
+            needsAuth: true,
+          },
+        });
+        return;
+      }
+      console.log("[DashboardProvider] Fetching GitHub issues...");
+      const issues = forceRefresh
+        ? await this._issuesService.refreshIssues()
+        : await this._issuesService.fetchCurrentRepositoryIssues();
+      this.sendMessage({
+        type: "updateIssues",
+        payload: {
+          issues,
+          timestamp: new Date().toISOString(),
+        },
+      });
+      console.log(
+        `[DashboardProvider] Sent ${issues.length} issues to webview`,
+      );
+    } catch (error) {
+      console.error("[DashboardProvider] Failed to fetch issues:", error);
+      this.sendMessage({
+        type: "updateIssues",
+        payload: {
+          issues: [],
+          error:
+            error instanceof Error ? error.message : "Failed to fetch issues",
+          needsAuth:
+            error instanceof Error &&
+            error.message.includes("not authenticated"),
+        },
+      });
     }
   }
   async updateProjectStats() {

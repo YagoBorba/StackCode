@@ -33,7 +33,6 @@ export class ReleaseCommand extends BaseCommand {
             message: t("vscode.release.preparing_release"),
           });
 
-          // Use StackCode CLI for release
           const command = `npx @stackcode/cli release`;
 
           progress.report({

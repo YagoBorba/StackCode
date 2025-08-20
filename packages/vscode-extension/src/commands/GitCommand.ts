@@ -85,7 +85,6 @@ export class GitCommand extends BaseCommand {
             message: t("vscode.git.switching_to_develop"),
           });
 
-          // Use StackCode CLI for git operations
           const command = `npx @stackcode/cli git start ${branchName} --type=${branchType.label}`;
 
           progress.report({
@@ -122,7 +121,6 @@ export class GitCommand extends BaseCommand {
         return;
       }
 
-      // Get current branch name
       const gitExtension = vscode.extensions.getExtension("vscode.git");
       let currentBranch = "current branch";
 
@@ -162,7 +160,6 @@ export class GitCommand extends BaseCommand {
             message: t("vscode.git.pushing_branch"),
           });
 
-          // Use StackCode CLI for git operations
           const command = `npx @stackcode/cli git finish`;
 
           progress.report({

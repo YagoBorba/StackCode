@@ -67,7 +67,6 @@ class ValidateCommand extends BaseCommand_1.BaseCommand {
             increment: 0,
             message: (0, i18n_1.t)("vscode.validate.running_validation"),
           });
-          // Use StackCode CLI for validation
           const command = `npx @stackcode/cli validate`;
           progress.report({
             increment: 50,

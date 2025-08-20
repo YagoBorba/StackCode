@@ -9,6 +9,7 @@ import { getGitCommand } from "./commands/git.js";
 import { getCommitCommand } from "./commands/commit.js";
 import { getConfigCommand } from "./commands/config.js";
 import { getReleaseCommand } from "./commands/release.js";
+import { getGitHubCommand } from "./commands/github.js";
 import { initI18n, t, getLocale } from "@stackcode/i18n";
 import { getErrorMessage } from "@stackcode/core";
 
@@ -32,6 +33,7 @@ async function main() {
       .command(getCommitCommand())
       .command(getConfigCommand())
       .command(getReleaseCommand())
+      .command(getGitHubCommand())
       .demandCommand(1, t("common.error_demand_command"))
       .help()
       .parse();

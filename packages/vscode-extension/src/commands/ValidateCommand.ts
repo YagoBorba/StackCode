@@ -24,7 +24,6 @@ export class ValidateCommand extends BaseCommand {
             message: t("vscode.validate.running_validation"),
           });
 
-          // Use StackCode CLI for validation
           const command = `npx @stackcode/cli validate`;
 
           progress.report({

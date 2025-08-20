@@ -52,7 +52,6 @@ export class ConfigCommand extends BaseCommand {
           this.showError(t("vscode.config.stackcoderc_not_found"));
         }
       } else if (action.label === t("vscode.config.create_project_config")) {
-        // Use StackCode CLI for config creation
         const command = `npx @stackcode/cli config init`;
         await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
         this.showSuccess(t("vscode.config.project_configuration_initialized"));

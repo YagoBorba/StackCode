@@ -1,4 +1,3 @@
-// packages/cli/src/commands/init.ts
 import fs from "fs/promises";
 import path from "path";
 import { scaffoldProject, setupHusky, generateReadmeContent, generateGitignoreContent, runCommand, } from "@stackcode/core";

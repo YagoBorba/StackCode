@@ -7,7 +7,6 @@ import * as path from "path";
 export class InitCommand extends BaseCommand {
   async execute(): Promise<void> {
     try {
-      // Prompt for project details
       const projectName = await vscode.window.showInputBox({
         prompt: t("vscode.init.enter_project_name"),
         placeHolder: t("vscode.init.my_awesome_project"),
@@ -57,7 +56,6 @@ export class InitCommand extends BaseCommand {
         return;
       }
 
-      // Get workspace folder or ask for project location
       const workspaceFolder = this.getCurrentWorkspaceFolder();
       let projectPath: string;
 
@@ -78,7 +76,6 @@ export class InitCommand extends BaseCommand {
         projectPath = path.join(folderUris[0].fsPath, projectName);
       }
 
-      // Check if directory exists
       try {
         await vscode.workspace.fs.stat(vscode.Uri.file(projectPath));
         const overwrite = await this.confirmAction(
@@ -92,7 +89,6 @@ export class InitCommand extends BaseCommand {
         // Directory doesn't exist, which is fine
       }
 
-      // Show progress
       vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
@@ -105,7 +101,6 @@ export class InitCommand extends BaseCommand {
             message: t("vscode.init.setting_up_structure"),
           });
 
-          // Use StackCode CLI for initialization
           const command = `npx @stackcode/cli init --name="${projectName}" --description="${description}" --author="${authorName}" --stack="${stack.label}" --path="${projectPath}"`;
 
           progress.report({
@@ -122,7 +117,6 @@ export class InitCommand extends BaseCommand {
         },
       );
 
-      // Ask if user wants to open the new project
       const openProject = await vscode.window.showInformationMessage(
         t("vscode.init.project_created_successfully", { projectName }),
         t("vscode.init.open_project"),
@@ -142,7 +136,6 @@ export class InitCommand extends BaseCommand {
 
   private async getGitUserName(): Promise<string> {
     try {
-      // Try to get git user name from workspace
       const terminal = vscode.window.createTerminal({ name: "temp" });
       terminal.sendText("git config user.name");
       terminal.dispose();

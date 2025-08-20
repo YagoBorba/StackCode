@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { getCommitCommand } from "../../src/commands/commit";
 import * as core from "@stackcode/core";
-import inquirer from "inquirer";
+import * as ui from "../../src/commands/ui";
 
 vi.mock("@stackcode/core");
-vi.mock("inquirer");
+vi.mock("../../src/commands/ui");
 
 describe("Commit Command Handler", () => {
   const { handler } = getCommitCommand();
@@ -24,7 +24,7 @@ describe("Commit Command Handler", () => {
       "M  packages/cli/src/commands/commit.ts",
     );
 
-    vi.mocked(inquirer.prompt).mockResolvedValue({
+    vi.mocked(ui.promptForCommitAnswers).mockResolvedValue({
       type: "feat",
       scope: "api",
       shortDescription: "add new login endpoint",
@@ -49,7 +49,7 @@ describe("Commit Command Handler", () => {
       "M  packages/cli/src/commands/commit.ts",
     );
 
-    vi.mocked(inquirer.prompt).mockResolvedValue({
+    vi.mocked(ui.promptForCommitAnswers).mockResolvedValue({
       type: "refactor",
       scope: "auth",
       shortDescription: "use JWT service for authentication",
@@ -77,7 +77,7 @@ closes #42`;
     expect(runCommandMock).toHaveBeenCalledWith(
       "git",
       ["commit", "-m", expectedMessage],
-      expect.anything(),
+      { cwd: process.cwd() },
     );
   });
 });

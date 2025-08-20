@@ -5,6 +5,40 @@ import StatusBar from "./components/StatusBar";
 import NotificationPanel from "./components/NotificationPanel";
 import CommandPalette from "./components/CommandPalette";
 
+// Interfaces para Issues do GitHub
+interface GitHubIssue {
+  id: number;
+  number: number;
+  title: string;
+  body: string | null;
+  state: "open" | "closed";
+  html_url: string;
+  user: {
+    login: string;
+    avatar_url: string;
+  };
+  assignees: Array<{
+    login: string;
+    avatar_url: string;
+  }>;
+  labels: Array<{
+    name: string;
+    color: string;
+    description: string | null;
+  }>;
+  created_at: string;
+  updated_at: string;
+  closed_at: string | null;
+}
+
+interface IssuesState {
+  issues: GitHubIssue[];
+  loading: boolean;
+  error: string | null;
+  needsAuth: boolean;
+  timestamp?: string;
+}
+
 // Mock VSCode API for development
 const mockVSCode = {
   postMessage: (message: { type: string; payload?: unknown }) => {
@@ -43,6 +77,14 @@ const initialStats = {
   files: 0,
 };
 
+// Estado inicial para issues
+const initialIssuesState: IssuesState = {
+  issues: [],
+  loading: false,
+  error: null,
+  needsAuth: false,
+};
+
 function App() {
   const [currentView] = useState<"dashboard" | "project">("dashboard");
   const [notifications, setNotifications] = useState<Notification[]>([
@@ -65,6 +107,8 @@ function App() {
   const [lastAction, setLastAction] = useState("Ready");
   const [, setStats] = useState(initialStats);
   const [isReady, setIsReady] = useState(false);
+  const [issuesState, setIssuesState] =
+    useState<IssuesState>(initialIssuesState);
   const [vscode] = useState(() => {
     return typeof window !== "undefined" && "acquireVsCodeApi" in window
       ? (window as { acquireVsCodeApi: () => VsCodeApi }).acquireVsCodeApi()
@@ -102,6 +146,15 @@ function App() {
           break;
         case "updateChanges":
           setHasChanges(message.payload?.hasChanges || false);
+          break;
+        case "updateIssues":
+          setIssuesState({
+            issues: message.payload?.issues || [],
+            loading: false,
+            error: message.payload?.error || null,
+            needsAuth: message.payload?.needsAuth || false,
+            timestamp: message.payload?.timestamp,
+          });
           break;
       }
     };
@@ -172,7 +225,19 @@ function App() {
         {/* Main Panel */}
         <div className="flex-1 overflow-auto">
           {currentView === "dashboard" ? (
-            <Dashboard vscode={vscode} />
+            <Dashboard
+              vscode={vscode}
+              currentBranch={currentBranch}
+              hasChanges={hasChanges}
+              issues={issuesState}
+              onRefreshIssues={() => {
+                setIssuesState((prev) => ({ ...prev, loading: true }));
+                vscode.postMessage({ type: "refreshIssues" });
+              }}
+              onLogin={() =>
+                vscode.postMessage({ type: "stackcode.auth.login" })
+              }
+            />
           ) : (
             <div className="p-8">
               <h1 className="text-2xl font-bold mb-4">Project View</h1>

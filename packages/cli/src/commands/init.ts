@@ -1,5 +1,3 @@
-// packages/cli/src/commands/init.ts
-
 import type { CommandModule } from "yargs";
 import fs from "fs/promises";
 import path from "path";

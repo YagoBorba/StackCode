@@ -5,9 +5,16 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
   "scripts": {
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
-    "build": "tsc",
+    "build": "tsc && mkdir -p dist/locales && cp src/locales/*.json dist/locales/",
     "test": "echo \"✅ No tests for this package\""
   },
   "keywords": [
