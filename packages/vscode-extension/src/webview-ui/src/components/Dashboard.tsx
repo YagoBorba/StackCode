@@ -83,8 +83,8 @@ interface ActivityItem {
 
 const Dashboard: React.FC<DashboardProps> = ({ 
   vscode, 
-  currentBranch = "main",
-  hasChanges = false,
+  // currentBranch = "main",
+  // hasChanges = false,
   issues,
   onRefreshIssues,
   onLogin 

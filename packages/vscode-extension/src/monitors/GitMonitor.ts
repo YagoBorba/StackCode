@@ -229,7 +229,7 @@ export class GitMonitor implements vscode.Disposable {
       const remotes = repository.state.remotes;
 
       // Procurar pelo remote 'origin'
-      const originRemote = remotes.find((remote: any) => remote.name === "origin");
+      const originRemote = remotes.find((remote: { name: string; fetchUrl?: string; pushUrl?: string }) => remote.name === "origin");
       if (!originRemote) {
         console.warn("[GitMonitor] No origin remote found");
         return null;
@@ -267,11 +267,11 @@ export class GitMonitor implements vscode.Disposable {
       // Regex para diferentes formatos de URL do GitHub
       const patterns = [
         // HTTPS: https://github.com/owner/repo
-        /^https:\/\/github\.com\/([^\/]+)\/([^\/]+)$/,
+        /^https:\/\/github\.com\/([^/]+)\/([^/]+)$/,
         // SSH: git@github.com:owner/repo
-        /^git@github\.com:([^\/]+)\/([^\/]+)$/,
+        /^git@github\.com:([^/]+)\/([^/]+)$/,
         // SSH alternative: ssh://git@github.com/owner/repo
-        /^ssh:\/\/git@github\.com\/([^\/]+)\/([^\/]+)$/,
+        /^ssh:\/\/git@github\.com\/([^/]+)\/([^/]+)$/,
       ];
 
       for (const pattern of patterns) {

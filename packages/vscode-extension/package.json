@@ -25,10 +25,7 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "onStartupFinished",
-    "onView:stackcode.dashboard",
-    "onView:stackcode.projectView",
-    "*"
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -171,6 +168,12 @@
         },
         {
           "command": "stackcode.dashboard"
+        },
+        {
+          "command": "stackcode.auth.login"
+        },
+        {
+          "command": "stackcode.auth.logout"
         }
       ]
     },

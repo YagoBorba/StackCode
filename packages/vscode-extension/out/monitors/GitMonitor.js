@@ -233,11 +233,11 @@ class GitMonitor {
             // Regex para diferentes formatos de URL do GitHub
             const patterns = [
                 // HTTPS: https://github.com/owner/repo
-                /^https:\/\/github\.com\/([^\/]+)\/([^\/]+)$/,
+                /^https:\/\/github\.com\/([^/]+)\/([^/]+)$/,
                 // SSH: git@github.com:owner/repo
-                /^git@github\.com:([^\/]+)\/([^\/]+)$/,
+                /^git@github\.com:([^/]+)\/([^/]+)$/,
                 // SSH alternative: ssh://git@github.com/owner/repo
-                /^ssh:\/\/git@github\.com\/([^\/]+)\/([^\/]+)$/,
+                /^ssh:\/\/git@github\.com\/([^/]+)\/([^/]+)$/,
             ];
             for (const pattern of patterns) {
                 const match = cleanUrl.match(pattern);

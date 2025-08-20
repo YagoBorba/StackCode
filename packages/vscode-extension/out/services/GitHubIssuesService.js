@@ -22,19 +22,28 @@ class GitHubIssuesService {
      */
     async fetchCurrentRepositoryIssues(options) {
         try {
+            console.log("🔍 [GitHubIssuesService] Starting fetchCurrentRepositoryIssues...");
             // Verificar autenticação
             if (!this._authService.isAuthenticated) {
+                console.warn("❌ [GitHubIssuesService] User not authenticated");
                 throw new Error("User not authenticated with GitHub");
             }
+            console.log("✅ [GitHubIssuesService] User is authenticated");
             // Detectar repositório atual
+            console.log("🔍 [GitHubIssuesService] Detecting current repository...");
             const repository = await this._gitMonitor.getCurrentGitHubRepository();
             if (!repository) {
+                console.warn("❌ [GitHubIssuesService] No GitHub repository detected");
                 throw new Error("No GitHub repository detected in current workspace");
             }
-            return await this.fetchRepositoryIssues(repository, options);
+            console.log(`✅ [GitHubIssuesService] Repository detected: ${repository.owner}/${repository.repo}`);
+            console.log("🚀 [GitHubIssuesService] Fetching issues...");
+            const issues = await this.fetchRepositoryIssues(repository, options);
+            console.log(`✅ [GitHubIssuesService] Found ${issues.length} issues`);
+            return issues;
         }
         catch (error) {
-            console.error("[GitHubIssuesService] Failed to fetch current repository issues:", error);
+            console.error("❌ [GitHubIssuesService] Failed to fetch current repository issues:", error);
             throw error;
         }
     }
