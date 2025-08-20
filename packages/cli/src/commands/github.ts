@@ -77,7 +77,6 @@ class CLIAuthManager {
  */
 function getCurrentRepository(): { owner: string; repo: string } | null {
   try {
-    // Debug: verificar diretório atual
     const cwd = process.cwd();
     console.log(`🔍 Detectando repositório em: ${cwd}`);
     
@@ -94,7 +93,6 @@ function getCurrentRepository(): { owner: string; repo: string } | null {
 
     console.log(`🔗 URL remota encontrada: ${remoteUrl}`);
 
-    // Parse GitHub URLs
     const patterns = [
       /^https:\/\/github\.com\/([^/]+)\/([^/]+)(?:\.git)?$/,
       /^git@github\.com:([^/]+)\/([^/]+)(?:\.git)?$/,
@@ -151,7 +149,6 @@ function getAuthCommand(): CommandModule<Record<string, unknown>, AuthArgs> {
         .example("$0 github auth --status", "Verificar status da autenticação"),
 
     async handler(args: AuthArgs) {
-      // Ensure i18n is initialized
       await initI18n();
       
       const authManager = new CLIAuthManager();
@@ -258,19 +255,16 @@ function getIssuesCommand(): CommandModule<Record<string, unknown>, IssuesArgs> 
         .example("$0 github issues --assignee me", "Listar minhas issues atribuídas"),
 
     async handler(args: IssuesArgs) {
-      // Ensure i18n is initialized
       await initI18n();
       
       const authManager = new CLIAuthManager();
 
       try {
-        // Se não tiver argumentos específicos, mostrar menu interativo
         if (!args.repo && !args.state && !args.assignee && !args.labels && !args.limit) {
           await showInteractiveIssuesMenu(authManager);
           return;
         }
 
-        // Verificar autenticação
         const token = authManager.getToken();
         if (!token) {
           console.error(`❌ ${t("github.auth.not_authenticated")}`);
@@ -278,7 +272,6 @@ function getIssuesCommand(): CommandModule<Record<string, unknown>, IssuesArgs> 
           process.exit(1);
         }
 
-        // Determinar repositório
         let owner: string, repo: string;
         if (args.repo) {
           const parts = args.repo.split("/");
@@ -299,7 +292,6 @@ function getIssuesCommand(): CommandModule<Record<string, unknown>, IssuesArgs> 
 
         console.log(`📋 ${t("github.issues.fetching")} ${owner}/${repo}...`);
 
-        // Buscar issues
         const octokit = new Octokit({ auth: token });
         const issues = await fetchRepositoryIssues(octokit, {
           owner,
@@ -310,7 +302,6 @@ function getIssuesCommand(): CommandModule<Record<string, unknown>, IssuesArgs> 
           per_page: args.limit || 30,
         });
 
-        // Exibir resultados
         if (issues.length === 0) {
           console.log(`✅ ${t("github.issues.no_issues_found")} ${owner}/${repo}`);
           return;
@@ -358,7 +349,6 @@ export function getGitHubCommand(): CommandModule {
         .demandCommand(1, "You need to specify a subcommand")
         .help(),
     handler: () => {
-      // Será tratado pelos subcomandos
     },
   };
 }
@@ -369,7 +359,6 @@ export function getGitHubCommand(): CommandModule {
 async function showInteractiveIssuesMenu(authManager: CLIAuthManager): Promise<void> {
   const inquirer = await import("inquirer");
 
-  // Verificar autenticação
   const token = authManager.getToken();
   if (!token) {
     console.error(`❌ ${t("github.auth.not_authenticated")}`);
@@ -377,7 +366,6 @@ async function showInteractiveIssuesMenu(authManager: CLIAuthManager): Promise<v
     process.exit(1);
   }
 
-  // Detectar repositório atual
   const currentRepo = getCurrentRepository();
   
   const choices = [
@@ -520,7 +508,6 @@ async function fetchAndDisplayIssues(
 
     console.log(`\n📄 ${t("github.issues.found_issues")} ${issues.length} ${options.state || "open"} ${t("github.issues.issues")}:\n`);
 
-    // Exibir issues com paginação simples
     const pageSize = 5;
     for (let i = 0; i < issues.length; i += pageSize) {
       const pageIssues = issues.slice(i, i + pageSize);
@@ -542,7 +529,6 @@ async function fetchAndDisplayIssues(
         console.log(`   🔗 ${issue.html_url}`);
       });
 
-      // Se há mais páginas, perguntar se quer continuar
       if (i + pageSize < issues.length) {
         const inquirer = await import("inquirer");
         const { continueReading } = await inquirer.default.prompt([
@@ -564,3 +550,5 @@ async function fetchAndDisplayIssues(
     console.error(`❌ ${t("github.issues.error_fetching")} ${getErrorMessage(error)}`);
   }
 }
+
+export { CLIAuthManager, getCurrentRepository, fetchRepositoryIssues };

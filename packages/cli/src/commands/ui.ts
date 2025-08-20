@@ -2,6 +2,9 @@ import chalk from "chalk";
 import inquirer from "inquirer";
 import { t } from "@stackcode/i18n";
 import { type PackageBumpInfo } from "@stackcode/core";
+import { CLIAuthManager } from "./github.js";
+import { getCurrentRepository, fetchRepositoryIssues } from "./github.js";
+import { Octokit } from "@octokit/rest";
 
 export const log = {
   info: (message: string) => console.log(chalk.blue(message)),
@@ -257,6 +260,12 @@ export interface CommitAnswers {
   affectedIssues: string;
 }
 
+export interface GitHubIssueChoice {
+  number: number;
+  title: string;
+  url: string;
+}
+
 export async function promptForCommitAnswers(): Promise<CommitAnswers> {
   const getCommitTypes = () => [
     { name: t("commit.types.feat"), value: "feat" },
@@ -270,7 +279,7 @@ export async function promptForCommitAnswers(): Promise<CommitAnswers> {
     { name: t("commit.types.revert"), value: "revert" },
   ];
 
-  return inquirer.prompt<CommitAnswers>([
+  const basicAnswers = await inquirer.prompt<CommitAnswers>([
     {
       type: "list",
       name: "type",
@@ -295,10 +304,114 @@ export async function promptForCommitAnswers(): Promise<CommitAnswers> {
       name: "breakingChanges",
       message: t("commit.prompt.breaking_changes"),
     },
-    {
-      type: "input",
-      name: "affectedIssues",
-      message: t("commit.prompt.affected_issues"),
-    },
   ]);
+
+  // Verificar se há autenticação GitHub e repositório
+  const authManager = new CLIAuthManager();
+  const hasGitHubAuth = authManager.getToken() !== null;
+  const currentRepo = hasGitHubAuth ? getCurrentRepository() : null;
+
+  let affectedIssues = "";
+
+  if (hasGitHubAuth && currentRepo) {
+    const { useGitHubIntegration } = await inquirer.prompt<{
+      useGitHubIntegration: boolean;
+    }>([
+      {
+        type: "confirm",
+        name: "useGitHubIntegration",
+        message: `🔗 ${t("commit.prompt.link_github_issues")} (${currentRepo.owner}/${currentRepo.repo})?`,
+        default: false,
+      },
+    ]);
+
+    if (useGitHubIntegration) {
+      const selectedIssues = await promptForGitHubIssues(authManager, currentRepo);
+      if (selectedIssues.length > 0) {
+        affectedIssues = selectedIssues
+          .map((issue) => `closes #${issue.number}`)
+          .join(", ");
+      }
+    }
+  }
+
+  if (!affectedIssues) {
+    const { manualIssues } = await inquirer.prompt<{ manualIssues: string }>([
+      {
+        type: "input",
+        name: "manualIssues",
+        message: t("commit.prompt.affected_issues"),
+      },
+    ]);
+    affectedIssues = manualIssues;
+  }
+
+  return {
+    ...basicAnswers,
+    affectedIssues,
+  };
+}
+
+/**
+ * Prompt para seleção de issues do GitHub
+ */
+async function promptForGitHubIssues(
+  authManager: CLIAuthManager,
+  repository: { owner: string; repo: string }
+): Promise<GitHubIssueChoice[]> {
+  try {
+    log.info(`📋 ${t("github.issues.fetching")} ${repository.owner}/${repository.repo}...`);
+    
+    const token = authManager.getToken()!;
+    const octokit = new Octokit({ auth: token });
+    
+    const issues = await fetchRepositoryIssues(octokit, {
+      owner: repository.owner,
+      repo: repository.repo,
+      state: "open",
+      per_page: 20, // Limite razoável para seleção
+    });
+
+    if (issues.length === 0) {
+      log.warning(`✅ ${t("github.issues.no_issues_found")} ${repository.owner}/${repository.repo}`);
+      return [];
+    }
+
+    const choices = issues.map((issue) => ({
+      name: `#${issue.number} ${issue.title}`,
+      value: {
+        number: issue.number,
+        title: issue.title,
+        url: issue.html_url,
+      },
+      short: `#${issue.number}`,
+    }));
+
+    choices.push({
+      name: `❌ ${t("common.cancel")}`,
+      value: { number: -1, title: "cancel", url: "" }, // Valor especial para cancelamento
+      short: "cancel",
+    });
+
+    const { selectedIssues } = await inquirer.prompt<{
+      selectedIssues: GitHubIssueChoice[];
+    }>([
+      {
+        type: "checkbox",
+        name: "selectedIssues",
+        message: `🎯 ${t("commit.prompt.select_issues_to_link")}:`,
+        choices,
+        pageSize: 10,
+        validate: (answer: GitHubIssueChoice[]) => {
+          return answer.length > 0 ? true : t("commit.prompt.select_at_least_one_issue");
+        },
+      },
+    ]);
+
+    // Filtrar o item de cancelamento
+    return selectedIssues.filter((issue) => issue.number !== -1);
+  } catch (error) {
+    log.error(`❌ ${t("github.issues.error_fetching")} ${error}`);
+    return [];
+  }
 }
