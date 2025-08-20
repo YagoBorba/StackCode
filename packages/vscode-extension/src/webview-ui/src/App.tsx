@@ -107,7 +107,8 @@ function App() {
   const [lastAction, setLastAction] = useState("Ready");
   const [, setStats] = useState(initialStats);
   const [isReady, setIsReady] = useState(false);
-  const [issuesState, setIssuesState] = useState<IssuesState>(initialIssuesState);
+  const [issuesState, setIssuesState] =
+    useState<IssuesState>(initialIssuesState);
   const [vscode] = useState(() => {
     return typeof window !== "undefined" && "acquireVsCodeApi" in window
       ? (window as { acquireVsCodeApi: () => VsCodeApi }).acquireVsCodeApi()
@@ -224,16 +225,18 @@ function App() {
         {/* Main Panel */}
         <div className="flex-1 overflow-auto">
           {currentView === "dashboard" ? (
-            <Dashboard 
+            <Dashboard
               vscode={vscode}
               currentBranch={currentBranch}
               hasChanges={hasChanges}
               issues={issuesState}
               onRefreshIssues={() => {
-                setIssuesState(prev => ({ ...prev, loading: true }));
+                setIssuesState((prev) => ({ ...prev, loading: true }));
                 vscode.postMessage({ type: "refreshIssues" });
               }}
-              onLogin={() => vscode.postMessage({ type: "stackcode.auth.login" })}
+              onLogin={() =>
+                vscode.postMessage({ type: "stackcode.auth.login" })
+              }
             />
           ) : (
             <div className="p-8">

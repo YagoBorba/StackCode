@@ -79,11 +79,12 @@ function getCurrentRepository(): { owner: string; repo: string } | null {
   try {
     const cwd = process.cwd();
     console.log(`🔍 Detectando repositório em: ${cwd}`);
-    
-    const remoteUrl = fs.readFileSync('.git/config', 'utf8')
-      .split('\n')
-      .find((line: string) => line.includes('url = '))
-      ?.split('url = ')[1]
+
+    const remoteUrl = fs
+      .readFileSync(".git/config", "utf8")
+      .split("\n")
+      .find((line: string) => line.includes("url = "))
+      ?.split("url = ")[1]
       ?.trim();
 
     if (!remoteUrl) {
@@ -107,11 +108,13 @@ function getCurrentRepository(): { owner: string; repo: string } | null {
         return result;
       }
     }
-    
+
     console.log(`❌ URL não corresponde aos padrões GitHub conhecidos`);
     return null;
   } catch (error) {
-    console.log(`❌ Erro ao detectar repositório: ${error instanceof Error ? error.message : String(error)}`);
+    console.log(
+      `❌ Erro ao detectar repositório: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return null;
   }
 }
@@ -128,7 +131,8 @@ function getAuthCommand(): CommandModule<Record<string, unknown>, AuthArgs> {
         .option("token", {
           alias: "t",
           type: "string",
-          describe: t("github.auth.token") || "Set GitHub personal access token",
+          describe:
+            t("github.auth.token") || "Set GitHub personal access token",
         })
         .option("login", {
           alias: "l",
@@ -150,7 +154,7 @@ function getAuthCommand(): CommandModule<Record<string, unknown>, AuthArgs> {
 
     async handler(args: AuthArgs) {
       await initI18n();
-      
+
       const authManager = new CLIAuthManager();
 
       try {
@@ -207,7 +211,9 @@ function getAuthCommand(): CommandModule<Record<string, unknown>, AuthArgs> {
 
         console.log(t("github.auth.use_options"));
       } catch (error) {
-        console.error(`${t("github.auth.auth_error")} ${getErrorMessage(error)}`);
+        console.error(
+          `${t("github.auth.auth_error")} ${getErrorMessage(error)}`,
+        );
         process.exit(1);
       }
     },
@@ -217,7 +223,10 @@ function getAuthCommand(): CommandModule<Record<string, unknown>, AuthArgs> {
 /**
  * Comando para listar issues
  */
-function getIssuesCommand(): CommandModule<Record<string, unknown>, IssuesArgs> {
+function getIssuesCommand(): CommandModule<
+  Record<string, unknown>,
+  IssuesArgs
+> {
   return {
     command: "issues",
     describe: t("github.issues.description") || "List repository issues",
@@ -243,7 +252,8 @@ function getIssuesCommand(): CommandModule<Record<string, unknown>, IssuesArgs> 
         .option("labels", {
           alias: "l",
           type: "string",
-          describe: t("github.issues.labels") || "Filter by labels (comma-separated)",
+          describe:
+            t("github.issues.labels") || "Filter by labels (comma-separated)",
         })
         .option("limit", {
           type: "number",
@@ -251,16 +261,28 @@ function getIssuesCommand(): CommandModule<Record<string, unknown>, IssuesArgs> 
           describe: t("github.issues.limit") || "Number of issues to fetch",
         })
         .example("$0 github issues", "Listar issues do repositório atual")
-        .example("$0 github issues --repo owner/repo", "Listar issues de repositório específico")
-        .example("$0 github issues --assignee me", "Listar minhas issues atribuídas"),
+        .example(
+          "$0 github issues --repo owner/repo",
+          "Listar issues de repositório específico",
+        )
+        .example(
+          "$0 github issues --assignee me",
+          "Listar minhas issues atribuídas",
+        ),
 
     async handler(args: IssuesArgs) {
       await initI18n();
-      
+
       const authManager = new CLIAuthManager();
 
       try {
-        if (!args.repo && !args.state && !args.assignee && !args.labels && !args.limit) {
+        if (
+          !args.repo &&
+          !args.state &&
+          !args.assignee &&
+          !args.labels &&
+          !args.limit
+        ) {
           await showInteractiveIssuesMenu(authManager);
           return;
         }
@@ -303,32 +325,39 @@ function getIssuesCommand(): CommandModule<Record<string, unknown>, IssuesArgs> 
         });
 
         if (issues.length === 0) {
-          console.log(`✅ ${t("github.issues.no_issues_found")} ${owner}/${repo}`);
+          console.log(
+            `✅ ${t("github.issues.no_issues_found")} ${owner}/${repo}`,
+          );
           return;
         }
 
-        console.log(`\n📄 ${t("github.issues.found_issues")} ${issues.length} ${args.state} ${t("github.issues.issues")}:\n`);
+        console.log(
+          `\n📄 ${t("github.issues.found_issues")} ${issues.length} ${args.state} ${t("github.issues.issues")}:\n`,
+        );
 
         issues.forEach((issue) => {
           console.log(`#${issue.number} ${issue.title}`);
-          console.log(`   👤 ${issue.user.login} • 🕐 ${new Date(issue.updated_at).toLocaleDateString()}`);
-          
+          console.log(
+            `   👤 ${issue.user.login} • 🕐 ${new Date(issue.updated_at).toLocaleDateString()}`,
+          );
+
           if (issue.labels.length > 0) {
-            const labels = issue.labels.map(l => l.name).join(", ");
+            const labels = issue.labels.map((l) => l.name).join(", ");
             console.log(`   🏷️  ${labels}`);
           }
-          
+
           if (issue.assignees.length > 0) {
-            const assignees = issue.assignees.map(a => a.login).join(", ");
+            const assignees = issue.assignees.map((a) => a.login).join(", ");
             console.log(`   👥 ${t("github.issues.assigned_to")} ${assignees}`);
           }
-          
+
           console.log(`   🔗 ${issue.html_url}`);
           console.log("");
         });
-
       } catch (error) {
-        console.error(`${t("github.issues.error_fetching")} ${getErrorMessage(error)}`);
+        console.error(
+          `${t("github.issues.error_fetching")} ${getErrorMessage(error)}`,
+        );
         process.exit(1);
       }
     },
@@ -348,15 +377,16 @@ export function getGitHubCommand(): CommandModule {
         .command(getIssuesCommand())
         .demandCommand(1, "You need to specify a subcommand")
         .help(),
-    handler: () => {
-    },
+    handler: () => {},
   };
 }
 
 /**
  * Menu interativo para issues do GitHub
  */
-async function showInteractiveIssuesMenu(authManager: CLIAuthManager): Promise<void> {
+async function showInteractiveIssuesMenu(
+  authManager: CLIAuthManager,
+): Promise<void> {
   const inquirer = await import("inquirer");
 
   const token = authManager.getToken();
@@ -367,7 +397,7 @@ async function showInteractiveIssuesMenu(authManager: CLIAuthManager): Promise<v
   }
 
   const currentRepo = getCurrentRepository();
-  
+
   const choices = [
     {
       name: `📋 ${t("github.issues.list_current_repo")} ${currentRepo ? `(${currentRepo.owner}/${currentRepo.repo})` : t("github.issues.no_repo_detected")}`,
@@ -410,23 +440,25 @@ async function showInteractiveIssuesMenu(authManager: CLIAuthManager): Promise<v
         await fetchAndDisplayIssues(authManager, currentRepo);
       }
       break;
-    
+
     case "specific":
       await handleSpecificRepository(authManager);
       break;
-    
+
     case "assigned":
       if (currentRepo) {
-        await fetchAndDisplayIssues(authManager, currentRepo, { assignee: "me" });
+        await fetchAndDisplayIssues(authManager, currentRepo, {
+          assignee: "me",
+        });
       }
       break;
-    
+
     case "labels":
       if (currentRepo) {
         await handleLabelFilter(authManager, currentRepo);
       }
       break;
-    
+
     case "back":
       return;
   }
@@ -435,7 +467,9 @@ async function showInteractiveIssuesMenu(authManager: CLIAuthManager): Promise<v
 /**
  * Handle repositório específico
  */
-async function handleSpecificRepository(authManager: CLIAuthManager): Promise<void> {
+async function handleSpecificRepository(
+  authManager: CLIAuthManager,
+): Promise<void> {
   const inquirer = await import("inquirer");
 
   const { repoInput } = await inquirer.default.prompt([
@@ -463,7 +497,10 @@ async function handleSpecificRepository(authManager: CLIAuthManager): Promise<vo
 /**
  * Handle filtro por labels
  */
-async function handleLabelFilter(authManager: CLIAuthManager, repository: { owner: string; repo: string }): Promise<void> {
+async function handleLabelFilter(
+  authManager: CLIAuthManager,
+  repository: { owner: string; repo: string },
+): Promise<void> {
   const inquirer = await import("inquirer");
 
   const { labels } = await inquirer.default.prompt([
@@ -474,7 +511,9 @@ async function handleLabelFilter(authManager: CLIAuthManager, repository: { owne
     },
   ]);
 
-  const labelArray = labels ? labels.split(",").map((l: string) => l.trim()) : undefined;
+  const labelArray = labels
+    ? labels.split(",").map((l: string) => l.trim())
+    : undefined;
   await fetchAndDisplayIssues(authManager, repository, { labels: labelArray });
 }
 
@@ -482,16 +521,23 @@ async function handleLabelFilter(authManager: CLIAuthManager, repository: { owne
  * Busca e exibe issues com opções de paginação
  */
 async function fetchAndDisplayIssues(
-  authManager: CLIAuthManager, 
-  repository: { owner: string; repo: string }, 
-  options: { state?: string; assignee?: string; labels?: string[]; per_page?: number } = {}
+  authManager: CLIAuthManager,
+  repository: { owner: string; repo: string },
+  options: {
+    state?: string;
+    assignee?: string;
+    labels?: string[];
+    per_page?: number;
+  } = {},
 ): Promise<void> {
-  console.log(`📋 ${t("github.issues.fetching")} ${repository.owner}/${repository.repo}...`);
+  console.log(
+    `📋 ${t("github.issues.fetching")} ${repository.owner}/${repository.repo}...`,
+  );
 
   try {
     const token = authManager.getToken()!;
     const octokit = new Octokit({ auth: token });
-    
+
     const issues = await fetchRepositoryIssues(octokit, {
       owner: repository.owner,
       repo: repository.repo,
@@ -502,30 +548,36 @@ async function fetchAndDisplayIssues(
     });
 
     if (issues.length === 0) {
-      console.log(`✅ ${t("github.issues.no_issues_found")} ${repository.owner}/${repository.repo}`);
+      console.log(
+        `✅ ${t("github.issues.no_issues_found")} ${repository.owner}/${repository.repo}`,
+      );
       return;
     }
 
-    console.log(`\n📄 ${t("github.issues.found_issues")} ${issues.length} ${options.state || "open"} ${t("github.issues.issues")}:\n`);
+    console.log(
+      `\n📄 ${t("github.issues.found_issues")} ${issues.length} ${options.state || "open"} ${t("github.issues.issues")}:\n`,
+    );
 
     const pageSize = 5;
     for (let i = 0; i < issues.length; i += pageSize) {
       const pageIssues = issues.slice(i, i + pageSize);
-      
+
       pageIssues.forEach((issue, index) => {
         console.log(`\n${i + index + 1}. #${issue.number} ${issue.title}`);
-        console.log(`   👤 ${issue.user.login} • 🕐 ${new Date(issue.updated_at).toLocaleDateString()}`);
-        
+        console.log(
+          `   👤 ${issue.user.login} • 🕐 ${new Date(issue.updated_at).toLocaleDateString()}`,
+        );
+
         if (issue.labels.length > 0) {
-          const labels = issue.labels.map(l => l.name).join(", ");
+          const labels = issue.labels.map((l) => l.name).join(", ");
           console.log(`   🏷️  ${labels}`);
         }
-        
+
         if (issue.assignees.length > 0) {
-          const assignees = issue.assignees.map(a => a.login).join(", ");
+          const assignees = issue.assignees.map((a) => a.login).join(", ");
           console.log(`   👥 ${t("github.issues.assigned_to")} ${assignees}`);
         }
-        
+
         console.log(`   🔗 ${issue.html_url}`);
       });
 
@@ -545,9 +597,10 @@ async function fetchAndDisplayIssues(
         }
       }
     }
-
   } catch (error) {
-    console.error(`❌ ${t("github.issues.error_fetching")} ${getErrorMessage(error)}`);
+    console.error(
+      `❌ ${t("github.issues.error_fetching")} ${getErrorMessage(error)}`,
+    );
   }
 }
 

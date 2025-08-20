@@ -3,7 +3,7 @@ import { Octokit } from "@octokit/rest";
 
 /**
  * GitHubAuthService - Gerencia autenticação OAuth2 com GitHub
- * 
+ *
  * Responsabilidades:
  * 1. Implementar fluxo OAuth2 usando VS Code native authentication
  * 2. Armazenar token seguramente usando SecretStorage
@@ -14,7 +14,7 @@ export class GitHubAuthService {
   private static readonly GITHUB_PROVIDER_ID = "github";
   private static readonly TOKEN_KEY = "stackcode.github.token";
   private static readonly SCOPES = ["repo", "user:email"];
-  
+
   private _context: vscode.ExtensionContext;
   private _octokit: Octokit | null = null;
   private _session: vscode.AuthenticationSession | null = null;
@@ -35,7 +35,7 @@ export class GitHubAuthService {
    */
   public get userInfo(): { username?: string; email?: string } | null {
     if (!this._session) return null;
-    
+
     return {
       username: this._session.account.label,
       email: this._session.account.id,
@@ -62,7 +62,7 @@ export class GitHubAuthService {
       this._session = await vscode.authentication.getSession(
         GitHubAuthService.GITHUB_PROVIDER_ID,
         GitHubAuthService.SCOPES,
-        { createIfNone: true }
+        { createIfNone: true },
       );
 
       if (this._session) {
@@ -74,14 +74,14 @@ export class GitHubAuthService {
         // Armazenar token seguramente
         await this._context.secrets.store(
           GitHubAuthService.TOKEN_KEY,
-          this._session.accessToken
+          this._session.accessToken,
         );
 
         // Verificar se o token funciona
         await this._validateToken();
 
         vscode.window.showInformationMessage(
-          `✅ Successfully logged in to GitHub as ${this._session.account.label}`
+          `✅ Successfully logged in to GitHub as ${this._session.account.label}`,
         );
 
         console.log("[StackCode] GitHub authentication successful");
@@ -91,7 +91,7 @@ export class GitHubAuthService {
       vscode.window.showErrorMessage(
         `Failed to authenticate with GitHub: ${
           error instanceof Error ? error.message : "Unknown error"
-        }`
+        }`,
       );
       throw error;
     }
@@ -114,14 +114,16 @@ export class GitHubAuthService {
       // Limpar cliente
       this._octokit = null;
 
-      vscode.window.showInformationMessage("✅ Successfully logged out from GitHub");
+      vscode.window.showInformationMessage(
+        "✅ Successfully logged out from GitHub",
+      );
       console.log("[StackCode] GitHub logout successful");
     } catch (error) {
       console.error("[StackCode] GitHub logout failed:", error);
       vscode.window.showErrorMessage(
         `Failed to logout from GitHub: ${
           error instanceof Error ? error.message : "Unknown error"
-        }`
+        }`,
       );
     }
   }
@@ -135,7 +137,7 @@ export class GitHubAuthService {
       const session = await vscode.authentication.getSession(
         GitHubAuthService.GITHUB_PROVIDER_ID,
         GitHubAuthService.SCOPES,
-        { createIfNone: false }
+        { createIfNone: false },
       );
 
       if (session) {

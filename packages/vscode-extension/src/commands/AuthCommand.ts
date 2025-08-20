@@ -4,7 +4,7 @@ import { GitHubAuthService } from "../services/GitHubAuthService";
 
 /**
  * AuthCommand - Gerencia comandos de autenticação GitHub
- * 
+ *
  * Comandos disponíveis:
  * - stackcode.auth.login: Inicia processo de login
  * - stackcode.auth.logout: Remove autenticação
@@ -34,7 +34,7 @@ export class AuthCommand extends BaseCommand {
         const result = await vscode.window.showInformationMessage(
           `Already logged in as ${userInfo?.username}. Would you like to logout and login again?`,
           "Yes, re-login",
-          "Cancel"
+          "Cancel",
         );
 
         if (result === "Yes, re-login") {
@@ -52,7 +52,7 @@ export class AuthCommand extends BaseCommand {
         },
         async () => {
           await this._authService.login();
-        }
+        },
       );
     } catch (error) {
       console.error("[AuthCommand] Login failed:", error);
@@ -73,7 +73,7 @@ export class AuthCommand extends BaseCommand {
       const result = await vscode.window.showWarningMessage(
         `Are you sure you want to logout from GitHub (${userInfo?.username})?`,
         "Yes, logout",
-        "Cancel"
+        "Cancel",
       );
 
       if (result === "Yes, logout") {
@@ -91,12 +91,12 @@ export class AuthCommand extends BaseCommand {
     if (this._authService.isAuthenticated) {
       const userInfo = this._authService.userInfo;
       vscode.window.showInformationMessage(
-        `✅ Authenticated with GitHub as ${userInfo?.username}`
+        `✅ Authenticated with GitHub as ${userInfo?.username}`,
       );
     } else {
       const result = await vscode.window.showInformationMessage(
         "❌ Not authenticated with GitHub",
-        "Login now"
+        "Login now",
       );
 
       if (result === "Login now") {

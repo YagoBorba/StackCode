@@ -15,9 +15,9 @@ export class DashboardProvider
   private _authService?: GitHubAuthService;
 
   constructor(
-    context: vscode.ExtensionContext, 
+    context: vscode.ExtensionContext,
     issuesService?: GitHubIssuesService,
-    authService?: GitHubAuthService
+    authService?: GitHubAuthService,
   ) {
     this._extensionUri = context.extensionUri;
     this._issuesService = issuesService;
@@ -133,7 +133,7 @@ export class DashboardProvider
 
       console.log("[DashboardProvider] Fetching GitHub issues...");
 
-      const issues = forceRefresh 
+      const issues = forceRefresh
         ? await this._issuesService.refreshIssues()
         : await this._issuesService.fetchCurrentRepositoryIssues();
 
@@ -145,16 +145,21 @@ export class DashboardProvider
         },
       });
 
-      console.log(`[DashboardProvider] Sent ${issues.length} issues to webview`);
+      console.log(
+        `[DashboardProvider] Sent ${issues.length} issues to webview`,
+      );
     } catch (error) {
       console.error("[DashboardProvider] Failed to fetch issues:", error);
-      
+
       this.sendMessage({
         type: "updateIssues",
         payload: {
           issues: [],
-          error: error instanceof Error ? error.message : "Failed to fetch issues",
-          needsAuth: error instanceof Error && error.message.includes("not authenticated"),
+          error:
+            error instanceof Error ? error.message : "Failed to fetch issues",
+          needsAuth:
+            error instanceof Error &&
+            error.message.includes("not authenticated"),
         },
       });
     }

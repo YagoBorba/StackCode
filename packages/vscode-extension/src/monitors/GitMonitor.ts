@@ -215,20 +215,29 @@ export class GitMonitor implements vscode.Disposable {
 
       const fromConfigFile = await this.getRepositoryFromGitConfig();
       if (fromConfigFile) {
-        console.log(`✅ [GitMonitor] Repository detected via .git/config: ${fromConfigFile.fullName}`);
+        console.log(
+          `✅ [GitMonitor] Repository detected via .git/config: ${fromConfigFile.fullName}`,
+        );
         return fromConfigFile;
       }
 
       const fromGitAPI = await this.getRepositoryFromGitAPI();
       if (fromGitAPI) {
-        console.log(`✅ [GitMonitor] Repository detected via Git API: ${fromGitAPI.fullName}`);
+        console.log(
+          `✅ [GitMonitor] Repository detected via Git API: ${fromGitAPI.fullName}`,
+        );
         return fromGitAPI;
       }
 
-      console.warn("❌ [GitMonitor] No GitHub repository detected with any strategy");
+      console.warn(
+        "❌ [GitMonitor] No GitHub repository detected with any strategy",
+      );
       return null;
     } catch (error) {
-      console.error("❌ [GitMonitor] Failed to get current GitHub repository:", error);
+      console.error(
+        "❌ [GitMonitor] Failed to get current GitHub repository:",
+        error,
+      );
       return null;
     }
   }
@@ -239,42 +248,47 @@ export class GitMonitor implements vscode.Disposable {
   private async getRepositoryFromGitConfig(): Promise<GitHubRepository | null> {
     try {
       const workspaceFolders = vscode.workspace.workspaceFolders;
-      
+
       // Lista de caminhos para tentar
       const pathsToTry: string[] = [];
-      
+
       if (workspaceFolders && workspaceFolders.length > 0) {
         // Adicionar workspace folders configurados
-        workspaceFolders.forEach(folder => {
+        workspaceFolders.forEach((folder) => {
           pathsToTry.push(folder.uri.fsPath);
         });
       }
-      
+
       // Adicionar caminhos alternativos comuns em dev containers
       pathsToTry.push(
         "/workspaces/StackCode",
         process.cwd(),
         path.join(process.cwd(), ".."),
-        path.join(process.cwd(), "..", "..")
+        path.join(process.cwd(), "..", ".."),
       );
 
-      console.log(`🔍 [GitMonitor] Trying ${pathsToTry.length} possible paths:`, pathsToTry);
+      console.log(
+        `🔍 [GitMonitor] Trying ${pathsToTry.length} possible paths:`,
+        pathsToTry,
+      );
 
       for (const folderPath of pathsToTry) {
         const gitConfigPath = path.join(folderPath, ".git", "config");
-        
+
         console.log(`🔍 [GitMonitor] Checking git config at: ${gitConfigPath}`);
-        
+
         if (fs.existsSync(gitConfigPath)) {
           const configContent = fs.readFileSync(gitConfigPath, "utf8");
           console.log(`📄 [GitMonitor] Found .git/config at: ${folderPath}`);
-          
+
           // Procurar pela URL do remote origin
-          const originMatch = configContent.match(/\[remote "origin"\]\s*\n\s*url\s*=\s*(.+)/);
+          const originMatch = configContent.match(
+            /\[remote "origin"\]\s*\n\s*url\s*=\s*(.+)/,
+          );
           if (originMatch) {
             const remoteUrl = originMatch[1].trim();
             console.log(`🔗 [GitMonitor] Found remote origin: ${remoteUrl}`);
-            
+
             const githubRepo = this.parseGitHubUrl(remoteUrl);
             if (githubRepo) {
               return githubRepo;
@@ -289,7 +303,7 @@ export class GitMonitor implements vscode.Disposable {
       console.error("❌ [GitMonitor] Error reading .git/config:", error);
       return null;
     }
-  }  /**
+  } /**
    * Estratégia 2: Via Git Extension API (método original como fallback)
    */
   private async getRepositoryFromGitAPI(): Promise<GitHubRepository | null> {
@@ -309,7 +323,10 @@ export class GitMonitor implements vscode.Disposable {
       const repository = gitAPI.repositories[0];
       const remotes = repository.state.remotes;
 
-      const originRemote = remotes.find((remote: { name: string; fetchUrl?: string; pushUrl?: string }) => remote.name === "origin");
+      const originRemote = remotes.find(
+        (remote: { name: string; fetchUrl?: string; pushUrl?: string }) =>
+          remote.name === "origin",
+      );
       if (!originRemote) {
         console.warn("⚠️ [GitMonitor] No origin remote found via API");
         return null;
@@ -323,13 +340,19 @@ export class GitMonitor implements vscode.Disposable {
 
       const githubRepo = this.parseGitHubUrl(remoteUrl);
       if (!githubRepo) {
-        console.warn("⚠️ [GitMonitor] Remote is not a GitHub repository:", remoteUrl);
+        console.warn(
+          "⚠️ [GitMonitor] Remote is not a GitHub repository:",
+          remoteUrl,
+        );
         return null;
       }
 
       return githubRepo;
     } catch (error) {
-      console.error("❌ [GitMonitor] Failed to get repository via Git API:", error);
+      console.error(
+        "❌ [GitMonitor] Failed to get repository via Git API:",
+        error,
+      );
       return null;
     }
   }

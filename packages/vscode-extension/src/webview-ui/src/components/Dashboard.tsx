@@ -81,13 +81,13 @@ interface ActivityItem {
   icon: React.ReactNode;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ 
-  vscode, 
+const Dashboard: React.FC<DashboardProps> = ({
+  vscode,
   // currentBranch = "main",
   // hasChanges = false,
   issues,
   onRefreshIssues,
-  onLogin 
+  onLogin,
 }) => {
   const [stats] = useState<ProjectStats>({
     files: 23,

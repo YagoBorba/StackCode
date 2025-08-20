@@ -1,5 +1,13 @@
 import React from "react";
-import { AlertCircle, ExternalLink, Clock, User, Tag, RefreshCw, LogIn } from "lucide-react";
+import {
+  AlertCircle,
+  ExternalLink,
+  Clock,
+  User,
+  Tag,
+  RefreshCw,
+  LogIn,
+} from "lucide-react";
 import { useTranslation } from "../utils/i18n";
 
 interface GitHubIssue {
@@ -41,7 +49,11 @@ interface IssuesPanelProps {
   onLogin: () => void;
 }
 
-export default function IssuesPanel({ issuesState, onRefresh, onLogin }: IssuesPanelProps) {
+export default function IssuesPanel({
+  issuesState,
+  onRefresh,
+  onLogin,
+}: IssuesPanelProps) {
   const { issues, loading, error, needsAuth } = issuesState;
   const { t } = useTranslation();
 
@@ -96,13 +108,15 @@ export default function IssuesPanel({ issuesState, onRefresh, onLogin }: IssuesP
             Repository Issues
           </h3>
         </div>
-                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+        <h3 className="text-lg font-semibold text-white flex items-center gap-2">
           <AlertCircle className="w-5 h-5 text-green-400" />
           {t("github.ui.repository_issues")}
         </h3>
         <div className="text-center py-8">
           <LogIn className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-          <p className="text-slate-400">{t("github.ui.login_to_view_issues")}</p>
+          <p className="text-slate-400">
+            {t("github.ui.login_to_view_issues")}
+          </p>
           <button
             onClick={onLogin}
             className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
@@ -164,7 +178,9 @@ export default function IssuesPanel({ issuesState, onRefresh, onLogin }: IssuesP
         <div className="text-center py-8">
           <AlertCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
           <p className="text-slate-400">{t("github.ui.no_issues_found")}</p>
-          <p className="text-slate-500 text-sm mt-1">{t("github.ui.great_job_clean")}</p>
+          <p className="text-slate-500 text-sm mt-1">
+            {t("github.ui.great_job_clean")}
+          </p>
         </div>
       </div>
     );
@@ -177,7 +193,9 @@ export default function IssuesPanel({ issuesState, onRefresh, onLogin }: IssuesP
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
           <AlertCircle className="w-5 h-5 text-blue-400" />
           {t("github.ui.repository_issues")}
-          <span className="text-sm text-slate-400 font-normal">({issues.length})</span>
+          <span className="text-sm text-slate-400 font-normal">
+            ({issues.length})
+          </span>
         </h3>
         <button
           onClick={onRefresh}

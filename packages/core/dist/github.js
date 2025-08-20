@@ -21,9 +21,9 @@ export async function fetchRepositoryIssues(octokit, options) {
             per_page,
         });
         // Filtrar apenas issues (não pull requests)
-        const issues = response.data.filter(issue => !issue.pull_request);
+        const issues = response.data.filter((issue) => !issue.pull_request);
         console.log(`[Core] Found ${issues.length} issues`);
-        return issues.map(issue => ({
+        return issues.map((issue) => ({
             id: issue.id,
             number: issue.number,
             title: issue.title,
@@ -34,11 +34,11 @@ export async function fetchRepositoryIssues(octokit, options) {
                 login: issue.user?.login || "unknown",
                 avatar_url: issue.user?.avatar_url || "",
             },
-            assignees: issue.assignees?.map(assignee => ({
+            assignees: issue.assignees?.map((assignee) => ({
                 login: assignee?.login || "unknown",
                 avatar_url: assignee?.avatar_url || "",
             })) || [],
-            labels: issue.labels?.map(label => ({
+            labels: issue.labels?.map((label) => ({
                 name: typeof label === "string" ? label : label.name || "",
                 color: typeof label === "string" ? "000000" : label.color || "000000",
                 description: typeof label === "string" ? null : label.description || null,

@@ -63,7 +63,11 @@ export async function activate(context: vscode.ExtensionContext) {
   gitHubIssuesService = new GitHubIssuesService(gitHubAuthService, gitMonitor);
 
   // Initialize providers (after services are ready)
-  dashboardProvider = new DashboardProvider(context, gitHubIssuesService, gitHubAuthService);
+  dashboardProvider = new DashboardProvider(
+    context,
+    gitHubIssuesService,
+    gitHubAuthService,
+  );
   projectViewProvider = new ProjectViewProvider(context.workspaceState);
 
   // Initialize commands
@@ -123,12 +127,16 @@ export async function activate(context: vscode.ExtensionContext) {
     ),
     vscode.commands.registerCommand("stackcode.auth.login", () => {
       console.log("🔐 [StackCode] AUTH LOGIN command executed!");
-      vscode.window.showInformationMessage("🔐 StackCode: Executando login GitHub...");
+      vscode.window.showInformationMessage(
+        "🔐 StackCode: Executando login GitHub...",
+      );
       return authCommand.executeLogin();
     }),
     vscode.commands.registerCommand("stackcode.auth.logout", () => {
       console.log("🔓 [StackCode] AUTH LOGOUT command executed!");
-      vscode.window.showInformationMessage("🔓 StackCode: Executando logout GitHub...");
+      vscode.window.showInformationMessage(
+        "🔓 StackCode: Executando logout GitHub...",
+      );
       return authCommand.executeLogout();
     }),
 
@@ -193,7 +201,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
   console.log("📋 [StackCode] Commands registered:", commands.length);
   console.log("🔐 [StackCode] Auth commands should be available now");
-  console.log("🎯 [StackCode] Available commands: stackcode.auth.login, stackcode.auth.logout, stackcode.dashboard");
+  console.log(
+    "🎯 [StackCode] Available commands: stackcode.auth.login, stackcode.auth.logout, stackcode.dashboard",
+  );
 
   // Initialize GitHub authentication
   await gitHubAuthService.initializeFromStorage();

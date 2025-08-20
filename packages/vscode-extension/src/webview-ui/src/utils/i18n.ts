@@ -8,7 +8,8 @@ const translations = {
     "github.ui.no_issues_found": "Nenhuma issue aberta encontrada!",
     "github.ui.great_job_clean": "Ótimo trabalho mantendo tudo limpo ✨",
     "github.ui.refresh_issues": "Atualizar issues",
-    "github.ui.login_to_view_issues": "Faça login no GitHub para ver as issues do repositório",
+    "github.ui.login_to_view_issues":
+      "Faça login no GitHub para ver as issues do repositório",
     "github.ui.login_github": "Entrar no GitHub",
     "github.ui.error_loading_issues": "Erro ao carregar issues",
     "github.ui.loading_issues": "Carregando issues...",
@@ -27,14 +28,15 @@ const translations = {
     "dashboard.welcome": "Bem-vindo ao StackCode",
     "dashboard.getting_started": "Começando",
     "dashboard.quick_actions": "Ações Rápidas",
-    "dashboard.recent_activity": "Atividade Recente"
+    "dashboard.recent_activity": "Atividade Recente",
   },
   en: {
     "github.ui.repository_issues": "Repository Issues",
     "github.ui.no_issues_found": "No open issues found!",
     "github.ui.great_job_clean": "Great job keeping things clean ✨",
     "github.ui.refresh_issues": "Refresh issues",
-    "github.ui.login_to_view_issues": "Login to GitHub to view repository issues",
+    "github.ui.login_to_view_issues":
+      "Login to GitHub to view repository issues",
     "github.ui.login_github": "Login to GitHub",
     "github.ui.error_loading_issues": "Error loading issues",
     "github.ui.loading_issues": "Loading issues...",
@@ -53,8 +55,8 @@ const translations = {
     "dashboard.welcome": "Welcome to StackCode",
     "dashboard.getting_started": "Getting Started",
     "dashboard.quick_actions": "Quick Actions",
-    "dashboard.recent_activity": "Recent Activity"
-  }
+    "dashboard.recent_activity": "Recent Activity",
+  },
 };
 
 /**
@@ -63,10 +65,13 @@ const translations = {
 export function useTranslation() {
   // Por enquanto, usando português como padrão
   // Em uma implementação completa, isso viria das configurações do VSCode
-  const currentLanguage = 'pt';
-  
+  const currentLanguage = "pt";
+
   const t = (key: string): string => {
-    const translation = translations[currentLanguage as keyof typeof translations]?.[key as keyof typeof translations.pt];
+    const translation =
+      translations[currentLanguage as keyof typeof translations]?.[
+        key as keyof typeof translations.pt
+      ];
     return translation || key;
   };
 
@@ -76,7 +81,8 @@ export function useTranslation() {
 /**
  * Função utilitária para tradução direta
  */
-export function translate(key: string, language: 'pt' | 'en' = 'pt'): string {
-  const translation = translations[language]?.[key as keyof typeof translations.pt];
+export function translate(key: string, language: "pt" | "en" = "pt"): string {
+  const translation =
+    translations[language]?.[key as keyof typeof translations.pt];
   return translation || key;
 }

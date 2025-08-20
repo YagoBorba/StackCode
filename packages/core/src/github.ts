@@ -39,14 +39,14 @@ export interface FetchIssuesOptions {
 
 /**
  * Busca issues de um repositório GitHub
- * 
+ *
  * @param octokit - Cliente Octokit autenticado
  * @param options - Opções de busca
  * @returns Promise com array de issues formatadas
  */
 export async function fetchRepositoryIssues(
   octokit: Octokit,
-  options: FetchIssuesOptions
+  options: FetchIssuesOptions,
 ): Promise<GitHubIssue[]> {
   const {
     owner,
@@ -74,11 +74,11 @@ export async function fetchRepositoryIssues(
     });
 
     // Filtrar apenas issues (não pull requests)
-    const issues = response.data.filter(issue => !issue.pull_request);
+    const issues = response.data.filter((issue) => !issue.pull_request);
 
     console.log(`[Core] Found ${issues.length} issues`);
 
-    return issues.map(issue => ({
+    return issues.map((issue) => ({
       id: issue.id,
       number: issue.number,
       title: issue.title,
@@ -89,24 +89,29 @@ export async function fetchRepositoryIssues(
         login: issue.user?.login || "unknown",
         avatar_url: issue.user?.avatar_url || "",
       },
-      assignees: issue.assignees?.map(assignee => ({
-        login: assignee?.login || "unknown",
-        avatar_url: assignee?.avatar_url || "",
-      })) || [],
-      labels: issue.labels?.map(label => ({
-        name: typeof label === "string" ? label : label.name || "",
-        color: typeof label === "string" ? "000000" : label.color || "000000",
-        description: typeof label === "string" ? null : label.description || null,
-      })) || [],
+      assignees:
+        issue.assignees?.map((assignee) => ({
+          login: assignee?.login || "unknown",
+          avatar_url: assignee?.avatar_url || "",
+        })) || [],
+      labels:
+        issue.labels?.map((label) => ({
+          name: typeof label === "string" ? label : label.name || "",
+          color: typeof label === "string" ? "000000" : label.color || "000000",
+          description:
+            typeof label === "string" ? null : label.description || null,
+        })) || [],
       created_at: issue.created_at,
       updated_at: issue.updated_at,
       closed_at: issue.closed_at,
     }));
   } catch (error) {
     console.error(`[Core] Failed to fetch issues for ${owner}/${repo}:`, error);
-    throw new Error(`Failed to fetch repository issues: ${
-      error instanceof Error ? error.message : "Unknown error"
-    }`);
+    throw new Error(
+      `Failed to fetch repository issues: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`,
+    );
   }
 }
 

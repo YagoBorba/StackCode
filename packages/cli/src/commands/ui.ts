@@ -325,7 +325,10 @@ export async function promptForCommitAnswers(): Promise<CommitAnswers> {
     ]);
 
     if (useGitHubIntegration) {
-      const selectedIssues = await promptForGitHubIssues(authManager, currentRepo);
+      const selectedIssues = await promptForGitHubIssues(
+        authManager,
+        currentRepo,
+      );
       if (selectedIssues.length > 0) {
         affectedIssues = selectedIssues
           .map((issue) => `closes #${issue.number}`)
@@ -356,14 +359,16 @@ export async function promptForCommitAnswers(): Promise<CommitAnswers> {
  */
 async function promptForGitHubIssues(
   authManager: CLIAuthManager,
-  repository: { owner: string; repo: string }
+  repository: { owner: string; repo: string },
 ): Promise<GitHubIssueChoice[]> {
   try {
-    log.info(`📋 ${t("github.issues.fetching")} ${repository.owner}/${repository.repo}...`);
-    
+    log.info(
+      `📋 ${t("github.issues.fetching")} ${repository.owner}/${repository.repo}...`,
+    );
+
     const token = authManager.getToken()!;
     const octokit = new Octokit({ auth: token });
-    
+
     const issues = await fetchRepositoryIssues(octokit, {
       owner: repository.owner,
       repo: repository.repo,
@@ -372,7 +377,9 @@ async function promptForGitHubIssues(
     });
 
     if (issues.length === 0) {
-      log.warning(`✅ ${t("github.issues.no_issues_found")} ${repository.owner}/${repository.repo}`);
+      log.warning(
+        `✅ ${t("github.issues.no_issues_found")} ${repository.owner}/${repository.repo}`,
+      );
       return [];
     }
 
@@ -402,7 +409,9 @@ async function promptForGitHubIssues(
         choices,
         pageSize: 10,
         validate: (answer: GitHubIssueChoice[]) => {
-          return answer.length > 0 ? true : t("commit.prompt.select_at_least_one_issue");
+          return answer.length > 0
+            ? true
+            : t("commit.prompt.select_at_least_one_issue");
         },
       },
     ]);
