@@ -57,6 +57,21 @@
       "no_repository_detected": "No GitHub repository detected",
       "run_from_git_repo": "Run this command from a Git repository or use --repo option",
       "error_fetching": "Error fetching issues:"
+    },
+    "ui": {
+      "repository_issues": "Repository Issues",
+      "no_issues_found": "No open issues found!",
+      "great_job_clean": "Great job keeping things clean ✨",
+      "refresh_issues": "Refresh issues",
+      "login_to_view_issues": "Login to GitHub to view repository issues",
+      "login_github": "Login to GitHub",
+      "error_loading_issues": "Error loading issues",
+      "loading_issues": "Loading issues...",
+      "view_on_github": "View on GitHub",
+      "created_by": "Created by",
+      "updated": "Updated",
+      "assigned_to": "Assigned to",
+      "open_issue": "Open issue"
     }
   },
   "commit": {

@@ -76,6 +76,21 @@
       "no_repository_detected": "Nenhum repositório GitHub detectado",
       "run_from_git_repo": "Execute este comando de um repositório Git ou use a opção --repo",
       "error_fetching": "Erro ao buscar issues:"
+    },
+    "ui": {
+      "repository_issues": "Issues do Repositório",
+      "no_issues_found": "Nenhuma issue aberta encontrada!",
+      "great_job_clean": "Ótimo trabalho mantendo tudo limpo ✨",
+      "refresh_issues": "Atualizar issues",
+      "login_to_view_issues": "Faça login no GitHub para ver as issues do repositório",
+      "login_github": "Entrar no GitHub",
+      "error_loading_issues": "Erro ao carregar issues",
+      "loading_issues": "Carregando issues...",
+      "view_on_github": "Ver no GitHub",
+      "created_by": "Criado por",
+      "updated": "Atualizado",
+      "assigned_to": "Atribuído para",
+      "open_issue": "Abrir issue"
     }
   },
   "commit": {

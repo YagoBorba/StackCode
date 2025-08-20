@@ -306,7 +306,6 @@ export async function promptForCommitAnswers(): Promise<CommitAnswers> {
     },
   ]);
 
-  // Verificar se há autenticação GitHub e repositório
   const authManager = new CLIAuthManager();
   const hasGitHubAuth = authManager.getToken() !== null;
   const currentRepo = hasGitHubAuth ? getCurrentRepository() : null;
@@ -408,7 +407,6 @@ async function promptForGitHubIssues(
       },
     ]);
 
-    // Filtrar o item de cancelamento
     return selectedIssues.filter((issue) => issue.number !== -1);
   } catch (error) {
     log.error(`❌ ${t("github.issues.error_fetching")} ${error}`);

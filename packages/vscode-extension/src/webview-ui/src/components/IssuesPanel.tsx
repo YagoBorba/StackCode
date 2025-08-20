@@ -1,5 +1,6 @@
 import React from "react";
 import { AlertCircle, ExternalLink, Clock, User, Tag, RefreshCw, LogIn } from "lucide-react";
+import { useTranslation } from "../utils/i18n";
 
 interface GitHubIssue {
   id: number;
@@ -42,6 +43,7 @@ interface IssuesPanelProps {
 
 export default function IssuesPanel({ issuesState, onRefresh, onLogin }: IssuesPanelProps) {
   const { issues, loading, error, needsAuth } = issuesState;
+  const { t } = useTranslation();
 
   // Formatador de tempo relativo
   const formatRelativeTime = (dateString: string) => {
@@ -94,17 +96,18 @@ export default function IssuesPanel({ issuesState, onRefresh, onLogin }: IssuesP
             Repository Issues
           </h3>
         </div>
+                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+          <AlertCircle className="w-5 h-5 text-green-400" />
+          {t("github.ui.repository_issues")}
+        </h3>
         <div className="text-center py-8">
-          <LogIn className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-          <p className="text-slate-400 mb-4">
-            Login to GitHub to view repository issues
-          </p>
+          <LogIn className="w-12 h-12 text-blue-400 mx-auto mb-4" />
+          <p className="text-slate-400">{t("github.ui.login_to_view_issues")}</p>
           <button
             onClick={onLogin}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 mx-auto transition-colors"
+            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
           >
-            <LogIn className="w-4 h-4" />
-            Login to GitHub
+            {t("github.ui.login_github")}
           </button>
         </div>
       </div>
@@ -118,12 +121,12 @@ export default function IssuesPanel({ issuesState, onRefresh, onLogin }: IssuesP
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-red-400" />
-            Repository Issues
+            {t("github.ui.repository_issues")}
           </h3>
           <button
             onClick={onRefresh}
             className="text-slate-400 hover:text-white transition-colors"
-            title="Refresh issues"
+            title={t("github.ui.refresh_issues")}
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -134,7 +137,7 @@ export default function IssuesPanel({ issuesState, onRefresh, onLogin }: IssuesP
             onClick={onRefresh}
             className="mt-2 text-blue-400 hover:text-blue-300 text-sm"
           >
-            Try again
+            {t("github.ui.refresh_issues")}
           </button>
         </div>
       </div>
@@ -148,20 +151,20 @@ export default function IssuesPanel({ issuesState, onRefresh, onLogin }: IssuesP
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-green-400" />
-            Repository Issues
+            {t("github.ui.repository_issues")}
           </h3>
           <button
             onClick={onRefresh}
             className="text-slate-400 hover:text-white transition-colors"
-            title="Refresh issues"
+            title={t("github.ui.refresh_issues")}
           >
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
         <div className="text-center py-8">
           <AlertCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
-          <p className="text-slate-400">No open issues found!</p>
-          <p className="text-slate-500 text-sm mt-1">Great job keeping things clean ✨</p>
+          <p className="text-slate-400">{t("github.ui.no_issues_found")}</p>
+          <p className="text-slate-500 text-sm mt-1">{t("github.ui.great_job_clean")}</p>
         </div>
       </div>
     );
@@ -173,13 +176,13 @@ export default function IssuesPanel({ issuesState, onRefresh, onLogin }: IssuesP
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
           <AlertCircle className="w-5 h-5 text-blue-400" />
-          Repository Issues
+          {t("github.ui.repository_issues")}
           <span className="text-sm text-slate-400 font-normal">({issues.length})</span>
         </h3>
         <button
           onClick={onRefresh}
           className="text-slate-400 hover:text-white transition-colors"
-          title="Refresh issues"
+          title={t("github.ui.refresh_issues")}
         >
           <RefreshCw className="w-4 h-4" />
         </button>

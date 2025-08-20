@@ -239,20 +239,37 @@ export class GitMonitor implements vscode.Disposable {
   private async getRepositoryFromGitConfig(): Promise<GitHubRepository | null> {
     try {
       const workspaceFolders = vscode.workspace.workspaceFolders;
-      if (!workspaceFolders || workspaceFolders.length === 0) {
-        console.log("🔍 [GitMonitor] No workspace folders found");
-        return null;
+      
+      // Lista de caminhos para tentar
+      const pathsToTry: string[] = [];
+      
+      if (workspaceFolders && workspaceFolders.length > 0) {
+        // Adicionar workspace folders configurados
+        workspaceFolders.forEach(folder => {
+          pathsToTry.push(folder.uri.fsPath);
+        });
       }
+      
+      // Adicionar caminhos alternativos comuns em dev containers
+      pathsToTry.push(
+        "/workspaces/StackCode",
+        process.cwd(),
+        path.join(process.cwd(), ".."),
+        path.join(process.cwd(), "..", "..")
+      );
 
-      for (const folder of workspaceFolders) {
-        const gitConfigPath = path.join(folder.uri.fsPath, ".git", "config");
+      console.log(`🔍 [GitMonitor] Trying ${pathsToTry.length} possible paths:`, pathsToTry);
+
+      for (const folderPath of pathsToTry) {
+        const gitConfigPath = path.join(folderPath, ".git", "config");
         
         console.log(`🔍 [GitMonitor] Checking git config at: ${gitConfigPath}`);
         
         if (fs.existsSync(gitConfigPath)) {
           const configContent = fs.readFileSync(gitConfigPath, "utf8");
-          console.log(`📄 [GitMonitor] Found .git/config`);
-
+          console.log(`📄 [GitMonitor] Found .git/config at: ${folderPath}`);
+          
+          // Procurar pela URL do remote origin
           const originMatch = configContent.match(/\[remote "origin"\]\s*\n\s*url\s*=\s*(.+)/);
           if (originMatch) {
             const remoteUrl = originMatch[1].trim();
@@ -266,14 +283,13 @@ export class GitMonitor implements vscode.Disposable {
         }
       }
 
+      console.log("❌ [GitMonitor] No .git/config found in any path");
       return null;
     } catch (error) {
       console.error("❌ [GitMonitor] Error reading .git/config:", error);
       return null;
     }
-  }
-
-  /**
+  }  /**
    * Estratégia 2: Via Git Extension API (método original como fallback)
    */
   private async getRepositoryFromGitAPI(): Promise<GitHubRepository | null> {
