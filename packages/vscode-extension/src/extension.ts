@@ -11,6 +11,7 @@ import { ValidateCommand } from "./commands/ValidateCommand";
 import { ReleaseCommand } from "./commands/ReleaseCommand";
 import { ConfigCommand } from "./commands/ConfigCommand";
 import { AuthCommand } from "./commands/AuthCommand";
+import { TestGitHubDetectionCommand } from "./commands/TestGitHubDetectionCommand";
 import { DashboardProvider } from "./providers/DashboardProvider";
 import { ProjectViewProvider } from "./providers/ProjectViewProvider";
 import { GitHubAuthService } from "./services/GitHubAuthService";
@@ -129,6 +130,13 @@ export async function activate(context: vscode.ExtensionContext) {
       console.log("🔓 [StackCode] AUTH LOGOUT command executed!");
       vscode.window.showInformationMessage("🔓 StackCode: Executando logout GitHub...");
       return authCommand.executeLogout();
+    }),
+
+    // Test commands (development only)
+    vscode.commands.registerCommand("stackcode.test.github.detection", () => {
+      console.log("🧪 [StackCode] TEST GITHUB DETECTION command executed!");
+      const testCommand = new TestGitHubDetectionCommand();
+      return testCommand.execute();
     }),
 
     // Legacy commands for backward compatibility

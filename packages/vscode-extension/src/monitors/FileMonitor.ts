@@ -18,7 +18,6 @@ export class FileMonitor implements vscode.Disposable {
   }
 
   startMonitoring(): void {
-    // Monitor file creation
     this.disposables.push(
       vscode.workspace.onDidCreateFiles((event: vscode.FileCreateEvent) => {
         for (const file of event.files) {
@@ -27,7 +26,6 @@ export class FileMonitor implements vscode.Disposable {
       }),
     );
 
-    // Monitor file changes
     this.disposables.push(
       vscode.workspace.onDidChangeTextDocument(
         (event: vscode.TextDocumentChangeEvent) => {
@@ -36,7 +34,6 @@ export class FileMonitor implements vscode.Disposable {
       ),
     );
 
-    // Monitor when files are opened
     this.disposables.push(
       vscode.window.onDidChangeActiveTextEditor(
         (editor: vscode.TextEditor | undefined) => {
@@ -62,7 +59,6 @@ export class FileMonitor implements vscode.Disposable {
 
     this.processedFiles.add(fileKey);
 
-    // Suggest generating comprehensive files
     if (["README.md", ".gitignore"].includes(fileName)) {
       await this.proactiveManager.showFileCreationSuggestion(fileName);
     }
@@ -73,7 +69,6 @@ export class FileMonitor implements vscode.Disposable {
   ): Promise<void> {
     const document = event.document;
 
-    // Skip if not a git commit message
     if (!document.fileName.includes("COMMIT_EDITMSG")) {
       return;
     }
@@ -94,7 +89,6 @@ export class FileMonitor implements vscode.Disposable {
 
     this.processedFiles.add(fileKey);
 
-    // Check for missing important files when opening project files
     if (
       fileName.endsWith(".js") ||
       fileName.endsWith(".ts") ||
@@ -131,7 +125,6 @@ export class FileMonitor implements vscode.Disposable {
       }
 
       if (missingFiles.length > 0 && Math.random() < 0.3) {
-        // Show suggestion 30% of the time
         const message = t("vscode.common.project_missing_files", {
           missingFiles: missingFiles.join(", "),
         });
@@ -144,7 +137,6 @@ export class FileMonitor implements vscode.Disposable {
         );
 
         if (action === t("vscode.common.generate_files")) {
-          // TODO: Implement file generation
           vscode.window.showInformationMessage(
             t("vscode.common.file_generation_available_soon"),
           );
@@ -156,7 +148,6 @@ export class FileMonitor implements vscode.Disposable {
         }
       }
     } catch (error: unknown) {
-      // Use proper VS Code logging instead of console.log
       const outputChannel = vscode.window.createOutputChannel("StackCode");
       outputChannel.appendLine(
         t("vscode.common.error_checking_project_structure", {

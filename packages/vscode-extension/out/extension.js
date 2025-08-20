@@ -37,6 +37,7 @@ const ValidateCommand_1 = require("./commands/ValidateCommand");
 const ReleaseCommand_1 = require("./commands/ReleaseCommand");
 const ConfigCommand_1 = require("./commands/ConfigCommand");
 const AuthCommand_1 = require("./commands/AuthCommand");
+const TestGitHubDetectionCommand_1 = require("./commands/TestGitHubDetectionCommand");
 const DashboardProvider_1 = require("./providers/DashboardProvider");
 const ProjectViewProvider_1 = require("./providers/ProjectViewProvider");
 const GitHubAuthService_1 = require("./services/GitHubAuthService");
@@ -111,6 +112,12 @@ async function activate(context) {
             console.log("🔓 [StackCode] AUTH LOGOUT command executed!");
             vscode.window.showInformationMessage("🔓 StackCode: Executando logout GitHub...");
             return authCommand.executeLogout();
+        }),
+        // Test commands (development only)
+        vscode.commands.registerCommand("stackcode.test.github.detection", () => {
+            console.log("🧪 [StackCode] TEST GITHUB DETECTION command executed!");
+            const testCommand = new TestGitHubDetectionCommand_1.TestGitHubDetectionCommand();
+            return testCommand.execute();
         }),
         // Legacy commands for backward compatibility
         vscode.commands.registerCommand("stackcode.createBranch", () => gitCommand.startBranch()),

@@ -1,4 +1,6 @@
 import * as vscode from "vscode";
+import * as fs from "fs";
+import * as path from "path";
 import { ProactiveNotificationManager } from "../notifications/ProactiveNotificationManager";
 import { ConfigurationManager } from "../config/ConfigurationManager";
 
@@ -24,7 +26,6 @@ export class GitMonitor implements vscode.Disposable {
   }
 
   startMonitoring(): void {
-    // Monitor git extension state changes
     const gitExtension = vscode.extensions.getExtension("vscode.git");
     if (gitExtension) {
       if (gitExtension.isActive) {
@@ -36,14 +37,12 @@ export class GitMonitor implements vscode.Disposable {
       }
     }
 
-    // Monitor workspace folder changes
     this.disposables.push(
       vscode.workspace.onDidChangeWorkspaceFolders(() => {
         this.checkCurrentBranch();
       }),
     );
 
-    // Initial check
     setTimeout(() => {
       this.checkCurrentBranch();
     }, 2000);
@@ -193,7 +192,6 @@ export class GitMonitor implements vscode.Disposable {
     }
     commitMessage += `: ${description}`;
 
-    // Copy to clipboard
     await vscode.env.clipboard.writeText(commitMessage);
 
     vscode.window
@@ -209,49 +207,113 @@ export class GitMonitor implements vscode.Disposable {
   }
 
   /**
-   * Detecta o repositório GitHub atual baseado no remote origin
+   * Detecta o repositório GitHub atual usando múltiplas estratégias
    */
   public async getCurrentGitHubRepository(): Promise<GitHubRepository | null> {
     try {
+      console.log("🔍 [GitMonitor] Starting repository detection...");
+
+      const fromConfigFile = await this.getRepositoryFromGitConfig();
+      if (fromConfigFile) {
+        console.log(`✅ [GitMonitor] Repository detected via .git/config: ${fromConfigFile.fullName}`);
+        return fromConfigFile;
+      }
+
+      const fromGitAPI = await this.getRepositoryFromGitAPI();
+      if (fromGitAPI) {
+        console.log(`✅ [GitMonitor] Repository detected via Git API: ${fromGitAPI.fullName}`);
+        return fromGitAPI;
+      }
+
+      console.warn("❌ [GitMonitor] No GitHub repository detected with any strategy");
+      return null;
+    } catch (error) {
+      console.error("❌ [GitMonitor] Failed to get current GitHub repository:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Estratégia 1: Lê repositório diretamente do .git/config
+   */
+  private async getRepositoryFromGitConfig(): Promise<GitHubRepository | null> {
+    try {
+      const workspaceFolders = vscode.workspace.workspaceFolders;
+      if (!workspaceFolders || workspaceFolders.length === 0) {
+        console.log("🔍 [GitMonitor] No workspace folders found");
+        return null;
+      }
+
+      for (const folder of workspaceFolders) {
+        const gitConfigPath = path.join(folder.uri.fsPath, ".git", "config");
+        
+        console.log(`🔍 [GitMonitor] Checking git config at: ${gitConfigPath}`);
+        
+        if (fs.existsSync(gitConfigPath)) {
+          const configContent = fs.readFileSync(gitConfigPath, "utf8");
+          console.log(`📄 [GitMonitor] Found .git/config`);
+
+          const originMatch = configContent.match(/\[remote "origin"\]\s*\n\s*url\s*=\s*(.+)/);
+          if (originMatch) {
+            const remoteUrl = originMatch[1].trim();
+            console.log(`🔗 [GitMonitor] Found remote origin: ${remoteUrl}`);
+            
+            const githubRepo = this.parseGitHubUrl(remoteUrl);
+            if (githubRepo) {
+              return githubRepo;
+            }
+          }
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error("❌ [GitMonitor] Error reading .git/config:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Estratégia 2: Via Git Extension API (método original como fallback)
+   */
+  private async getRepositoryFromGitAPI(): Promise<GitHubRepository | null> {
+    try {
       const git = vscode.extensions.getExtension("vscode.git")?.exports;
       if (!git) {
-        console.warn("[GitMonitor] Git extension not available");
+        console.warn("⚠️ [GitMonitor] Git extension not available");
         return null;
       }
 
       const gitAPI = git.getAPI(1);
       if (!gitAPI || gitAPI.repositories.length === 0) {
-        console.warn("[GitMonitor] No git repositories found");
+        console.warn("⚠️ [GitMonitor] No git repositories found via API");
         return null;
       }
 
       const repository = gitAPI.repositories[0];
       const remotes = repository.state.remotes;
 
-      // Procurar pelo remote 'origin'
       const originRemote = remotes.find((remote: { name: string; fetchUrl?: string; pushUrl?: string }) => remote.name === "origin");
       if (!originRemote) {
-        console.warn("[GitMonitor] No origin remote found");
+        console.warn("⚠️ [GitMonitor] No origin remote found via API");
         return null;
       }
 
       const remoteUrl = originRemote.fetchUrl || originRemote.pushUrl;
       if (!remoteUrl) {
-        console.warn("[GitMonitor] No remote URL found");
+        console.warn("⚠️ [GitMonitor] No remote URL found via API");
         return null;
       }
 
-      // Parse do GitHub URL
       const githubRepo = this.parseGitHubUrl(remoteUrl);
       if (!githubRepo) {
-        console.warn("[GitMonitor] Remote is not a GitHub repository:", remoteUrl);
+        console.warn("⚠️ [GitMonitor] Remote is not a GitHub repository:", remoteUrl);
         return null;
       }
 
-      console.log("[GitMonitor] Current GitHub repository:", githubRepo.fullName);
       return githubRepo;
     } catch (error) {
-      console.error("[GitMonitor] Failed to get current GitHub repository:", error);
+      console.error("❌ [GitMonitor] Failed to get repository via Git API:", error);
       return null;
     }
   }
@@ -261,10 +323,8 @@ export class GitMonitor implements vscode.Disposable {
    */
   private parseGitHubUrl(url: string): GitHubRepository | null {
     try {
-      // Remove .git suffix se existir
       const cleanUrl = url.replace(/\.git$/, "");
 
-      // Regex para diferentes formatos de URL do GitHub
       const patterns = [
         // HTTPS: https://github.com/owner/repo
         /^https:\/\/github\.com\/([^/]+)\/([^/]+)$/,
