@@ -20,7 +20,7 @@ Creates a complete project directory structure from predefined templates.
 
 - **`options`**: An object containing:
   - `projectPath: string`: The absolute path where the project will be created.
-  - `stack: 'node-ts'`: The technology stack to use.
+  - `stack: 'node-js' | 'node-ts' | 'react' | 'vue' | 'python' | 'java' | 'go' | 'php'`: The technology stack to use.
   - `features: ('docker' | 'husky')[]`: An array of additional features.
   - `replacements: Record<string, string>`: Placeholders to replace in `.tpl` files.
 

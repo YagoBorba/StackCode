@@ -84,7 +84,17 @@ export const getInitCommand = (): CommandModule => ({
     await runCommand("git", ["init"], { cwd: projectPath });
 
     ui.log.info(`  ${t("init.step.deps")}`);
-    await runCommand("npm", ["install"], { cwd: projectPath });
+    if (answers.stack === "python") {
+      await runCommand("pip", ["install", "-e", "."], { cwd: projectPath });
+    } else if (answers.stack === "java") {
+      await runCommand("mvn", ["install"], { cwd: projectPath });
+    } else if (answers.stack === "go") {
+      await runCommand("go", ["mod", "tidy"], { cwd: projectPath });
+    } else if (answers.stack === "php") {
+      await runCommand("composer", ["install"], { cwd: projectPath });
+    } else {
+      await runCommand("npm", ["install"], { cwd: projectPath });
+    }
 
     ui.log.divider();
     ui.log.success(t("init.success.ready"));
