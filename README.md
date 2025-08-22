@@ -43,7 +43,7 @@ Our goal is to make best practices the easiest path.
 StackCode is a suite of tools designed to work together seamlessly:
 
 - 🚀 **Effortless Project Scaffolding (`init`):**
-  Generate a complete, production-ready project structure in seconds. Starts with a professional Node.js + TypeScript stack, with more to come.
+  Generate a complete, production-ready project structure in seconds. Choose from multiple technology stacks including Node.js, React, Vue.js, Python, Java, Go, and PHP—each with best practices and optimal folder structures.
 
 - 📝 **Intelligent File Generation (`generate`):**
   Need a `.gitignore`? Don't just get one—get a perfect one. Our composable template engine combines rules for your stack, IDE, and tools (like Docker) into a single, organized file.

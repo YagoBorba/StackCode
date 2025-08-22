@@ -1,6 +1,6 @@
 export interface ProjectOptions {
     projectPath: string;
-    stack: "node-ts";
+    stack: "node-js" | "node-ts" | "react" | "vue" | "python" | "java" | "go" | "php";
     features: ("docker" | "husky")[];
     replacements: Record<string, string>;
 }

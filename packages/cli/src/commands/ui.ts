@@ -194,7 +194,7 @@ export interface InitAnswers {
   projectName: string;
   description: string;
   authorName: string;
-  stack: "node-ts";
+  stack: "node-js" | "node-ts" | "react" | "vue" | "python" | "java" | "go" | "php";
   features: ("docker" | "husky")[];
   commitValidation?: boolean;
 }
@@ -223,7 +223,16 @@ export async function promptForInitAnswers(): Promise<InitAnswers> {
       type: "list",
       name: "stack",
       message: t("init.prompt.stack"),
-      choices: [{ name: "Node.js + TypeScript", value: "node-ts" }],
+      choices: [
+        { name: "Node.js + JavaScript", value: "node-js" },
+        { name: "Node.js + TypeScript", value: "node-ts" },
+        { name: "React + TypeScript", value: "react" },
+        { name: "Vue.js + TypeScript", value: "vue" },
+        { name: "Python + FastAPI", value: "python" },
+        { name: "Java + Spring", value: "java" },
+        { name: "Go + Gin", value: "go" },
+        { name: "PHP + Laravel", value: "php" },
+      ],
     },
     {
       type: "checkbox",
