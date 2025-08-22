@@ -39,7 +39,15 @@ async function copyTemplateFiles(
 
 export interface ProjectOptions {
   projectPath: string;
-  stack: "node-js" | "node-ts" | "react" | "vue" | "python" | "java" | "go" | "php";
+  stack:
+    | "node-js"
+    | "node-ts"
+    | "react"
+    | "vue"
+    | "python"
+    | "java"
+    | "go"
+    | "php";
   features: ("docker" | "husky")[];
   replacements: Record<string, string>;
 }

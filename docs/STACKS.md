@@ -7,6 +7,7 @@ StackCode supports multiple technology stacks, each designed with best practices
 ### Frontend Stacks
 
 #### React + TypeScript
+
 - **Framework**: React 18 with TypeScript
 - **Build Tool**: Vite
 - **Styling**: TailwindCSS
@@ -15,6 +16,7 @@ StackCode supports multiple technology stacks, each designed with best practices
 - **Features**: Modern JSX Transform, ESLint configuration, component structure
 
 **Generated Structure:**
+
 ```
 ├── src/
 │   ├── components/
@@ -30,6 +32,7 @@ StackCode supports multiple technology stacks, each designed with best practices
 ```
 
 #### Vue.js + TypeScript
+
 - **Framework**: Vue 3 with Composition API and TypeScript
 - **Build Tool**: Vite
 - **Styling**: TailwindCSS
@@ -38,6 +41,7 @@ StackCode supports multiple technology stacks, each designed with best practices
 - **Features**: SFC (Single File Components), modern Vue patterns
 
 **Generated Structure:**
+
 ```
 ├── src/
 │   ├── components/         # Reusable components
@@ -54,11 +58,13 @@ StackCode supports multiple technology stacks, each designed with best practices
 ### Backend Stacks
 
 #### Node.js + JavaScript
+
 - **Runtime**: Node.js with ES6+
 - **Testing**: Jest
 - **Features**: Express.js structure, middleware, controllers, routes
 
 **Generated Structure:**
+
 ```
 ├── src/
 │   ├── controllers/        # Request handlers
@@ -72,11 +78,13 @@ StackCode supports multiple technology stacks, each designed with best practices
 ```
 
 #### Node.js + TypeScript
+
 - **Runtime**: Node.js with TypeScript
 - **Testing**: Vitest
 - **Features**: Type-safe development, modern TypeScript configuration
 
 **Generated Structure:**
+
 ```
 ├── src/
 │   ├── controllers/        # Type-safe controllers
@@ -88,11 +96,13 @@ StackCode supports multiple technology stacks, each designed with best practices
 ```
 
 #### Python + FastAPI
+
 - **Framework**: FastAPI
 - **Package Management**: pip with pyproject.toml
 - **Features**: Modern Python async API development
 
 **Generated Structure:**
+
 ```
 ├── src/
 │   └── main.py
@@ -100,11 +110,13 @@ StackCode supports multiple technology stacks, each designed with best practices
 ```
 
 #### Java + Spring
+
 - **Framework**: Spring Boot
 - **Build Tool**: Maven
 - **Features**: Enterprise Java development structure
 
 **Generated Structure:**
+
 ```
 ├── src/main/java/com/example/app/
 │   ├── Application.java
@@ -114,22 +126,26 @@ StackCode supports multiple technology stacks, each designed with best practices
 ```
 
 #### Go + Gin
+
 - **Framework**: Gin web framework
 - **Package Management**: Go modules
 - **Features**: High-performance Go web development
 
 **Generated Structure:**
+
 ```
 ├── main.go
 └── go.mod
 ```
 
 #### PHP + Laravel
+
 - **Framework**: Laravel
 - **Package Management**: Composer
 - **Features**: Modern PHP development with MVC structure
 
 **Generated Structure:**
+
 ```
 ├── app/Http/Controllers/
 ├── bootstrap/
@@ -141,7 +157,9 @@ StackCode supports multiple technology stacks, each designed with best practices
 ## 🔧 Stack Features
 
 ### Automatic Configuration
+
 Each stack includes:
+
 - ✅ **Optimized package.json** (or equivalent) with relevant dependencies
 - ✅ **TypeScript configuration** (where applicable)
 - ✅ **Build tool setup** (Vite, Maven, etc.)
@@ -150,18 +168,23 @@ Each stack includes:
 - ✅ **Best practice folder structure**
 
 ### Smart Package Management
+
 StackCode automatically uses the appropriate package manager:
+
 - **npm** for Node.js-based stacks (React, Vue, Node.js)
 - **pip** for Python projects
-- **maven** for Java projects  
+- **maven** for Java projects
 - **go mod** for Go projects
 - **composer** for PHP projects
 
 ### Docker Support
+
 All stacks can include Docker configuration when the Docker feature is selected during project initialization.
 
 ### Git Integration
+
 Every generated project includes:
+
 - ✅ **Stack-specific .gitignore** files
 - ✅ **Git repository initialization**
 - ✅ **Conventional commit setup** (with Husky)
@@ -181,12 +204,13 @@ Then select your preferred technology stack from the interactive menu.
 Interested in adding support for a new technology stack? Check out our comprehensive guide in [CONTRIBUTING.md](../CONTRIBUTING.md#adding-new-technology-stacks).
 
 The process involves:
+
 1. Creating template files
-2. Updating type definitions  
+2. Updating type definitions
 3. Adding CLI options
 4. Configuring package management
 5. Testing thoroughly
 
 ---
 
-*For more information about StackCode, visit our [main documentation](../README.md).*
+_For more information about StackCode, visit our [main documentation](../README.md)._

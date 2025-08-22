@@ -101,11 +101,13 @@ packages/core/src/templates/your-stack-name/
 ```
 
 **Important**: Use these replacement variables in your templates:
+
 - `{{projectName}}` - The project name
 - `{{description}}` - Project description
 - `{{authorName}}` - Author name
 
 **Example package.json.tpl:**
+
 ```json
 {
   "name": "{{projectName}}",
@@ -137,22 +139,42 @@ dist/
 Add your new stack to the type definitions:
 
 **In `packages/core/src/scaffold.ts`:**
+
 ```typescript
 export interface ProjectOptions {
   projectPath: string;
-  stack: "node-js" | "node-ts" | "react" | "vue" | "python" | "java" | "go" | "php" | "your-stack-name";
+  stack:
+    | "node-js"
+    | "node-ts"
+    | "react"
+    | "vue"
+    | "python"
+    | "java"
+    | "go"
+    | "php"
+    | "your-stack-name";
   features: ("docker" | "husky")[];
   replacements: Record<string, string>;
 }
 ```
 
 **In `packages/cli/src/commands/ui.ts`:**
+
 ```typescript
 export interface InitAnswers {
   projectName: string;
   description: string;
   authorName: string;
-  stack: "node-js" | "node-ts" | "react" | "vue" | "python" | "java" | "go" | "php" | "your-stack-name";
+  stack:
+    | "node-js"
+    | "node-ts"
+    | "react"
+    | "vue"
+    | "python"
+    | "java"
+    | "go"
+    | "php"
+    | "your-stack-name";
   features: ("docker" | "husky")[];
   commitValidation?: boolean;
 }
@@ -176,7 +198,7 @@ Update the stack choices in `packages/cli/src/commands/ui.ts`:
     { name: "Java + Spring", value: "java" },
     { name: "Go + Gin", value: "go" },
     { name: "PHP + Laravel", value: "php" },
-    { name: "Your Stack + Framework", value: "your-stack-name" }, 
+    { name: "Your Stack + Framework", value: "your-stack-name" },
   ],
 }
 ```
@@ -206,6 +228,7 @@ if (answers.stack === "python") {
 ### 3. Best Practices for New Stacks
 
 #### Template Structure Guidelines:
+
 - **Follow conventions**: Use the technology's standard project structure
 - **Include essentials**: Configuration files, build tools, testing setup
 - **Add documentation**: Include basic README template
@@ -215,6 +238,7 @@ if (answers.stack === "python") {
 #### Example Folder Structures:
 
 **Frontend Stack (SPA):**
+
 ```
 src/
 ├── components/
@@ -226,6 +250,7 @@ src/
 ```
 
 **Backend Stack (API):**
+
 ```
 src/
 ├── controllers/
@@ -237,6 +262,7 @@ src/
 ```
 
 **Full-Stack Framework:**
+
 ```
 src/
 ├── components/

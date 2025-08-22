@@ -194,7 +194,15 @@ export interface InitAnswers {
   projectName: string;
   description: string;
   authorName: string;
-  stack: "node-js" | "node-ts" | "react" | "vue" | "python" | "java" | "go" | "php";
+  stack:
+    | "node-js"
+    | "node-ts"
+    | "react"
+    | "vue"
+    | "python"
+    | "java"
+    | "go"
+    | "php";
   features: ("docker" | "husky")[];
   commitValidation?: boolean;
 }
