@@ -371,3 +371,9 @@ docs(readme): 📝 update installation instructions
 Our CI pipeline will run these tests automatically on your PR.
 
 Thank you again for your interest in contributing!
+
+---
+
+## Documentation
+- [Architecture Guide](docs/ARCHITECTURE.md)
+- [Self-Hosting Guide](docs/SELF_HOSTING_GUIDE.md)

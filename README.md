@@ -74,6 +74,14 @@ StackCode is a suite of tools designed to work together seamlessly:
 
 ## 🚀 Getting Started
 
+Before you start, check out our documentation:
+
+**Documentation:**
+- [Architecture Guide](docs/ARCHITECTURE.md)
+- [Self-Hosting Guide](docs/SELF_HOSTING_GUIDE.md)
+- [Documentation Index](docs/README.md)
+- [Contribution Guide](docs/CONTRIBUTING.md)
+
 There are two primary ways to use StackCode, depending on your needs.
 
 ### Global Installation (For Convenience)
@@ -106,7 +114,9 @@ This is the best approach for ensuring everyone on a project uses the exact same
 
 Awesome! StackCode is an open-source project, and we welcome contributions.
 
-To get started, please read our **[Contribution Guide](CONTRIBUTING.md)**. It has everything you need to know about our workflow, code standards, and how to submit your pull requests.
+To get started, please read our **[Contribution Guide](docs/CONTRIBUTING.md)**. It has everything you need to know about our workflow, code standards, and how to submit your pull requests.
+
+For technical details, see the [Architecture Guide](docs/ARCHITECTURE.md) and [Self-Hosting Guide](docs/SELF_HOSTING_GUIDE.md).
 
 ## 📝 License
 
