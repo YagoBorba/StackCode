@@ -1,55 +1,110 @@
-# StackCode - Documentación en Español
+# 📚 Documentación de StackCode
 
-Esta carpeta contiene la documentación de StackCode traducida al español.
+¡Bienvenido al hub de documentación de StackCode! Este directorio contiene documentación completa para desarrolladores, contribuidores y organizaciones que usan StackCode.
 
-## 📚 Documentos Disponibles
+## � Navegación Rápida
 
-- **[📐 Guía de Arquitectura](ARCHITECTURE.md)** *(Próximamente)* - Vista completa de la estructura del proyecto
-- **[🤝 Guía de Contribución](CONTRIBUTING.md)** *(Próximamente)* - Cómo contribuir al proyecto
-- **[🛠️ Stacks Soportados](STACKS.md)** *(Próximamente)* - Lista de tecnologías y plantillas
-- **[🚀 Guía de Auto-hospedaje](SELF_HOSTING_GUIDE.md)** *(Próximamente)* - Despliegue personalizado
-- **[🏛️ ADRs](adr/)** *(Próximamente)* - Registros de decisiones arquitecturales
+### 🏗️ **Documentación Principal**
+- **[📐 Guía de Arquitectura](ARCHITECTURE.md)** - Visión técnica completa de la estructura del monorepo, principios de diseño e interacciones entre componentes
+- **[🛠️ Stacks de Tecnología](STACKS.md)** - Lista detallada de frameworks, plantillas y tipos de proyecto soportados
+- **[🤝 Guía de Contribución](CONTRIBUTING.md)** - Todo lo que necesitas saber para contribuir a StackCode
+- **[🚀 Guía de Auto-hospedaje](SELF_HOSTING_GUIDE.md)** - Despliega y personaliza StackCode para tu organización
 
-## 🌐 Estado de la Traducción
+### 🏛️ **Decisiones Arquitecturales**
+- **[Directorio ADR](adr/)** - Registros de Decisiones Arquitecturales documentando decisiones de diseño importantes
+  - [ADR-001: Estructura Monorepo](adr/001-monorepo-structure.md)
+  - [ADR-002: TypeScript y ES Modules](adr/002-typescript-esm.md)
+  - [ADR-003: Diseño de CLI](adr/003-cli-design.md)
+  - [ADR-004: Estrategia de Internacionalización](adr/004-i18n-strategy.md)
 
-| Documento | Estado | Última Actualización |
-|-----------|--------|---------------------|
-| README.md | ⏳ Planeado | - |
-| ARCHITECTURE.md | ⏳ Planeado | - |
-| CONTRIBUTING.md | ⏳ Planeado | - |
-| STACKS.md | ⏳ Planeado | - |
-| SELF_HOSTING_GUIDE.md | ⏳ Planeado | - |
-| adr/README.md | ⏳ Planeado | - |
-| adr/001-monorepo-structure.md | ⏳ Planeado | - |
-| adr/002-typescript-esm.md | ⏳ Planeado | - |
-| adr/003-cli-design.md | ⏳ Planeado | - |
-| adr/004-i18n-strategy.md | ⏳ Planeado | - |
+### 🌐 **Traducciones**
+- **[🇪🇸 Español](es/)** - Documentación en español *(actual)*
+- **[🇧🇷 Português (Brasil)](../pt-BR/)** - Documentação em português
+- **[🇺🇸 English](../)** - English documentation *(original)*
 
-## 🤝 Cómo Contribuir con Traducciones
+## 🎯 **Documentación por Audiencia**
 
-¿Quieres ayudar a traducir la documentación? Consulta nuestra [guía de contribución](../CONTRIBUTING.md#internationalization).
+### 👩‍💻 **Para Desarrolladores Usando StackCode**
+Comienza aquí si quieres usar StackCode en tus proyectos:
+1. [README Principal](../../README.md) - Visión general del proyecto y primeros pasos
+2. [Stacks de Tecnología](STACKS.md) - Ve qué tipos de proyecto son soportados
+3. [Guía de Auto-hospedaje](SELF_HOSTING_GUIDE.md) - Despliega para tu organización
 
-### Proceso de Traducción
+### 🛠️ **Para Contribuidores**
+Comienza aquí si quieres contribuir a StackCode:
+1. [Guía de Contribución](CONTRIBUTING.md) - Cómo contribuir efectivamente
+2. [Guía de Arquitectura](ARCHITECTURE.md) - Entiende la base de código
+3. [Directorio ADR](adr/) - Aprende sobre decisiones arquitecturales
 
-1. **Elige un documento** de la lista anterior
-2. **Crea un issue** informando que vas a traducir
-3. **Traduce el documento** manteniendo el formato
-4. **Abre un Pull Request** con la traducción
-5. **Espera la revisión** de otros hablantes nativos
+### � **Para Organizaciones**
+Comienza aquí si quieres desplegar StackCode internamente:
+1. [Guía de Auto-hospedaje](SELF_HOSTING_GUIDE.md) - Despliegue y personalización
+2. [Guía de Arquitectura](ARCHITECTURE.md) - Visión técnica general
+3. [Guía de Contribución](CONTRIBUTING.md) - Cómo contribuir mejoras de vuelta
 
-### Directrices de Traducción
+## 🔧 **Referencia Técnica**
 
-- **Mantén el formato** original (enlaces, código, etc.)
-- **Usa lenguaje claro** y accesible
-- **Sé consistente** con la terminología técnica
-- **Adapta ejemplos** cuando sea necesario para el contexto hispano
+### Estructura del Proyecto
+```
+docs/
+├── README.md                 # Este archivo
+├── ARCHITECTURE.md           # Arquitectura técnica
+├── CONTRIBUTING.md           # Directrices de contribución
+├── SELF_HOSTING_GUIDE.md     # Guía de despliegue
+├── STACKS.md                 # Tecnologías soportadas
+├── adr/                      # Registros de Decisiones Arquitecturales
+│   ├── README.md
+│   ├── 001-monorepo-structure.md
+│   ├── 002-typescript-esm.md
+│   ├── 003-cli-design.md
+│   └── 004-i18n-strategy.md
+├── pt-BR/                    # Traducciones en portugués
+│   └── README.md
+└── es/                       # Traducciones en español
+    └── README.md
+```
 
-## 📞 Contacto
+### Conceptos Clave
+- **Arquitectura Monorepo**: StackCode usa un monorepo con múltiples paquetes
+- **Sistema de Plantillas**: Plantillas de proyecto configurables para diferentes tecnologías
+- **CLI + Extensión VS Code**: Múltiples interfaces para la misma funcionalidad principal
+- **Internacionalización**: Soporte multi-idioma en todas las interfaces
 
-Para dudas sobre traducciones:
-- Abre un [issue en GitHub](https://github.com/YagoBorba/StackCode/issues)
-- Usa las etiquetas `translation` y `documentation`
+## 🤝 **Contribuyendo a la Documentación**
+
+¡Acogemos mejoras a nuestra documentación! Así es como puedes ayudar:
+
+### Correcciones Rápidas
+- Corrige errores tipográficos, enlaces rotos o explicaciones poco claras
+- Añade ejemplos o mejora los existentes
+- Actualiza información desactualizada
+
+### Contribuciones Principales
+- Escribe nuevas guías o tutoriales
+- Crea documentación para nuevas características
+- Ayuda con traducciones
+
+### Ayuda con Traducciones
+- Traduce documentación existente a tu idioma
+- Revisa traducciones de otros contribuidores
+- Mantén consistencia entre traducciones
+
+Ve nuestra [Guía de Contribución](CONTRIBUTING.md) para instrucciones detalladas.
+
+## 🔗 **Recursos Externos**
+
+- **[Repositorio GitHub](https://github.com/YagoBorba/StackCode)** - Código fuente e issues
+- **[Paquete NPM](https://www.npmjs.com/package/@stackcode/cli)** - Paquete CLI publicado
+- **[Extensión VS Code](https://marketplace.visualstudio.com/items?itemName=YagoBorba.stackcode-vscode)** - VS Code Marketplace
+
+## 📞 **Obteniendo Ayuda**
+
+¿Necesitas ayuda con StackCode?
+
+- **[GitHub Issues](https://github.com/YagoBorba/StackCode/issues)** - Reportes de bugs y solicitudes de características
+- **[GitHub Discussions](https://github.com/YagoBorba/StackCode/discussions)** - Preguntas y soporte de la comunidad
+- **[Guía de Contribución](CONTRIBUTING.md)** - Cómo involucrarse
 
 ---
 
-*Para la documentación en inglés, visita [docs/](../)*
+*Última actualización: Septiembre 2025 | Equipo de Documentación StackCode*

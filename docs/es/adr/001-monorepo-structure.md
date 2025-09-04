@@ -1,30 +1,58 @@
 # ADR-001: Estructura Monorepo
 
-*Esta es una traducción del documento original en inglés. Para la versión más actualizada, consulte [docs/adr/001-monorepo-structure.md](../../adr/001-monorepo-structure.md).*
+## Estado
+Aceptado
 
----
+## Contexto
+StackCode consiste en múltiples paquetes relacionados que comparten funcionalidad común:
+- Una herramienta CLI para uso en línea de comandos
+- Una extensión VS Code para integración con IDE
+- Lógica de negocio principal que ambas interfaces usan
+- Soporte de internacionalización en todos los componentes
 
-## 🚧 Traducción en Progreso
+Necesitábamos decidir cómo organizar estos paquetes relacionados pero distintos de una manera que:
+- Permita compartir código entre paquetes
+- Mantenga límites claros entre componentes
+- Simplifique la gestión de dependencias
+- Facilite releases coordinados
+- Reduzca la complejidad de desarrollo
 
-Este documento está siendo traducido al español. 
+## Decisión
+Usaremos una estructura monorepo con los siguientes paquetes:
+- `@stackcode/cli` - Interfaz de línea de comandos
+- `@stackcode/core` - Lógica de negocio compartida y utilidades
+- `@stackcode/i18n` - Soporte de internacionalización
+- `stackcode-vscode` - Extensión VS Code
 
-### Estado de la Traducción: ⏳ Planeado
+El monorepo será gestionado usando npm workspaces, proporcionando:
+- Gestión compartida de dependencias
+- Linking entre paquetes
+- Procesos de build coordinados
+- Estrategia de versionado unificada
 
-Para contribuir con la traducción de este documento:
+## Consecuencias
 
-1. **Fork** el repositorio
-2. **Traduzca** el contenido manteniendo el formato original
-3. **Mantenga** los enlaces a los archivos originales en inglés cuando sea apropiado
-4. **Abra un Pull Request** con sus traducciones
+### Positivas
+- **Reutilización de Código**: La lógica de negocio principal puede ser compartida entre CLI y extensión VS Code
+- **APIs Consistentes**: Todos los paquetes usan las mismas interfaces y tipos subyacentes
+- **Desarrollo Simplificado**: Checkout de repositorio único proporciona acceso a todos los componentes
+- **Releases Coordinados**: Todos los paquetes pueden ser versionados y lanzados juntos
+- **Reducción de Duplicación**: Utilidades comunes y tipos están centralizados
+- **Pruebas Más Fáciles**: Las pruebas de integración pueden abarcar múltiples paquetes
 
-### Contenido Original
+### Negativas
+- **Complejidad de Build**: El sistema de build debe manejar múltiples paquetes y sus dependencias
+- **Tamaño del Repositorio**: Repositorio único contiene todos los componentes, potencialmente aumentando el tamaño
+- **Limitaciones de Herramientas**: Algunas herramientas pueden no manejar monorepos de forma óptima
+- **Gestión de Dependencias**: Cambios en paquetes principales afectan todos los dependientes
 
-El documento original completo está disponible en: [**ADR-001: Monorepo Structure (English)**](../../adr/001-monorepo-structure.md)
+### Riesgos
+- **Dependencias Circulares**: Se debe tener cuidado para evitar referencias circulares entre paquetes
+- **Orden de Build**: El orden de build de los paquetes se vuelve importante
+- **Coordinación de Versión**: Todos los paquetes típicamente necesitan ser versionados juntos
 
-## 🤝 Cómo Contribuir
-
-Vea la [guía de contribución](../../CONTRIBUTING.md#internationalization) para más detalles sobre cómo ayudar con las traducciones.
-
----
-
-*Para la documentación en inglés, visite [docs/adr/](../../adr/)*
+### Estrategias de Mitigación
+- Usar referencias de proyecto TypeScript para manejar dependencias de build
+- Implementar límites e interfaces claros entre paquetes
+- Usar npm workspaces para gestión de dependencias
+- Establecer directrices claras para dependencias entre paquetes

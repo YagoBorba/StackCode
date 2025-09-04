@@ -1,30 +1,179 @@
 # ADR-004: Estrategia de Internacionalización
 
-*Esta es una traducción del documento original en inglés. Para la versión más actualizada, consulte [docs/adr/004-i18n-strategy.md](../../adr/004-i18n-strategy.md).*
+## Estado
+Aceptado
 
----
+## Contexto
+StackCode está diseñado para ser usado por desarrolladores mundialmente y necesita:
+- Soportar múltiples idiomas para todo el texto orientado al usuario
+- Proporcionar mensajes de error y prompts localizados
+- Soportar tanto interfaces CLI como extensión VS Code
+- Ser extensible para idiomas adicionales
+- Mantener rendimiento con carga de locales
+- Soportar cambio dinámico de idioma
 
-## 🚧 Traducción en Progreso
+Necesitábamos decidir:
+- Biblioteca y enfoque i18n
+- Organización de archivos de locale
+- Estrategia de detección de idioma
+- Mecanismos de fallback
+- Integración entre paquetes
 
-Este documento está siendo traducido al español. 
+## Decisión
+Implementaremos un sistema i18n personalizado con un paquete dedicado:
 
-### Estado de la Traducción: ⏳ Planeado
+### Paquete @stackcode/i18n
+- Lógica de internacionalización centralizada
+- Archivos de locale basados en JSON
+- Cambio de locale en tiempo de ejecución
+- Fallback automático al inglés
+- Compartido entre todos los paquetes
 
-Para contribuir con la traducción de este documento:
+### Locale Management
+- JSON files for each supported language in `locales/` directory
+- Hierarchical key structure for organization
+- Support for interpolation and pluralization
+- Template literal style for better developer experience
 
-1. **Fork** el repositorio
-2. **Traduzca** el contenido manteniendo el formato original
-3. **Mantenga** los enlaces a los archivos originales en inglés cuando sea apropiado
-4. **Abra un Pull Request** con sus traducciones
+### Language Detection
+- Environment variable (`STACKCODE_LANG`)
+- System locale detection as fallback
+- User configuration override
+- VS Code extension uses VS Code's locale
 
-### Contenido Original
+### Supported Languages (Initial)
+- English (en) - Primary/fallback language
+- Portuguese (pt) - Secondary language
 
-El documento original completo está disponible en: [**ADR-004: Internationalization Strategy (English)**](../../adr/004-i18n-strategy.md)
+## Consequences
 
-## 🤝 Cómo Contribuir
+### Positive
+- **Global Accessibility**: Supports international developer community
+- **Consistent Localization**: Same i18n system across CLI and VS Code extension
+- **Extensible**: Easy to add new languages by adding JSON files
+- **Performance**: Lazy loading of locale files
+- **Type Safety**: TypeScript interfaces for locale keys
+- **Developer Experience**: Simple API for developers
 
-Vea la [guía de contribución](../../CONTRIBUTING.md#internationalization) para más detalles sobre cómo ayudar con las traducciones.
+### Negative
+- **Maintenance Overhead**: All user-facing strings need translation
+- **Coordination**: Changes require updates to all locale files
+- **Testing Complexity**: Need to test multiple language scenarios
 
----
+### Technical Implementation
 
-*Para la documentación en inglés, visite [docs/adr/](../../adr/)*
+#### Locale File Structure
+```json
+{
+  "commands": {
+    "init": {
+      "description": "Initialize a new project",
+      "prompts": {
+        "projectName": "What is your project name?",
+        "techStack": "Select a technology stack:"
+      }
+    },
+    "commit": {
+      "description": "Create a conventional commit",
+      "validation": {
+        "invalidType": "Invalid commit type: {type}"
+      }
+    }
+  },
+  "errors": {
+    "fileNotFound": "File not found: {filename}",
+    "networkError": "Network error occurred"
+  }
+}
+```
+
+#### API Design
+```typescript
+// Basic translation
+t('commands.init.description')
+
+// With interpolation
+t('errors.fileNotFound', { filename: 'package.json' })
+
+// Pluralization
+t('files.count', { count: 5 })
+```
+
+### Language Detection Priority
+1. `STACKCODE_LANG` environment variable
+2. User configuration file
+3. System locale (`process.env.LANG`)
+4. Fallback to English
+
+### Package Integration
+
+#### CLI Package
+- Initialize i18n before command parsing
+- Use locale for help text and prompts
+- Support `--lang` flag for temporary override
+
+#### VS Code Extension
+- Use VS Code's built-in locale detection
+- Respect VS Code's language settings
+- Provide language switching in extension settings
+
+#### Core Package
+- All user-facing error messages support i18n
+- Template descriptions and comments localized
+- GitHub integration messages localized
+
+### File Organization
+```
+packages/i18n/
+├── src/
+│   ├── index.ts           # Main i18n API
+│   └── locales/
+│       ├── en.json        # English (primary)
+│       └── pt.json        # Portuguese
+```
+
+### Future Expansion Strategy
+- Additional languages in `locales/` directory
+- Community contributions for translations
+- Possible locale validation tools
+- Right-to-left (RTL) language support consideration
+
+## Alternatives Considered
+
+### i18next
+- **Pros**: Mature, feature-rich, ecosystem support
+- **Cons**: Heavy dependency, over-engineered for our needs
+
+### React i18n (for VS Code extension only)
+- **Pros**: React ecosystem integration
+- **Cons**: Doesn't solve CLI internationalization
+
+### No internationalization
+- **Pros**: Simpler development and maintenance
+- **Cons**: Limits global adoption and accessibility
+
+## Implementation Guidelines
+
+### Translation Keys
+- Use hierarchical dot notation for organization
+- Descriptive key names that indicate context
+- Consistent naming patterns across components
+- Avoid deeply nested structures
+
+### String Management
+- All user-facing strings must use i18n system
+- No hardcoded English strings in code
+- Include context comments for translators
+- Use interpolation for dynamic content
+
+### Testing Strategy
+- Test default (English) locale thoroughly
+- Spot check key translations
+- Test locale switching functionality
+- Ensure fallbacks work correctly
+
+### Contribution Guidelines
+- Native speakers preferred for translations
+- Translation reviews by multiple contributors
+- Consistent terminology across all strings
+- Regular updates when English text changes
