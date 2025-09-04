@@ -7,11 +7,26 @@ First off, thank you for considering contributing! It's people like you that mak
 - [Code of Conduct](#code-of-conduct)
 - [How Can I Contribute?](#how-can-i-contribute)
 - [Development Setup](#development-setup)
+- [Architecture Overview](#architecture-overview)
 - [Adding New Technology Stacks](#adding-new-technology-stacks)
 - [Git Workflow and Pull Requests](#git-workflow-and-pull-requests)
 - [Coding Style and Principles](#coding-style-and-principles)
 - [Commit Message Guidelines](#commit-message-guidelines)
 - [Testing](#testing)
+
+## Architecture Overview
+
+Before contributing, please familiarize yourself with the project architecture:
+
+- **[📐 Architecture Guide](docs/ARCHITECTURE.md)** - Complete overview of the monorepo structure, design principles, and component interactions
+- **[🏛️ ADRs](docs/adr/)** - Architectural decision records explaining key design choices
+- **[🛠️ Technology Stacks](docs/STACKS.md)** - Supported frameworks and project templates
+
+Understanding the architecture will help you:
+- Choose the right package for your changes
+- Follow established patterns and conventions
+- Understand cross-package dependencies
+- Write better tests and documentation
 
 ## Code of Conduct
 
