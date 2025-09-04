@@ -18,10 +18,20 @@ Each ADR follows this structure:
 
 ## Index
 
-- [ADR-001: Monorepo Structure](./001-monorepo-structure.md)
-- [ADR-002: TypeScript and ES Modules](./002-typescript-esm.md)
-- [ADR-003: Command Line Interface Design](./003-cli-design.md)
-- [ADR-004: Internationalization Strategy](./004-i18n-strategy.md)
+Currently documented architectural decisions:
+
+- **[ADR-001: Monorepo Structure](./001-monorepo-structure.md)** - Decision to organize the project as a monorepo with npm workspaces
+- **[ADR-002: TypeScript and ES Modules](./002-typescript-esm.md)** - Choice of TypeScript with ESM as the primary development stack
+- **[ADR-003: Command Line Interface Design](./003-cli-design.md)** - CLI framework selection and command architecture
+- **[ADR-004: Internationalization Strategy](./004-i18n-strategy.md)** - Multi-language support implementation approach
+
+### Future ADRs
+Additional architectural decisions to be documented:
+- VS Code Extension Architecture
+- Template System Design
+- GitHub Integration Strategy
+- Release Management Process
+- Testing Strategy
 
 ## Template
 

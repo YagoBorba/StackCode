@@ -102,11 +102,28 @@ This is the best approach for ensuring everyone on a project uses the exact same
     npx stc commit
     ```
 
+## 📚 Documentation
+
+For detailed information about the project:
+
+- **[📐 Architecture Guide](docs/ARCHITECTURE.md)** - Understand the project structure, design principles, and component interactions
+- **[🤝 Contributing Guide](docs/CONTRIBUTING.md)** - Development workflow, coding standards, and how to contribute
+- **[🛠️ Technology Stacks](docs/STACKS.md)** - Complete list of supported frameworks and project templates
+- **[🚀 Self-Hosting Guide](docs/SELF_HOSTING_GUIDE.md)** - Deploy and customize StackCode for your organization
+- **[🏛️ ADRs](docs/adr/)** - Architectural decision records documenting key design choices
+
+### 🌐 Documentation in Other Languages
+
+- **[🇧🇷 Português (Brasil)](docs/pt-BR/)** - Documentação em português *(em desenvolvimento)*
+- **[🇪🇸 Español](docs/es/)** - Documentación en español *(en desarrollo)*
+
+*Want to help translate the documentation? Check our [contribution guide](docs/CONTRIBUTING.md#internationalization)!*
+
 ## 🤝 Want to Contribute?
 
 Awesome! StackCode is an open-source project, and we welcome contributions.
 
-To get started, please read our **[Contribution Guide](CONTRIBUTING.md)**. It has everything you need to know about our workflow, code standards, and how to submit your pull requests.
+To get started, please read our **[Contribution Guide](docs/CONTRIBUTING.md)**. It has everything you need to know about our workflow, code standards, and how to submit your pull requests.
 
 ## 📝 License
 
