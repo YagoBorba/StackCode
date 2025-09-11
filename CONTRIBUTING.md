@@ -23,6 +23,7 @@ Before contributing, please familiarize yourself with the project architecture:
 - **[🛠️ Technology Stacks](docs/STACKS.md)** - Supported frameworks and project templates
 
 Understanding the architecture will help you:
+
 - Choose the right package for your changes
 - Follow established patterns and conventions
 - Understand cross-package dependencies
@@ -220,10 +221,33 @@ Update the stack choices in `packages/cli/src/commands/ui.ts`:
 
 #### Step 6: Update Package Manager Logic
 
-If your stack uses a different package manager, update the dependency installation logic in `packages/cli/src/commands/init.ts`:
+When adding a new stack, you need to update two areas to handle dependency management:
+
+**A. Add stack dependencies mapping in `packages/core/src/utils.ts`:**
 
 ```typescript
-// Install dependencies based on the stack type
+export function getStackDependencies(stack: string): string[] {
+  const stackMap: Record<string, string[]> = {
+    go: ["go"],
+    php: ["composer", "php"],
+    java: ["mvn", "java"],
+    python: ["pip", "python"],
+    "your-stack-name": ["your-tool", "another-tool"], // Add your stack here
+    // Node.js stacks use npm
+    "node-js": ["npm"],
+    "node-ts": ["npm"],
+    react: ["npm"],
+    vue: ["npm"],
+  };
+  return stackMap[stack] || ["npm"];
+}
+```
+
+**B. Update dependency installation logic in `packages/cli/src/commands/init.ts`:**
+
+```typescript
+// The validation is now handled automatically, but you still need to
+// specify the installation command for your stack
 if (answers.stack === "python") {
   await runCommand("pip", ["install", "-e", "."], { cwd: projectPath });
 } else if (answers.stack === "java") {
@@ -240,7 +264,63 @@ if (answers.stack === "python") {
 }
 ```
 
-### 3. Best Practices for New Stacks
+**C. Add installation instructions in i18n files:**
+
+Add entries to both `packages/i18n/src/locales/en.json` and `packages/i18n/src/locales/pt.json`:
+
+```json
+{
+  "init": {
+    "dependencies": {
+      "install_your_tool": "  - Your Tool: https://example.com/install"
+    }
+  }
+}
+```
+
+### 3. System Dependency Validation
+
+StackCode now includes intelligent dependency validation that checks if required tools are installed before attempting to create projects. This prevents crashes and provides helpful guidance to users.
+
+#### How It Works
+
+1. **Pre-validation**: Before installing dependencies, StackCode checks if required tools are available in the system PATH
+2. **User feedback**: If tools are missing, users see:
+   - Clear warnings about missing dependencies
+   - Direct download links for each missing tool
+   - Option to continue without installing dependencies
+3. **Graceful handling**: Even if dependencies fail to install, the project structure is still created successfully
+
+#### Supported Stack Dependencies
+
+| Stack                                | Required Tools    | Validation |
+| ------------------------------------ | ----------------- | ---------- |
+| `go`                                 | `go`              | ✅         |
+| `php`                                | `composer`, `php` | ✅         |
+| `java`                               | `mvn`, `java`     | ✅         |
+| `python`                             | `pip`, `python`   | ✅         |
+| `node-js`, `node-ts`, `react`, `vue` | `npm`             | ✅         |
+
+#### Testing Dependency Validation
+
+To test the validation system:
+
+```bash
+# Test with missing dependencies (assuming Go is not installed)
+stc init
+# Choose "Go + Gin" stack
+# You should see warnings and installation instructions
+
+# Test validation programmatically
+node -e "
+const { validateStackDependencies } = require('@stackcode/core');
+validateStackDependencies('go').then(result =>
+  console.log('Result:', result)
+);
+"
+```
+
+### 4. Best Practices for New Stacks
 
 #### Template Structure Guidelines:
 
@@ -390,5 +470,6 @@ Thank you again for your interest in contributing!
 ---
 
 ## Documentation
+
 - [Architecture Guide](docs/ARCHITECTURE.md)
 - [Self-Hosting Guide](docs/SELF_HOSTING_GUIDE.md)

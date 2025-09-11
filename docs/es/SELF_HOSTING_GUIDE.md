@@ -39,12 +39,14 @@ npm link
 For organizations with private NPM registries:
 
 1. **Fork the Repository**
+
    ```bash
    git clone https://github.com/your-org/StackCode.git
    cd StackCode
    ```
 
 2. **Customize Package Configuration**
+
    ```json
    // In packages/cli/package.json
    {
@@ -89,15 +91,17 @@ docker run -it your-org/stackcode init
 ### Template Customization
 
 1. **Add Custom Templates**
+
    ```bash
    # Create your organization's templates
    mkdir packages/core/src/templates/your-org-stack
-   
+
    # Add template files with .tpl extension
    # Use {{variableName}} for replacements
    ```
 
 2. **Modify Existing Templates**
+
    ```bash
    # Edit existing templates in packages/core/src/templates/
    # Update package.json dependencies
@@ -107,15 +111,13 @@ docker run -it your-org/stackcode init
 3. **Update Type Definitions**
    ```typescript
    // In packages/core/src/types.ts
-   export type SupportedStack = 
-     | "node-js"
-     | "react" 
-     | "your-custom-stack"  // Add your stack
+   export type SupportedStack = "node-js" | "react" | "your-custom-stack"; // Add your stack
    ```
 
 ### Configuration Customization
 
 1. **Default Configuration**
+
    ```json
    // Create .stackcoderc in your users' home directories
    {
@@ -213,6 +215,7 @@ Organization Setup:
 ### Common Issues
 
 1. **Permission Errors**
+
    ```bash
    # Fix NPM permissions
    sudo chown -R $(whoami) ~/.npm
@@ -220,19 +223,21 @@ Organization Setup:
    ```
 
 2. **Template Not Found**
+
    ```bash
    # Verify template location
    ls packages/core/src/templates/
-   
+
    # Check build output
    ls packages/core/dist/templates/
    ```
 
 3. **Registry Issues**
+
    ```bash
    # Check registry configuration
    npm config get registry
-   
+
    # Test registry connectivity
    npm ping --registry https://your-registry.com
    ```
@@ -273,4 +278,4 @@ For self-hosting support:
 
 ---
 
-*For more information about StackCode architecture and development, see the [Architecture Guide](ARCHITECTURE.md).*
+_For more information about StackCode architecture and development, see the [Architecture Guide](ARCHITECTURE.md)._

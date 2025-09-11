@@ -15,7 +15,7 @@ The command-line interface is designed to be modular and easy to extend.
 
 - **`src/index.ts`**: The main entry point that initializes the i18n system and registers all available commands with Yargs.
 - **`src/commands/`**: This directory contains the implementation for each top-level command. Each file exports a `get<CommandName>Command` function that returns a Yargs `CommandModule`.
-  - `init.ts`: Handles the project scaffolding wizard.
+  - `init.ts`: Handles the project scaffolding wizard with intelligent dependency validation.
   - `generate.ts`: Handles the generation of individual files like `.gitignore`.
   - `commit.ts`: Provides the interactive conventional commit wizard.
   - `git.ts`: Orchestrates the Gitflow subcommands.

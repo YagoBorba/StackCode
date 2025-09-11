@@ -45,15 +45,18 @@ StackCode sigue una **arquitectura de monorepo modular** con clara separación d
 ## 📦 Estructura de Paquetes
 
 ### 1. **@stackcode/cli** - Interfaz de Línea de Comandos
+
 **Propósito:** Interfaz primaria del usuario para las funcionalidades de StackCode.
 
 **Componentes Principales:**
+
 - **Capa de Comandos:** Puntos de entrada para todas las operaciones CLI
 - **Manejadores de Comandos:** Implementaciones de comandos individuales
 - **Prompts Interactivos:** Orientación al usuario y recolección de entrada
 - **Manejo de Errores:** Reporte de errores consistente y recuperación
 
 **Arquitectura:**
+
 ```typescript
 cli/
 ├── src/
@@ -71,9 +74,11 @@ cli/
 ```
 
 ### 2. **@stackcode/core** - Motor de Lógica de Negocio
+
 **Propósito:** Contiene toda la lógica de negocio, utilidades y plantillas.
 
 **Componentes Principales:**
+
 - **Generadores:** Lógica de generación de proyectos y archivos
 - **Validadores:** Validación de mensajes de commit y proyectos
 - **Integración GitHub:** Interacciones API y automatización
@@ -81,6 +86,7 @@ cli/
 - **Sistema de Plantillas:** Plantillas de proyecto configurables
 
 **Arquitectura:**
+
 ```typescript
 core/
 ├── src/
@@ -107,15 +113,18 @@ core/
 ```
 
 ### 3. **@stackcode/i18n** - Internationalization
+
 **Purpose:** Manages multi-language support across all packages.
 
 **Features:**
+
 - Dynamic locale detection
 - Translation loading and caching
 - Language switching
 - Fallback mechanisms
 
 **Architecture:**
+
 ```typescript
 i18n/
 ├── src/
@@ -126,9 +135,11 @@ i18n/
 ```
 
 ### 4. **stackcode-vscode** - VS Code Extension
+
 **Purpose:** Integrates StackCode functionality directly into VS Code.
 
 **Key Components:**
+
 - **Extension Commands:** VS Code command palette integration
 - **File Monitors:** Real-time file change detection
 - **Git Monitors:** Git state monitoring
@@ -137,6 +148,7 @@ i18n/
 - **Notification System:** Proactive user guidance
 
 **Architecture:**
+
 ```typescript
 vscode-extension/
 ├── src/
@@ -154,6 +166,7 @@ vscode-extension/
 ## 🔄 Data Flow and Interactions
 
 ### Command Execution Flow
+
 1. **User Input:** CLI command or VS Code action
 2. **Command Parsing:** Yargs (CLI) or VS Code API
 3. **Core Logic:** Business logic execution in `@stackcode/core`
@@ -161,6 +174,7 @@ vscode-extension/
 5. **Output:** Results displayed to user
 
 ### Cross-Package Dependencies
+
 ```mermaid
 graph TD
     A[CLI Package] --> C[Core Package]
@@ -173,42 +187,50 @@ graph TD
 ## 🎯 Design Principles
 
 ### 1. **Separation of Concerns**
+
 - **CLI Package:** User interface and command handling
 - **Core Package:** Business logic and utilities
 - **i18n Package:** Internationalization concerns
 - **VS Code Extension:** IDE integration
 
 ### 2. **Dependency Inversion**
+
 - Higher-level modules don't depend on lower-level modules
 - Both depend on abstractions (interfaces)
 - External dependencies are injected, not hardcoded
 
 ### 3. **Single Responsibility**
+
 - Each package has a clearly defined purpose
 - Functions and classes have single, well-defined responsibilities
 - Templates are modular and composable
 
 ### 4. **Open/Closed Principle**
+
 - System is open for extension (new templates, commands)
 - Closed for modification (core logic remains stable)
 
 ## 🛠️ Technology Stack
 
 ### Core Technologies
+
 - **TypeScript:** Type safety and modern JavaScript features
 - **Node.js:** Runtime environment
 - **ESM:** Modern module system
 
 ### CLI-Specific
+
 - **Yargs:** Command-line argument parsing
 - **Inquirer:** Interactive command-line prompts
 
 ### VS Code Extension-Specific
+
 - **VS Code API:** Extension development framework
 - **React:** Webview UI components
 - **Vite:** Build tool for webview assets
 
 ### Development Tools
+
 - **Vitest/Jest:** Testing frameworks
 - **ESLint:** Code linting
 - **Prettier:** Code formatting
@@ -217,6 +239,7 @@ graph TD
 ## 📁 File Organization Strategy
 
 ### Monorepo Structure
+
 ```
 StackCode/
 ├── packages/                 # All packages
@@ -230,7 +253,9 @@ StackCode/
 ```
 
 ### Package Structure Conventions
+
 Each package follows consistent patterns:
+
 - `src/` - Source code
 - `test/` - Test files
 - `dist/` - Compiled output
@@ -242,11 +267,13 @@ Each package follows consistent patterns:
 ## 🔧 Build System
 
 ### TypeScript Compilation
+
 - **Monorepo Build:** `tsc --build` for cross-package dependencies
 - **Asset Copying:** Templates and locales copied to `dist/`
 - **Executable Permissions:** CLI entry point marked as executable
 
 ### VS Code Extension Build
+
 - **Extension Compilation:** TypeScript to JavaScript
 - **Webview Build:** Vite for React components
 - **Package Generation:** `.vsix` file creation
@@ -254,11 +281,13 @@ Each package follows consistent patterns:
 ## 🧪 Testing Strategy
 
 ### Unit Testing
+
 - **Core Logic:** Comprehensive tests for business logic
 - **CLI Commands:** Command execution and error handling
 - **Validators:** Input validation and error cases
 
 ### Integration Testing
+
 - **Cross-Package:** Ensure packages work together
 - **Template Generation:** Verify output correctness
 - **GitHub Integration:** API interaction testing
@@ -266,22 +295,26 @@ Each package follows consistent patterns:
 ## 🚀 Deployment and Distribution
 
 ### NPM Packages
+
 - **@stackcode/cli:** Published to NPM for global installation
 - **@stackcode/core:** Internal package, not published separately
 - **@stackcode/i18n:** Internal package, not published separately
 
 ### VS Code Extension
+
 - **Marketplace:** Published to VS Code Marketplace
 - **VSIX:** Direct installation package available
 
 ## 🔮 Extensibility Points
 
 ### Template System
+
 - **Custom Templates:** Easy addition of new project types
 - **Template Composition:** Combining multiple template sources
 - **Dynamic Configuration:** Runtime template customization
 
 ### Command System
+
 - **Plugin Architecture:** Future support for custom commands
 - **Middleware Support:** Pre/post command hooks
 - **Configuration Extension:** Custom validation and generation rules

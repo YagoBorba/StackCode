@@ -1,10 +1,13 @@
 # ADR-004: Estrategia de Internacionalización
 
 ## Estado
+
 Aceptado
 
 ## Contexto
+
 StackCode está diseñado para ser usado por desarrolladores mundialmente y necesita:
+
 - Soportar múltiples idiomas para todo el texto orientado al usuario
 - Proporcionar mensajes de error y prompts localizados
 - Soportar tanto interfaces CLI como extensión VS Code
@@ -13,6 +16,7 @@ StackCode está diseñado para ser usado por desarrolladores mundialmente y nece
 - Soportar cambio dinámico de idioma
 
 Necesitábamos decidir:
+
 - Biblioteca y enfoque i18n
 - Organización de archivos de locale
 - Estrategia de detección de idioma
@@ -20,9 +24,11 @@ Necesitábamos decidir:
 - Integración entre paquetes
 
 ## Decisión
+
 Implementaremos un sistema i18n personalizado con un paquete dedicado:
 
 ### Paquete @stackcode/i18n
+
 - Lógica de internacionalización centralizada
 - Archivos de locale basados en JSON
 - Cambio de locale en tiempo de ejecución
@@ -30,24 +36,28 @@ Implementaremos un sistema i18n personalizado con un paquete dedicado:
 - Compartido entre todos los paquetes
 
 ### Locale Management
+
 - JSON files for each supported language in `locales/` directory
 - Hierarchical key structure for organization
 - Support for interpolation and pluralization
 - Template literal style for better developer experience
 
 ### Language Detection
+
 - Environment variable (`STACKCODE_LANG`)
 - System locale detection as fallback
 - User configuration override
 - VS Code extension uses VS Code's locale
 
 ### Supported Languages (Initial)
+
 - English (en) - Primary/fallback language
 - Portuguese (pt) - Secondary language
 
 ## Consequences
 
 ### Positive
+
 - **Global Accessibility**: Supports international developer community
 - **Consistent Localization**: Same i18n system across CLI and VS Code extension
 - **Extensible**: Easy to add new languages by adding JSON files
@@ -56,6 +66,7 @@ Implementaremos un sistema i18n personalizado con un paquete dedicado:
 - **Developer Experience**: Simple API for developers
 
 ### Negative
+
 - **Maintenance Overhead**: All user-facing strings need translation
 - **Coordination**: Changes require updates to all locale files
 - **Testing Complexity**: Need to test multiple language scenarios
@@ -63,6 +74,7 @@ Implementaremos un sistema i18n personalizado con un paquete dedicado:
 ### Technical Implementation
 
 #### Locale File Structure
+
 ```json
 {
   "commands": {
@@ -88,18 +100,20 @@ Implementaremos un sistema i18n personalizado con un paquete dedicado:
 ```
 
 #### API Design
+
 ```typescript
 // Basic translation
-t('commands.init.description')
+t("commands.init.description");
 
 // With interpolation
-t('errors.fileNotFound', { filename: 'package.json' })
+t("errors.fileNotFound", { filename: "package.json" });
 
 // Pluralization
-t('files.count', { count: 5 })
+t("files.count", { count: 5 });
 ```
 
 ### Language Detection Priority
+
 1. `STACKCODE_LANG` environment variable
 2. User configuration file
 3. System locale (`process.env.LANG`)
@@ -108,21 +122,25 @@ t('files.count', { count: 5 })
 ### Package Integration
 
 #### CLI Package
+
 - Initialize i18n before command parsing
 - Use locale for help text and prompts
 - Support `--lang` flag for temporary override
 
 #### VS Code Extension
+
 - Use VS Code's built-in locale detection
 - Respect VS Code's language settings
 - Provide language switching in extension settings
 
 #### Core Package
+
 - All user-facing error messages support i18n
 - Template descriptions and comments localized
 - GitHub integration messages localized
 
 ### File Organization
+
 ```
 packages/i18n/
 ├── src/
@@ -133,6 +151,7 @@ packages/i18n/
 ```
 
 ### Future Expansion Strategy
+
 - Additional languages in `locales/` directory
 - Community contributions for translations
 - Possible locale validation tools
@@ -141,38 +160,45 @@ packages/i18n/
 ## Alternatives Considered
 
 ### i18next
+
 - **Pros**: Mature, feature-rich, ecosystem support
 - **Cons**: Heavy dependency, over-engineered for our needs
 
 ### React i18n (for VS Code extension only)
+
 - **Pros**: React ecosystem integration
 - **Cons**: Doesn't solve CLI internationalization
 
 ### No internationalization
+
 - **Pros**: Simpler development and maintenance
 - **Cons**: Limits global adoption and accessibility
 
 ## Implementation Guidelines
 
 ### Translation Keys
+
 - Use hierarchical dot notation for organization
 - Descriptive key names that indicate context
 - Consistent naming patterns across components
 - Avoid deeply nested structures
 
 ### String Management
+
 - All user-facing strings must use i18n system
 - No hardcoded English strings in code
 - Include context comments for translators
 - Use interpolation for dynamic content
 
 ### Testing Strategy
+
 - Test default (English) locale thoroughly
 - Spot check key translations
 - Test locale switching functionality
 - Ensure fallbacks work correctly
 
 ### Contribution Guidelines
+
 - Native speakers preferred for translations
 - Translation reviews by multiple contributors
 - Consistent terminology across all strings

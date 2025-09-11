@@ -60,11 +60,9 @@ const translations = {
 };
 
 /**
- * Hook para obter função de tradução
+ * Hook to get translation function
  */
 export function useTranslation() {
-  // Por enquanto, usando português como padrão
-  // Em uma implementação completa, isso viria das configurações do VSCode
   const currentLanguage = "pt";
 
   const t = (key: string): string => {

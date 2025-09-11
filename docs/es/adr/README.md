@@ -1,6 +1,6 @@
 # Registros de Decisiones Arquitecturales (ADRs)
 
-*Esta es una traducción del documento original en inglés. Para la versión más actualizada, consulte [docs/adr/README.md](../../adr/README.md).*
+_Esta es una traducción del documento original en inglés. Para la versión más actualizada, consulte [docs/adr/README.md](../../adr/README.md)._
 
 ---
 
@@ -24,13 +24,15 @@ Cada ADR sigue esta estructura:
 
 Decisiones arquitecturales actualmente documentadas:
 
-- **[ADR-001: Estructura Monorepo](./001-monorepo-structure.md)** *(⏳ Planeado)* - Decisión de organizar el proyecto como un monorepo con npm workspaces
-- **[ADR-002: TypeScript y ES Modules](./002-typescript-esm.md)** *(⏳ Planeado)* - Elección de TypeScript con ESM como stack de desarrollo principal
-- **[ADR-003: Diseño de Interfaz de Línea de Comandos](./003-cli-design.md)** *(⏳ Planeado)* - Selección del framework CLI y arquitectura de comandos
-- **[ADR-004: Estrategia de Internacionalización](./004-i18n-strategy.md)** *(⏳ Planeado)* - Enfoque de implementación de soporte multi-idioma
+- **[ADR-001: Estructura Monorepo](./001-monorepo-structure.md)** _(⏳ Planeado)_ - Decisión de organizar el proyecto como un monorepo con npm workspaces
+- **[ADR-002: TypeScript y ES Modules](./002-typescript-esm.md)** _(⏳ Planeado)_ - Elección de TypeScript con ESM como stack de desarrollo principal
+- **[ADR-003: Diseño de Interfaz de Línea de Comandos](./003-cli-design.md)** _(⏳ Planeado)_ - Selección del framework CLI y arquitectura de comandos
+- **[ADR-004: Estrategia de Internacionalización](./004-i18n-strategy.md)** _(⏳ Planeado)_ - Enfoque de implementación de soporte multi-idioma
 
 ### ADRs Futuros
+
 Decisiones arquitecturales adicionales a ser documentadas:
+
 - Arquitectura de la Extensión VS Code
 - Diseño del Sistema de Plantillas
 - Estrategia de Integración GitHub
@@ -72,4 +74,4 @@ Vea la [guía de contribución](../../CONTRIBUTING.md#internationalization) para
 
 ---
 
-*Para la documentación en inglés, visite [docs/adr/](../../adr/)*
+_Para la documentación en inglés, visite [docs/adr/](../../adr/)_

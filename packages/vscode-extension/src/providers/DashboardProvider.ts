@@ -4,6 +4,10 @@ import * as fs from "fs";
 import { GitHubIssuesService } from "../services/GitHubIssuesService";
 import { GitHubAuthService } from "../services/GitHubAuthService";
 
+/**
+ * Provides the StackCode dashboard webview interface.
+ * Manages project statistics, GitHub issues, and integration with various services.
+ */
 export class DashboardProvider
   implements vscode.WebviewViewProvider, vscode.Disposable
 {
@@ -24,13 +28,7 @@ export class DashboardProvider
     this._authService = authService;
   }
 
-  public resolveWebviewView(
-    webviewView: vscode.WebviewView,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    context: vscode.WebviewViewResolveContext,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    token: vscode.CancellationToken,
-  ) {
+  public resolveWebviewView(webviewView: vscode.WebviewView) {
     this._view = webviewView;
 
     webviewView.webview.options = {
@@ -45,14 +43,12 @@ export class DashboardProvider
         console.log(`[StackCode] Received command from webview: ${data.type}`);
 
         try {
-          // Tratar comandos específicos do webview
           switch (data.type) {
             case "webviewReady":
               console.log(
                 "[StackCode] Webview reported ready, sending initial data",
               );
               this.updateProjectStats();
-              // Buscar issues automaticamente se autenticado
               if (this._authService?.isAuthenticated) {
                 await this.updateIssues();
               }

@@ -26,7 +26,9 @@ Currently documented architectural decisions:
 - **[ADR-004: Internationalization Strategy](./004-i18n-strategy.md)** - Multi-language support implementation approach
 
 ### Future ADRs
+
 Additional architectural decisions to be documented:
+
 - VS Code Extension Architecture
 - Template System Design
 - GitHub Integration Strategy

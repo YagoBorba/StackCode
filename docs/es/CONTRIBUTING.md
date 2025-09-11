@@ -19,6 +19,7 @@ Antes de contribuir, familiarízate con la arquitectura del proyecto:
 - **[🛠️ Stacks Tecnológicos](STACKS.md)** - Frameworks soportados y plantillas de proyecto
 
 Comprender la arquitectura te ayudará a:
+
 - Elegir el paquete correcto para tus cambios
 - Seguir patrones y convenciones establecidas
 - Entender dependencias entre paquetes
@@ -27,28 +28,33 @@ Comprender la arquitectura te ayudará a:
 ## 🚀 Configuración de Desarrollo
 
 1. **Fork y Clonar**
+
    ```bash
    git clone https://github.com/tu-usuario/StackCode.git
    cd StackCode
    ```
 
 2. **Instalar Dependencias**
+
    ```bash
    npm install
    ```
 
 3. **Construir el Proyecto**
+
    ```bash
    npm run build
    ```
 
 4. **Vincular CLI para Desarrollo**
+
    ```bash
    cd packages/cli
    npm link
    ```
 
 5. **Ejecutar Tests**
+
    ```bash
    npm test
    ```
@@ -78,27 +84,34 @@ Comprender la arquitectura te ayudará a:
 ### 1. Reportar Bugs
 
 Antes de reportar un bug:
+
 - Verifica que no esté ya reportado en [Issues](https://github.com/YagoBorba/StackCode/issues)
 - Usa la plantilla de bug report
 - Proporciona información detallada sobre reproducción
 
 **Plantilla de Bug Report:**
+
 ```markdown
 ## Descripción
+
 Descripción clara del bug.
 
 ## Pasos para Reproducir
+
 1. Ejecuta `stc init`
 2. Selecciona template 'react'
 3. Ve el error
 
 ## Comportamiento Esperado
+
 Lo que esperabas que sucediera.
 
 ## Comportamiento Actual
+
 Lo que realmente sucedió.
 
 ## Entorno
+
 - OS: [macOS/Windows/Linux]
 - Node.js: [versión]
 - StackCode: [versión]
@@ -107,6 +120,7 @@ Lo que realmente sucedió.
 ### 2. Sugerir Funcionalidades
 
 Para sugerir nuevas funcionalidades:
+
 - Revisa las [Discussions](https://github.com/YagoBorba/StackCode/discussions)
 - Usa la plantilla de feature request
 - Explica el caso de uso y beneficios
@@ -116,23 +130,27 @@ Para sugerir nuevas funcionalidades:
 #### Tipos de Contribuciones de Código
 
 **a) Corrección de Bugs**
+
 - Identifica el bug en el código
 - Escribe un test que reproduzca el bug
 - Implementa la corrección
 - Verifica que todos los tests pasen
 
 **b) Nuevas Funcionalidades**
+
 - Discute la funcionalidad en Issues/Discussions
 - Sigue los principios de arquitectura
 - Incluye tests completos
 - Actualiza documentación
 
 **c) Mejoras de Performance**
+
 - Benchmarking antes y después
 - Mantén compatibilidad con API existente
 - Incluye tests de rendimiento
 
 **d) Refactorización**
+
 - Mantén comportamiento existente
 - Mejora legibilidad o estructura
 - Incluye tests que verifiquen no regression
@@ -140,6 +158,7 @@ Para sugerir nuevas funcionalidades:
 #### Flujo de Desarrollo
 
 1. **Crear Branch**
+
    ```bash
    git checkout -b feature/nueva-funcionalidad
    # o
@@ -152,6 +171,7 @@ Para sugerir nuevas funcionalidades:
    - Actualiza documentación
 
 3. **Commit**
+
    ```bash
    # Usa conventional commits
    git commit -m "feat(cli): add support for new template"
@@ -166,6 +186,7 @@ Para sugerir nuevas funcionalidades:
 ### 4. Mejorar Documentación
 
 Tipos de mejoras de documentación:
+
 - Corregir errores tipográficos
 - Mejorar claridad de explicaciones
 - Agregar ejemplos
@@ -202,10 +223,10 @@ npm run format:check
 
 ```typescript
 // Orden de imports
-import { something } from 'node:fs';           // Node.js built-ins
-import { yargs } from 'yargs';                 // External dependencies
-import { helper } from '@stackcode/core';      // Internal packages
-import { local } from './localFile.js';       // Local files
+import { something } from "node:fs"; // Node.js built-ins
+import { yargs } from "yargs"; // External dependencies
+import { helper } from "@stackcode/core"; // Internal packages
+import { local } from "./localFile.js"; // Local files
 
 // Orden de exports
 export type { TypeDefinition };
@@ -215,14 +236,14 @@ export default defaultExport;
 
 #### Documentación de Código
 
-```typescript
+````typescript
 /**
  * Genera un nuevo proyecto basado en una plantilla.
- * 
+ *
  * @param template - El nombre de la plantilla a usar
  * @param options - Opciones de configuración para la generación
  * @returns Promise que resuelve con el resultado de la generación
- * 
+ *
  * @example
  * ```typescript
  * const result = await generateProject('react', {
@@ -233,11 +254,11 @@ export default defaultExport;
  */
 export async function generateProject(
   template: SupportedTemplate,
-  options: GenerationOptions
+  options: GenerationOptions,
 ): Promise<GenerationResult> {
   // Implementación...
 }
-```
+````
 
 ### Testing
 
@@ -251,29 +272,29 @@ export async function generateProject(
 #### Estructura de Tests
 
 ```typescript
-describe('TemplateGenerator', () => {
-  describe('generateProject', () => {
-    it('should create project with correct structure', async () => {
+describe("TemplateGenerator", () => {
+  describe("generateProject", () => {
+    it("should create project with correct structure", async () => {
       // Arrange
-      const template = 'react';
-      const options = { directory: './test-project' };
-      
+      const template = "react";
+      const options = { directory: "./test-project" };
+
       // Act
       const result = await generator.generateProject(template, options);
-      
+
       // Assert
       expect(result.success).toBe(true);
-      expect(fs.existsSync('./test-project/package.json')).toBe(true);
+      expect(fs.existsSync("./test-project/package.json")).toBe(true);
     });
 
-    it('should handle invalid template gracefully', async () => {
+    it("should handle invalid template gracefully", async () => {
       // Arrange
-      const template = 'invalid-template' as SupportedTemplate;
-      
+      const template = "invalid-template" as SupportedTemplate;
+
       // Act & Assert
-      await expect(
-        generator.generateProject(template, {})
-      ).rejects.toThrow('Template not supported');
+      await expect(generator.generateProject(template, {})).rejects.toThrow(
+        "Template not supported",
+      );
     });
   });
 });
@@ -283,13 +304,13 @@ describe('TemplateGenerator', () => {
 
 ```typescript
 // Mock external dependencies
-jest.mock('node:fs', () => ({
+jest.mock("node:fs", () => ({
   existsSync: jest.fn(),
   writeFileSync: jest.fn(),
 }));
 
 // Mock internal modules
-jest.mock('@stackcode/core', () => ({
+jest.mock("@stackcode/core", () => ({
   generateTemplate: jest.fn(),
 }));
 ```
@@ -309,6 +330,7 @@ Seguimos la especificación [Conventional Commits](https://conventionalcommits.o
 ```
 
 **Tipos:**
+
 - `feat`: Nueva funcionalidad
 - `fix`: Corrección de bug
 - `docs`: Cambios en documentación
@@ -318,6 +340,7 @@ Seguimos la especificación [Conventional Commits](https://conventionalcommits.o
 - `chore`: Tareas de mantenimiento
 
 **Scopes:**
+
 - `cli`: CLI package
 - `core`: Core package
 - `i18n`: Internationalization package
@@ -326,6 +349,7 @@ Seguimos la especificación [Conventional Commits](https://conventionalcommits.o
 - `build`: Build system
 
 **Ejemplos:**
+
 ```bash
 feat(cli): add support for Vue 3 template
 fix(core): resolve path resolution issue on Windows
@@ -367,6 +391,7 @@ StackCode soporta múltiples idiomas y valoramos contribuciones de traducción.
 ### Agregar Traducciones
 
 1. **Localizar Archivos de Idioma**
+
    ```
    packages/i18n/src/locales/
    ├── en.json (base)
@@ -376,11 +401,13 @@ StackCode soporta múltiples idiomas y valoramos contribuciones de traducción.
    ```
 
 2. **Crear Nuevo Archivo de Idioma**
+
    ```bash
    cp packages/i18n/src/locales/en.json packages/i18n/src/locales/fr.json
    ```
 
 3. **Traducir Contenido**
+
    ```json
    {
      "commands": {
@@ -397,7 +424,7 @@ StackCode soporta múltiples idiomas y valoramos contribuciones de traducción.
 4. **Actualizar Configuración**
    ```typescript
    // En packages/i18n/src/index.ts
-   const supportedLocales = ['en', 'pt', 'es', 'fr'];
+   const supportedLocales = ["en", "pt", "es", "fr"];
    ```
 
 ### Directrices de Traducción
@@ -413,6 +440,7 @@ StackCode soporta múltiples idiomas y valoramos contribuciones de traducción.
 Para traducir documentación (como este archivo):
 
 1. **Crear Estructura de Directorios**
+
    ```
    docs/
    ├── README.md (inglés)
@@ -431,11 +459,14 @@ Para traducir documentación (como este archivo):
    - Misma estructura de encabezados
 
 3. **Referencias Internas**
+
    ```markdown
    <!-- Mantener referencias relativas -->
+
    [Architecture Guide](ARCHITECTURE.md)
-   
+
    <!-- Para referencias entre idiomas -->
+
    [English Version](../README.md)
    ```
 
@@ -444,6 +475,7 @@ Para traducir documentación (como este archivo):
 ### Antes del Pull Request
 
 1. **Auto-verificación**
+
    ```bash
    npm run lint
    npm run test
@@ -492,6 +524,7 @@ open coverage/lcov-report/index.html
 ```
 
 **Objetivos:**
+
 - **Global**: >80%
 - **Funciones**: >85%
 - **Líneas**: >80%
@@ -543,10 +576,11 @@ node --inspect packages/cli/dist/index.js init
    - Se abre nueva ventana con extensión cargada
 
 2. **Debug Console**
+
    ```typescript
    // En código de extensión
-   console.log('Debug info:', data);
-   
+   console.log("Debug info:", data);
+
    // Ver en VS Code Developer Tools
    // Help > Toggle Developer Tools
    ```
@@ -589,6 +623,7 @@ node --inspect packages/cli/dist/index.js init
 ### Hall of Fame
 
 Los contribuidores destacados son reconocidos en:
+
 - README principal del proyecto
 - Releases notes
 - Documentación oficial
@@ -597,30 +632,34 @@ Los contribuidores destacados son reconocidos en:
 ---
 
 ¿Tienes preguntas? No dudes en:
+
 - Abrir una [Discussion](https://github.com/YagoBorba/StackCode/discussions)
 - Crear un [Issue](https://github.com/YagoBorba/StackCode/issues)
 - Revisar documentación existente
 
 ¡Esperamos tu contribución! 🚀
-   git clone https://github.com/your-username/StackCode.git
-   cd StackCode
-   ```
+git clone https://github.com/your-username/StackCode.git
+cd StackCode
+
+````
 
 2. **Install Dependencies**
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+````
 
 3. **Build the Project**
+
    ```bash
    npm run build
    ```
 
 4. **Test Your Setup**
+
    ```bash
    # Run tests
    npm test
-   
+
    # Test CLI locally
    node packages/cli/dist/index.js --help
    ```
@@ -628,34 +667,40 @@ Los contribuidores destacados son reconocidos en:
 ## 🤝 How to Contribute
 
 ### 🐛 Bug Reports
+
 - Check [existing issues](https://github.com/YagoBorba/StackCode/issues) first
 - Provide clear reproduction steps
 - Include environment details (OS, Node.js version, etc.)
 - Use the bug report template
 
 ### ✨ Feature Requests
+
 - Open an issue to discuss the feature first
 - Explain the use case and benefits
 - Consider if it fits the project's scope
 - Provide implementation ideas if possible
 
 ### 📝 Documentation Improvements
+
 - Fix typos, improve clarity, add examples
 - Update docs when adding new features
 - Help with translations (see [Internationalization](#internationalization))
 
 ### 🛠️ Code Contributions
+
 - Pick up issues labeled `good-first-issue` or `help-wanted`
 - Follow the [development workflow](#development-workflow)
 - Ensure all tests pass
 - Add tests for new functionality
 
 ### 🌐 Adding New Technology Stacks
+
 See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-new-technology-stacks).
 
 ## 🔄 Development Workflow
 
 1. **Create a Feature Branch**
+
    ```bash
    git checkout develop
    git pull origin develop
@@ -668,6 +713,7 @@ See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-
    - Update documentation as needed
 
 3. **Test Thoroughly**
+
    ```bash
    npm test
    npm run lint
@@ -675,6 +721,7 @@ See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-
    ```
 
 4. **Commit Your Changes**
+
    ```bash
    # Use conventional commits with emojis
    git commit -m "feat(cli): ✨ add new project template"
@@ -689,18 +736,21 @@ See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-
 ## 🎨 Coding Standards
 
 ### General Principles
+
 - **Clean Code**: Write readable, maintainable code
 - **SOLID Principles**: Follow SOLID design principles
 - **Single Responsibility**: Each function/class should have one purpose
 - **Documentation**: Use TSDoc comments for public APIs
 
 ### TypeScript Guidelines
+
 - Use strict TypeScript configuration
 - Prefer explicit types over `any`
 - Use interfaces for object shapes
 - Follow ESLint rules
 
 ### Testing Requirements
+
 - Add unit tests for new functionality
 - Maintain or improve test coverage
 - Test both success and error scenarios
@@ -711,6 +761,7 @@ See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-
 We welcome contributions to support more languages:
 
 ### Current Structure
+
 ```
 packages/i18n/src/locales/
 ├── en.json          # English (primary)
@@ -720,12 +771,14 @@ packages/i18n/src/locales/
 ### Adding New Languages
 
 1. **Create Locale File**
+
    ```bash
    # Example for Spanish
    cp packages/i18n/src/locales/en.json packages/i18n/src/locales/es.json
    ```
 
 2. **Translate Strings**
+
    ```json
    {
      "commands": {
@@ -742,6 +795,7 @@ packages/i18n/src/locales/
    ```
 
 ### Future Structure (Planned)
+
 ```
 docs/
 ├── pt-BR/           # Portuguese (Brazil)
@@ -753,12 +807,14 @@ docs/
 ## 📏 Code Review Process
 
 ### For Contributors
+
 - Keep PRs focused and small
 - Write clear PR descriptions
 - Respond to feedback promptly
 - Update documentation as needed
 
 ### Review Criteria
+
 - Code quality and maintainability
 - Test coverage and quality
 - Documentation completeness
@@ -797,6 +853,7 @@ Need help contributing?
 ## 🙏 Recognition
 
 All contributors are recognized in:
+
 - [Contributors section](../README.md#contributors) in README
 - Git commit history
 - Release notes for significant contributions
@@ -806,6 +863,7 @@ Thank you for helping make StackCode better! 🚀
 ---
 
 For more details, see:
+
 - **[Main README](../README.md)** - Project overview
 - **[Architecture Guide](ARCHITECTURE.md)** - Technical details
 - **[Self-Hosting Guide](SELF_HOSTING_GUIDE.md)** - Deployment options

@@ -43,7 +43,7 @@ Our goal is to make best practices the easiest path.
 StackCode is a suite of tools designed to work together seamlessly:
 
 - 🚀 **Effortless Project Scaffolding (`init`):**
-  Generate a complete, production-ready project structure in seconds. Choose from multiple technology stacks including Node.js, React, Vue.js, Python, Java, Go, and PHP—each with best practices and optimal folder structures.
+  Generate a complete, production-ready project structure in seconds. Choose from multiple technology stacks including Node.js, React, Vue.js, Python, Java, Go, and PHP—each with best practices and optimal folder structures. **Now with intelligent dependency validation** that checks if required tools are installed before proceeding, providing helpful installation instructions when needed.
 
 - 📝 **Intelligent File Generation (`generate`):**
   Need a `.gitignore`? Don't just get one—get a perfect one. Our composable template engine combines rules for your stack, IDE, and tools (like Docker) into a single, organized file.
@@ -114,10 +114,10 @@ For detailed information about the project:
 
 ### 🌐 Documentation in Other Languages
 
-- **[🇧🇷 Português (Brasil)](docs/pt-BR/)** - Documentação em português *(em desenvolvimento)*
-- **[🇪🇸 Español](docs/es/)** - Documentación en español *(en desarrollo)*
+- **[🇧🇷 Português (Brasil)](docs/pt-BR/)** - Documentação em português _(em desenvolvimento)_
+- **[🇪🇸 Español](docs/es/)** - Documentación en español _(en desarrollo)_
 
-*Want to help translate the documentation? Check our [contribution guide](docs/CONTRIBUTING.md#internationalization)!*
+_Want to help translate the documentation? Check our [contribution guide](docs/CONTRIBUTING.md#internationalization)!_
 
 ## 🤝 Want to Contribute?
 

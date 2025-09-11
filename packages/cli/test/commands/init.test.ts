@@ -7,6 +7,7 @@ import {
   generateReadmeContent,
   generateGitignoreContent,
   runCommand,
+  validateStackDependencies,
 } from "@stackcode/core";
 import { getInitCommand } from "../../src/commands/init";
 
@@ -16,6 +17,7 @@ vi.mock("@stackcode/core", () => ({
   generateReadmeContent: vi.fn(),
   generateGitignoreContent: vi.fn(),
   runCommand: vi.fn(),
+  validateStackDependencies: vi.fn(),
 }));
 
 vi.mock("inquirer");
@@ -30,6 +32,7 @@ const mockedCore = {
   generateReadmeContent: vi.mocked(generateReadmeContent),
   generateGitignoreContent: vi.mocked(generateGitignoreContent),
   runCommand: vi.mocked(runCommand),
+  validateStackDependencies: vi.mocked(validateStackDependencies),
 };
 
 describe("Init Command", () => {
@@ -53,6 +56,11 @@ describe("Init Command", () => {
     mockedFs.access.mockRejectedValue(new Error("not found"));
     mockedCore.generateReadmeContent.mockResolvedValue("# Test Project");
     mockedCore.generateGitignoreContent.mockResolvedValue("node_modules");
+    mockedCore.validateStackDependencies.mockResolvedValue({
+      isValid: true,
+      missingDependencies: [],
+      availableDependencies: ["npm"],
+    });
 
     // Act
     await handler({ _: [], $0: "stc" });

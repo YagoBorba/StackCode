@@ -133,7 +133,7 @@ export class GitCommand extends BaseCommand {
             currentBranch = repo.state.HEAD.name || "current branch";
           }
         } catch {
-          // Fallback to generic message
+          // Git API unavailable - use generic message
         }
       }
 

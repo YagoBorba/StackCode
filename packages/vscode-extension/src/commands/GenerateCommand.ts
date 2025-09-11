@@ -4,7 +4,14 @@ import { ProgressCallback } from "../types";
 import { t } from "@stackcode/i18n";
 import * as path from "path";
 
+/**
+ * Command to generate project files like README.md and .gitignore.
+ * Provides options to generate individual files or both at once.
+ */
 export class GenerateCommand extends BaseCommand {
+  /**
+   * Executes the file generation workflow with user selection.
+   */
   async execute(): Promise<void> {
     const option = await vscode.window.showQuickPick(
       [
@@ -60,7 +67,7 @@ export class GenerateCommand extends BaseCommand {
           return;
         }
       } catch {
-        // File doesn't exist, which is fine
+        // File doesn't exist - proceed with generation
       }
 
       vscode.window.withProgress(
@@ -129,7 +136,7 @@ export class GenerateCommand extends BaseCommand {
           return;
         }
       } catch {
-        // File doesn't exist, which is fine
+        // File doesn't exist - proceed with generation
       }
 
       const projectType = await vscode.window.showQuickPick(

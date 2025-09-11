@@ -173,11 +173,37 @@
       "gitignore": "-> Generating .gitignore...",
       "husky": "-> Configuring Husky...",
       "git": "-> Initializing Git repository...",
-      "deps": "-> Installing dependencies (this may take a moment)..."
+      "deps": "-> Installing dependencies (this may take a moment)...",
+      "validate_deps": "-> Checking system dependencies..."
+    },
+    "dependencies": {
+      "checking": "Checking if required tools are installed...",
+      "missing": "⚠️ Missing tools detected for stack '{stack}':",
+      "missing_detail": "  - {command}: Not found in system",
+      "install_instructions": "📋 To continue, please install the missing tools:",
+      "install_go": "  - Go: https://golang.org/dl/",
+      "install_composer": "  - Composer: https://getcomposer.org/download/",
+      "install_maven": "  - Maven: https://maven.apache.org/install.html",
+      "install_python": "  - Python/pip: https://python.org/downloads/",
+      "install_pip": "  - Python/pip: https://python.org/downloads/",
+      "install_php": "  - PHP: https://php.net/downloads/",
+      "install_java": "  - Java: https://adoptium.net/",
+      "install_mvn": "  - Maven: https://maven.apache.org/install.html",
+      "all_available": "✅ All required tools are available.",
+      "optional_skip": "⚠️ You can continue without installing dependencies, but package installation will fail.",
+      "prompt_continue": "Do you want to continue anyway?"
+    },
+    "error": {
+      "deps_install_failed": "⚠️ Dependency installation failed: {error}",
+      "deps_install_manual": "The project was created successfully, but you'll need to install dependencies manually.",
+      "suggested_command": "Suggested command:"
     },
     "success": {
       "ready": "✅ Success! Your project is ready.",
-      "next_steps": "Next steps:"
+      "next_steps": "Next steps:",
+      "step1": "1. cd {projectName}",
+      "step2": "2. Open the project in your favorite editor.",
+      "step3": "3. Start coding! 🎉"
     }
   },
   "release": {

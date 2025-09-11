@@ -11,6 +11,10 @@ export interface GitHubRepository {
   remoteUrl: string;
 }
 
+/**
+ * Monitors Git repository changes and provides Git-related functionality.
+ * Tracks branch changes, detects GitHub repositories, and provides Git workflow helpers.
+ */
 export class GitMonitor implements vscode.Disposable {
   private proactiveManager: ProactiveNotificationManager;
   private configManager: ConfigurationManager;
@@ -25,6 +29,9 @@ export class GitMonitor implements vscode.Disposable {
     this.configManager = configManager;
   }
 
+  /**
+   * Starts monitoring Git repository changes and workspace events.
+   */
   startMonitoring(): void {
     const gitExtension = vscode.extensions.getExtension("vscode.git");
     if (gitExtension) {
@@ -249,17 +256,14 @@ export class GitMonitor implements vscode.Disposable {
     try {
       const workspaceFolders = vscode.workspace.workspaceFolders;
 
-      // Lista de caminhos para tentar
       const pathsToTry: string[] = [];
 
       if (workspaceFolders && workspaceFolders.length > 0) {
-        // Adicionar workspace folders configurados
         workspaceFolders.forEach((folder) => {
           pathsToTry.push(folder.uri.fsPath);
         });
       }
 
-      // Adicionar caminhos alternativos comuns em dev containers
       pathsToTry.push(
         "/workspaces/StackCode",
         process.cwd(),
@@ -281,7 +285,6 @@ export class GitMonitor implements vscode.Disposable {
           const configContent = fs.readFileSync(gitConfigPath, "utf8");
           console.log(`📄 [GitMonitor] Found .git/config at: ${folderPath}`);
 
-          // Procurar pela URL do remote origin
           const originMatch = configContent.match(
             /\[remote "origin"\]\s*\n\s*url\s*=\s*(.+)/,
           );
@@ -365,11 +368,8 @@ export class GitMonitor implements vscode.Disposable {
       const cleanUrl = url.replace(/\.git$/, "");
 
       const patterns = [
-        // HTTPS: https://github.com/owner/repo
         /^https:\/\/github\.com\/([^/]+)\/([^/]+)$/,
-        // SSH: git@github.com:owner/repo
         /^git@github\.com:([^/]+)\/([^/]+)$/,
-        // SSH alternative: ssh://git@github.com/owner/repo
         /^ssh:\/\/git@github\.com\/([^/]+)\/([^/]+)$/,
       ];
 
