@@ -10,6 +10,8 @@ export {
   isCommandAvailable,
   getStackDependencies,
   validateStackDependencies,
+  loadStackCodeConfig,
+  saveStackCodeConfig,
 } from "./utils.js";
 export {
   generateGitignoreContent,
@@ -18,7 +20,6 @@ export {
 export {
   scaffoldProject,
   setupHusky,
-  type ProjectOptions,
 } from "./scaffold.js";
 export { validateCommitMessage } from "./validator.js";
 

@@ -3,6 +3,9 @@
  * @module core/utils
  */
 import { spawn } from "child_process";
+import fs from "fs/promises";
+import path from "path";
+import { StackCodeConfig } from "./types.js";
 
 interface RunCommandOptions {
   cwd: string;
@@ -176,4 +179,39 @@ export function getErrorMessage(error: unknown): string {
   }
 
   return String(error);
+}
+
+/**
+ * Loads StackCode configuration from .stackcoderc.json file.
+ * @param projectPath - The project path to look for configuration.
+ * @returns A promise that resolves to the configuration object.
+ */
+export async function loadStackCodeConfig(projectPath: string): Promise<StackCodeConfig> {
+  const configPath = path.join(projectPath, ".stackcoderc.json");
+  
+  try {
+    const configContent = await fs.readFile(configPath, "utf8");
+    return JSON.parse(configContent) as StackCodeConfig;
+  } catch {
+    return {
+      features: {
+        commitValidation: false,
+        husky: false,
+        docker: false,
+      },
+    };
+  }
+}
+
+/**
+ * Saves StackCode configuration to .stackcoderc.json file.
+ * @param projectPath - The project path to save configuration.
+ * @param config - The configuration object to save.
+ */
+export async function saveStackCodeConfig(
+  projectPath: string,
+  config: StackCodeConfig,
+): Promise<void> {
+  const configPath = path.join(projectPath, ".stackcoderc.json");
+  await fs.writeFile(configPath, JSON.stringify(config, null, 2));
 }

@@ -26,3 +26,37 @@ export interface GitHubReleaseOptions {
   releaseNotes: string;
   token: string;
 }
+
+export interface StackCodeConfig {
+  defaultAuthor?: string;
+  defaultLicense?: string;
+  defaultDescription?: string;
+  features?: {
+    commitValidation?: boolean;
+    husky?: boolean;
+    docker?: boolean;
+  };
+}
+
+export interface ProjectOptions {
+  projectPath: string;
+  stack: SupportedStack;
+  features: ("docker" | "husky")[];
+  replacements: {
+    projectName: string;
+    description: string;
+    authorName: string;
+  };
+}
+
+export type SupportedStack = 
+  | "node-js" 
+  | "node-ts" 
+  | "react" 
+  | "vue" 
+  | "angular" 
+  | "svelte" 
+  | "python" 
+  | "java" 
+  | "go" 
+  | "php";

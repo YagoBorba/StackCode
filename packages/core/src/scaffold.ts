@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
+import { ProjectOptions } from "./types.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -35,21 +36,6 @@ async function copyTemplateFiles(
     });
     await fs.writeFile(dest, content);
   }
-}
-
-export interface ProjectOptions {
-  projectPath: string;
-  stack:
-    | "node-js"
-    | "node-ts"
-    | "react"
-    | "vue"
-    | "python"
-    | "java"
-    | "go"
-    | "php";
-  features: ("docker" | "husky")[];
-  replacements: Record<string, string>;
 }
 
 export async function scaffoldProject(options: ProjectOptions): Promise<void> {

@@ -8,7 +8,9 @@ import {
   generateGitignoreContent,
   runCommand,
   validateStackDependencies,
+  saveStackCodeConfig,
   type ProjectOptions,
+  type StackCodeConfig,
 } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
 import * as ui from "./ui.js";
@@ -63,14 +65,12 @@ export const getInitCommand = (): CommandModule => ({
       answers.features.includes("husky") &&
       answers.commitValidation !== undefined
     ) {
-      const config = {
-        stack: answers.stack,
+      const config: StackCodeConfig = {
+        defaultAuthor: answers.authorName,
+        defaultLicense: "MIT", // Default license, could be prompted in future
         features: { commitValidation: answers.commitValidation },
       };
-      await fs.writeFile(
-        path.join(projectPath, ".stackcoderc.json"),
-        JSON.stringify(config, null, 2),
-      );
+      await saveStackCodeConfig(projectPath, config);
     }
 
     ui.log.info(`  ${t("init.step.readme")}`);

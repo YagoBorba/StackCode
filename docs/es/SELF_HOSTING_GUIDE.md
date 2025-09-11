@@ -146,71 +146,7 @@ echo '{"welcome": "Bienvenido"}' > packages/i18n/src/locales/es.json
 echo '{"welcome": "Willkommen"}' > packages/i18n/src/locales/de.json
 ```
 
-## 🔒 Security Considerations
-
-### Code Review Process
-
-1. **Fork and Review**: Always fork the repository and review changes
-2. **Dependency Scanning**: Regularly scan dependencies for vulnerabilities
-3. **Access Control**: Restrict who can modify templates and configurations
-
-### Network Security
-
-1. **Private Registries**: Use private NPM registries for internal packages
-2. **VPN Access**: Require VPN for accessing internal StackCode instances
-3. **Audit Logging**: Log all template generations and modifications
-
-### Template Security
-
-1. **Sanitize Inputs**: Validate all user inputs in templates
-2. **Restrict File Access**: Limit template file system access
-3. **Code Review Templates**: Review all custom templates for security issues
-
-## 🔄 Update Management
-
-### Versioning Strategy
-
-1. **Semantic Versioning**: Follow semver for your organization's version
-2. **Release Notes**: Maintain detailed changelog for internal releases
-3. **Testing Pipeline**: Test all changes before deploying to teams
-
-### Update Process
-
-```bash
-# Update from upstream
-git remote add upstream https://github.com/YagoBorba/StackCode.git
-git fetch upstream
-git merge upstream/develop
-
-# Review changes and test
-npm test
-npm run build
-
-# Deploy to your organization
-npm publish --registry https://your-npm-registry.com
-```
-
-## 🏗️ Architecture for Organizations
-
-### Centralized Configuration
-
-```
-Organization Setup:
-├── stackcode-config/
-│   ├── templates/           # Custom organization templates
-│   ├── configs/            # Default configurations
-│   └── policies/           # Development policies
-├── private-registry/       # Internal NPM registry
-└── deployment/            # Deployment scripts
-```
-
-### Team Integration
-
-1. **Team Templates**: Create templates specific to different teams
-2. **Approval Workflows**: Implement approval processes for new templates
-3. **Usage Analytics**: Track template usage across teams
-
-## 🛠️ Troubleshooting
+## ️ Troubleshooting
 
 ### Common Issues
 
