@@ -17,10 +17,7 @@ export {
   generateGitignoreContent,
   generateReadmeContent,
 } from "./generators.js";
-export {
-  scaffoldProject,
-  setupHusky,
-} from "./scaffold.js";
+export { scaffoldProject, setupHusky } from "./scaffold.js";
 export { validateCommitMessage } from "./validator.js";
 
 export * from "./github.js";

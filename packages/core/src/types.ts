@@ -49,14 +49,14 @@ export interface ProjectOptions {
   };
 }
 
-export type SupportedStack = 
-  | "node-js" 
-  | "node-ts" 
-  | "react" 
-  | "vue" 
-  | "angular" 
-  | "svelte" 
-  | "python" 
-  | "java" 
-  | "go" 
+export type SupportedStack =
+  | "node-js"
+  | "node-ts"
+  | "react"
+  | "vue"
+  | "angular"
+  | "svelte"
+  | "python"
+  | "java"
+  | "go"
   | "php";

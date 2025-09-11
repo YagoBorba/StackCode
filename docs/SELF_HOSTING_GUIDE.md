@@ -128,6 +128,7 @@ StackCode supports a simple `.stackcoderc.json` configuration file to set projec
 ```
 
 This configuration currently supports:
+
 - `commitValidation`: Enable/disable conventional commit validation
 
 ### Internationalization
@@ -147,6 +148,7 @@ echo '{"welcome": "Willkommen"}' > packages/i18n/src/locales/de.json
 1. **Fork and Review**: Always fork the repository and review changes
 2. **Dependency Scanning**: Regularly scan dependencies for vulnerabilities
 3. **Access Control**: Restrict who can modify templates and configurations
+
 ## 🛠️ Troubleshooting
 
 ### Common Issues

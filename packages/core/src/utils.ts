@@ -186,9 +186,11 @@ export function getErrorMessage(error: unknown): string {
  * @param projectPath - The project path to look for configuration.
  * @returns A promise that resolves to the configuration object.
  */
-export async function loadStackCodeConfig(projectPath: string): Promise<StackCodeConfig> {
+export async function loadStackCodeConfig(
+  projectPath: string,
+): Promise<StackCodeConfig> {
   const configPath = path.join(projectPath, ".stackcoderc.json");
-  
+
   try {
     const configContent = await fs.readFile(configPath, "utf8");
     return JSON.parse(configContent) as StackCodeConfig;
