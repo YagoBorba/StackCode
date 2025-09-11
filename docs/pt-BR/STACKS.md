@@ -2,7 +2,7 @@
 
 O StackCode suporta múltiplos stacks de tecnologia, cada um projetado com as melhores práticas e estruturas de projeto otimizadas. Este documento fornece uma visão geral de todos os stacks **atualmente implementados** baseados nos templates disponíveis no pacote principal.
 
-## � Validação de Dependências
+## 🔍 Validação de Dependências
 
 O StackCode valida automaticamente se todas as ferramentas necessárias para o stack escolhido estão instaladas antes de prosseguir com a criação do projeto. Isso garante uma experiência de configuração tranquila e previne erros comuns de instalação.
 
@@ -28,7 +28,7 @@ O StackCode valida automaticamente se todas as ferramentas necessárias para o s
 
 > **💡 Dica**: Se você vir avisos de dependência, ainda pode criar a estrutura do projeto. Você só precisará instalar as dependências manualmente depois.
 
-## �📋 Stacks Atualmente Disponíveis
+## 📋 Stacks Atualmente Disponíveis
 
 ### Stacks Frontend
 
@@ -93,23 +93,19 @@ O StackCode valida automaticamente se todas as ferramentas necessárias para o s
 - **Runtime**: Node.js com ES6+
 - **Testes**: Jest
 - **Linting**: ESLint
-- **Recursos**: estrutura Express.js, variáveis de ambiente, configuração de testes
+- **Recursos**: Estrutura Express.js, variáveis de ambiente, configuração de testes
 
 **Estrutura Gerada:**
 
 ```
 ├── src/
-│   ├── controllers/
-│   ├── middleware/
-│   ├── routes/
-│   ├── utils/
-│   └── index.js
-├── test/
+│   ├── app.js
+│   ├── index.js
+│   └── routes/
+├── tests/
 ├── package.json
-├── jest.config.js
-├── .eslintrc.cjs
 ├── .env.example
-└── README.md
+└── jest.config.js
 ```
 
 #### Node.js + TypeScript
@@ -117,87 +113,56 @@ O StackCode valida automaticamente se todas as ferramentas necessárias para o s
 **Localização do Template:** `packages/core/src/templates/node-ts/`
 
 - **Runtime**: Node.js com TypeScript
-- **Testes**: Vitest
-- **Recursos**: desenvolvimento type-safe, configuração moderna do TypeScript
+- **Framework**: Express.js
+- **Testes**: Jest com ts-jest
+- **Recursos**: Configuração TypeScript completa, estrutura Express tipada
 
 **Estrutura Gerada:**
 
 ```
 ├── src/
-│   ├── controllers/
-│   ├── utils/
-│   └── index.ts
+│   ├── app.ts
+│   ├── index.ts
+│   └── routes/
 ├── tests/
 ├── package.json
 ├── tsconfig.json
-└── .gitignore
+└── jest.config.js
 ```
 
-#### Python + Configuração Moderna
+#### Python + FastAPI
 
 **Localização do Template:** `packages/core/src/templates/python/`
 
-- **Gerenciamento de Pacotes**: pip com pyproject.toml
-- **Recursos**: estrutura de projeto Python moderna, gerenciamento de dependências
+- **Framework**: FastAPI
+- **Gerenciamento de Dependências**: pip + requirements.txt
+- **Recursos**: Estrutura FastAPI, documentação automática, endpoints de exemplo
 
-**Estrutura Gerada:**
-
-```
-├── src/
-│   └── main.py
-└── pyproject.toml
-```
-
-#### Java + Maven
+#### Java + Spring Boot
 
 **Localização do Template:** `packages/core/src/templates/java/`
 
-- **Ferramenta de Build**: Maven
-- **Recursos**: estrutura padrão de projeto Java, configuração Maven
+- **Framework**: Spring Boot
+- **Build Tool**: Maven
+- **Recursos**: Estrutura Spring Boot, configuração Maven, controller de exemplo
 
-**Estrutura Gerada:**
-
-```
-├── src/
-│   └── main/
-│       └── java/
-└── pom.xml
-```
-
-#### Go + Modules
+#### Go + Gin
 
 **Localização do Template:** `packages/core/src/templates/go/`
 
-- **Gerenciamento de Pacotes**: Go modules
-- **Recursos**: projeto Go simples com suporte a módulos
-
-**Estrutura Gerada:**
-
-```
-├── main.go
-└── go.mod
-```
+- **Framework**: Gin
+- **Gerenciamento de Dependências**: Go modules
+- **Recursos**: Estrutura Gin, roteamento, middleware básico
 
 #### PHP + Laravel
 
 **Localização do Template:** `packages/core/src/templates/php/`
 
-- **Framework**: estrutura estilo Laravel
-- **Gerenciamento de Pacotes**: Composer
-- **Recursos**: estrutura MVC, variáveis de ambiente
+- **Framework**: Laravel
+- **Gerenciamento de Dependências**: Composer
+- **Recursos**: Estrutura Laravel, configuração básica, rotas de exemplo
 
-**Estrutura Gerada:**
-
-```
-├── app/
-├── bootstrap/
-├── resources/
-├── routes/
-├── composer.json
-└── .env.example
-```
-
-## 🗃️ Suporte Adicional ao .gitignore
+## 📁 Suporte Adicional para .gitignore
 
 Além dos templates de projeto principais, o StackCode fornece suporte abrangente ao `.gitignore` para:
 
@@ -207,107 +172,75 @@ Além dos templates de projeto principais, o StackCode fornece suporte abrangent
 
 - **Android** (`android.tpl`) - Android Studio, Gradle, arquivos APK
 - **Flutter** (`flutter.tpl`) - Dart, arquivos de build Flutter, arquivos específicos da plataforma
-- **React Native** (`react_native.tpl`) - Metro bundler, builds de plataforma
-- **Swift** (`swift.tpl`) - Xcode, arquivos de desenvolvimento iOS
 
 ### Frameworks Frontend
 
-- **Angular** (`angular.tpl`) - Angular CLI, artefatos de build
-- **Svelte** (`svelte.tpl`) - SvelteKit, outputs de build
+- **React** (`react.tpl`) - Build artifacts, dependências
+- **Vue.js** (`vue.tpl`) - Dist/, node_modules, arquivos de cache
+- **Angular** (`angular.tpl`) - Dist/, .angular, e2e
+- **Svelte** (`svelte.tpl`) - Public/build, .svelte-kit
 
-### Backend & Linguagens
+### Frameworks Backend
 
-- **Go** (`go.tpl`) - binários Go, diretórios vendor
-- **Java** (`java.tpl`) - Maven, Gradle, arquivos IDE
-- **Node.js** (`node-js.tpl`, `node-ts.tpl`) - npm, yarn, outputs de build
-- **PHP** (`php.tpl`) - Composer, artefatos Laravel
-- **Python** (`python.tpl`) - pip, ambientes virtuais, **pycache**
-- **JavaScript** (`javascript.tpl`) - arquivos gerais de projeto JS
+- **Node.js** (`node.tpl`) - node_modules, logs, variáveis de ambiente
+- **Python** (`python.tpl`) - __pycache__, .env, .venv
+- **Java** (`java.tpl`) - .class, target/, .jar
+- **Go** (`go.tpl`) - Binários Go, arquivos vendor
+- **PHP** (`php.tpl`) - vendor/, .env, cache
 
-### Ferramentas de Desenvolvimento
+### IDEs e Editores
 
-- **IDEs** (`ides.tpl`) - configurações VS Code, IntelliJ, Eclipse
+- **VS Code** (`vscode.tpl`) - .vscode/ (configurações específicas do usuário)
+- **IntelliJ** (`intellij.tpl`) - .idea/, .iml
+- **Eclipse** (`eclipse.tpl`) - .project, .classpath
 
-### Uso
+### Ferramentas e Serviços
+
+- **Docker** (`docker.tpl`) - Arquivos temporários Docker
+- **Database** (`database.tpl`) - Dumps SQL, arquivos SQLite
 
 Ao criar projetos, o StackCode seleciona automaticamente o template `.gitignore` apropriado baseado no stack escolhido, e pode combinar múltiplos templates ao usar recursos como Docker ou IDEs específicas.
 
 ## 🔧 Recursos dos Stacks
 
-### Configuração Automática
+### Recursos Comuns
 
-Cada template de stack inclui:
+Todos os stacks incluem:
 
-- ✅ **Configuração de pacotes** (`package.json`, `pyproject.toml`, `pom.xml`, `composer.json`, `go.mod`)
-- ✅ **Configuração TypeScript** (quando aplicável - React, Vue, Node-TS)
-- ✅ **Configuração de ferramenta de build** (Vite para frontend, Maven para Java)
-- ✅ **Linting e formatação** (ESLint para projetos Node.js)
-- ✅ **Framework de testes** (Jest para Node.js, Vitest para projetos TypeScript)
-- ✅ **Variáveis de ambiente** (`.env.example` para Node.js e PHP)
-- ✅ **Estrutura de pastas das melhores práticas** com diretórios de código organizados
+- **Estrutura de projeto consistente** com separação clara de responsabilidades
+- **Configuração de desenvolvimento** com linting e formatação
+- **Configuração de testes** com framework apropriado
+- **Documentação básica** incluindo README.md
+- **Configuração Git** com .gitignore otimizado
 
-### Gerenciamento Inteligente de Pacotes
+### Validação de Dependências
 
-O StackCode usa automaticamente o gerenciador de pacotes apropriado baseado no tipo de projeto:
+O StackCode verifica automaticamente a disponibilidade de:
 
 - **npm** para stacks baseados em Node.js (React, Vue, Node.js, Node-TS)
-- **pip** para projetos Python (com pyproject.toml)
-- **maven** para projetos Java
-- **go mod** para projetos Go
-- **composer** para projetos PHP
+- **go** para projetos Go
+- **composer** e **php** para projetos PHP
+- **mvn** e **java** para projetos Java
+- **pip** e **python** para projetos Python
 
-### Geração Inteligente de .gitignore
-
-Todo projeto recebe um arquivo `.gitignore` personalizado que combina:
-
-- **Regras específicas do stack** (baseadas na tecnologia escolhida)
-- **Regras específicas da IDE** (ambientes de desenvolvimento comuns)
-- **Regras de ferramentas adicionais** (Docker, gerenciadores de pacotes, artefatos de build)
-
-### Recursos do Sistema de Templates
+### Sistema de Templates
 
 - **Substituição de variáveis**: Templates usam `{{projectName}}`, `{{description}}`, `{{authorName}}`
-- **Composição modular**: Combina templates base com recursos adicionais
-- **Estrutura consistente**: Todos os templates seguem padrões estabelecidos para seus respectivos ecossistemas
+- **Condicional**: Arquivos opcionais baseados em configurações escolhidas
+- **Extensível**: Fácil adição de novos templates e stacks
 
-### Recursos Opcionais
+## 🚀 Adicionando Novos Stacks
 
-Ao inicializar projetos, você pode habilitar recursos adicionais:
+Para contribuidores interessados em adicionar suporte a novos stacks:
 
-- **Suporte Docker**: Adiciona configurações Dockerfile e docker-compose
-- **Integração Husky**: Configura Git hooks para validação de commits
-- **Conventional Commits**: Força padrões de mensagem de commit
+1. **Crie template do projeto** em `packages/core/src/templates/`
+2. **Adicione validação de dependências** em `packages/core/src/utils.ts`
+3. **Atualize arquivos de localização** em `packages/i18n/src/locales/`
+4. **Adicione testes** para o novo stack
+5. **Atualize documentação** incluindo este arquivo
 
-### Integração Git
-
-Todo projeto gerado inclui:
-
-- ✅ **Arquivos .gitignore inteligentes** (específicos para stack + ferramentas + IDE)
-- ✅ **Inicialização de repositório Git**
-- ✅ **Configuração de commit convencional** (quando o recurso Husky é selecionado)
-
-## 🚀 Uso
-
-Para criar um projeto com qualquer stack:
-
-```bash
-stc init
-```
-
-Em seguida, selecione seu stack de tecnologia preferido do menu interativo.
-
-## 🛠️ Contribuindo com Novos Stacks
-
-Interessado em adicionar suporte para um novo stack de tecnologia? Confira nosso guia abrangente em [CONTRIBUTING.md](../CONTRIBUTING.md#adding-new-technology-stacks).
-
-O processo envolve:
-
-1. Criar arquivos de template
-2. Atualizar definições de tipo
-3. Adicionar opções CLI
-4. Configurar gerenciamento de pacotes
-5. Testar completamente
+Veja o [Guia de Contribuição](../CONTRIBUTING.md) para instruções detalhadas sobre como adicionar novos stacks de tecnologia.
 
 ---
 
-_Para mais informações sobre o StackCode, visite nossa [documentação principal](../README.md)._
+_Para informações mais detalhadas sobre arquitetura e desenvolvimento, consulte o [Guia de Arquitetura](ARCHITECTURE.md)._

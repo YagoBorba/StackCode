@@ -24,10 +24,10 @@ Cada ADR segue esta estrutura:
 
 Decisões arquiteturais atualmente documentadas:
 
-- **[ADR-001: Estrutura Monorepo](./001-monorepo-structure.md)** _(⏳ Planejado)_ - Decisão de organizar o projeto como um monorepo com npm workspaces
-- **[ADR-002: TypeScript e ES Modules](./002-typescript-esm.md)** _(⏳ Planejado)_ - Escolha do TypeScript com ESM como stack de desenvolvimento principal
-- **[ADR-003: Design da Interface de Linha de Comando](./003-cli-design.md)** _(⏳ Planejado)_ - Seleção do framework CLI e arquitetura de comandos
-- **[ADR-004: Estratégia de Internacionalização](./004-i18n-strategy.md)** _(⏳ Planejado)_ - Abordagem de implementação de suporte multi-idioma
+- **[ADR-001: Estrutura Monorepo](./001-monorepo-structure.md)** - Decisão de organizar o projeto como um monorepo com npm workspaces
+- **[ADR-002: TypeScript e ES Modules](./002-typescript-esm.md)** - Escolha do TypeScript com ESM como stack de desenvolvimento principal
+- **[ADR-003: Design da Interface de Linha de Comando](./003-cli-design.md)** - Seleção do framework CLI e arquitetura de comandos
+- **[ADR-004: Estratégia de Internacionalização](./004-i18n-strategy.md)** - Abordagem de implementação de suporte multi-idioma
 
 ### ADRs Futuros
 

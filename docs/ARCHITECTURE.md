@@ -211,7 +211,7 @@ graph TD
 - System is open for extension (new templates, commands)
 - Closed for modification (core logic remains stable)
 
-## � System Validation Architecture
+## 🔍 System Validation Architecture
 
 ### Dependency Validation System
 
@@ -271,7 +271,7 @@ graph TD
 - **User Choice:** Option to proceed or cancel when dependencies are missing
 - **i18n Support:** Error messages localized in multiple languages
 
-## �🛠️ Technology Stack
+## 🛠️ Technology Stack
 
 ### Core Technologies
 
@@ -353,7 +353,7 @@ Each package follows consistent patterns:
 - **Template Generation:** Verify output correctness
 - **GitHub Integration:** API interaction testing
 
-## �️ Dependency Validation System
+## ⚙️ Dependency Validation System
 
 ### Architecture Overview
 
@@ -402,7 +402,7 @@ const result = await validateStackDependencies("go");
 | `python`                             | `pip`, `python`   | ✅                |
 | `node-js`, `node-ts`, `react`, `vue` | `npm`             | ✅                |
 
-## �🚀 Deployment and Distribution
+## 🚀 Deployment and Distribution
 
 ### NPM Packages
 

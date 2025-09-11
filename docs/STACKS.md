@@ -2,7 +2,7 @@
 
 StackCode supports multiple technology stacks, each designed with best practices and optimal project structures. This document provides an overview of all **currently implemented** stacks based on the available templates in the core package.
 
-## � Dependency Validation
+## 🔍 Dependency Validation
 
 StackCode automatically validates that all required tools for your chosen stack are installed before proceeding with project creation. This ensures a smooth setup experience and prevents common installation errors.
 
@@ -28,7 +28,7 @@ StackCode automatically validates that all required tools for your chosen stack 
 
 > **💡 Tip**: If you see dependency warnings, you can still create the project structure. You'll just need to install the dependencies manually afterward.
 
-## �📋 Currently Available Stacks
+## 📋 Currently Available Stacks
 
 ### Frontend Stacks
 
@@ -253,7 +253,7 @@ StackCode automatically validates that all required tools for your chosen stack 
 └── composer.json
 ```
 
-## � Additional .gitignore Support
+## 📁 Additional .gitignore Support
 
 Beyond the main project templates, StackCode provides comprehensive `.gitignore` support for:
 

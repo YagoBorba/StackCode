@@ -1,4 +1,11 @@
-# Registros de Decisiones Arquitecturales (ADRs)
+# Registros de Decisio## Índice
+
+Decisiones arquitectónicas actualmente documentadas:
+
+- **[ADR-001: Estructura Monorepo](./001-monorepo-structure.md)** - Decisión de organizar el proyecto como un monorepo con npm workspaces
+- **[ADR-002: TypeScript y ES Modules](./002-typescript-esm.md)** - Elección de TypeScript con ESM como stack de desarrollo principal
+- **[ADR-003: Diseño de Interfaz de Línea de Comandos](./003-cli-design.md)** - Selección del framework CLI y arquitectura de comandos
+- **[ADR-004: Estrategia de Internacionalización](./004-i18n-strategy.md)** - Enfoque de implementación de soporte multi-idiomaitecturales (ADRs)
 
 _Esta es una traducción del documento original en inglés. Para la versión más actualizada, consulte [docs/adr/README.md](../../adr/README.md)._
 

@@ -4,11 +4,11 @@ Obrigado por considerar contribuir com o StackCode! Este guia fornece todas as i
 
 ## 📋 Navegação Rápida
 
-- **[Visão Geral da Arquitetura](#architecture-overview)** - Entenda a estrutura do projeto
-- **[Configuração de Desenvolvimento](#development-setup)** - Prepare seu ambiente
-- **[Tipos de Contribuição](#how-to-contribute)** - Diferentes formas de contribuir
-- **[Padrões de Código](#coding-standards)** - Siga nossas diretrizes
-- **[Internacionalização](#internationalization)** - Ajude com traduções
+- **[Visão Geral da Arquitetura](#visão-geral-da-arquitetura)** - Entenda a estrutura do projeto
+- **[Configuração de Desenvolvimento](#configuração-de-desenvolvimento)** - Prepare seu ambiente
+- **[Como Contribuir](#como-contribuir)** - Diferentes formas de contribuir
+- **[Padrões de Código](#padrões-de-código)** - Siga nossas diretrizes
+- **[Internacionalização](#internacionalização)** - Ajude com traduções
 
 ## 🏗️ Visão Geral da Arquitetura
 
@@ -76,12 +76,12 @@ Entender a arquitetura ajudará você a:
 
 - Corrija erros de digitação, melhore a clareza, adicione exemplos
 - Atualize docs ao adicionar novos recursos
-- Ajude com traduções (veja [Internacionalização](#internationalization))
+- Ajude com traduções (veja [Internacionalização](#internacionalização))
 
 ### 🛠️ Contribuições de Código
 
 - Escolha issues marcadas com `good-first-issue` ou `help-wanted`
-- Siga o [fluxo de trabalho de desenvolvimento](#development-workflow)
+- Siga o [fluxo de trabalho de desenvolvimento](#fluxo-de-trabalho-de-desenvolvimento)
 - Garanta que todos os testes passem
 - Adicione testes para nova funcionalidade
 
@@ -89,7 +89,13 @@ Entender a arquitetura ajudará você a:
 
 Veja o guia abrangente em [CONTRIBUTING.md principal](../../CONTRIBUTING.md#adding-new-technology-stacks).
 
-## � Fluxo de Trabalho de Desenvolvimento
+**Importante**: Ao adicionar novos stacks, garanta que você atualize o sistema de validação de dependências:
+
+- Adicionando dependências do stack a `getStackDependencies()` em `packages/core/src/utils.ts`
+- Adicionando instruções de instalação aos arquivos i18n (`packages/i18n/src/locales/`)
+- Testando o fluxo de validação com e sem as ferramentas necessárias instaladas
+
+## 🔄 Fluxo de Trabalho de Desenvolvimento
 
 1. **Criar um Branch de Feature**
 
@@ -125,7 +131,7 @@ Veja o guia abrangente em [CONTRIBUTING.md principal](../../CONTRIBUTING.md#addi
    # Abra PR contra o branch develop
    ```
 
-## 🎨 Padrões de Codificação
+## 🎨 Padrões de Código
 
 ### Princípios Gerais
 
@@ -259,212 +265,3 @@ Para mais detalhes, veja:
 - **[README Principal](../../README.md)** - Visão geral do projeto
 - **[Guia de Arquitetura](ARCHITECTURE.md)** - Detalhes técnicos
 - **[Guia de Auto-hospedagem](SELF_HOSTING_GUIDE.md)** - Opções de deployment
-  node packages/cli/dist/index.js --help
-
-  ```
-
-  ```
-
-## 🤝 How to Contribute
-
-### 🐛 Bug Reports
-
-- Check [existing issues](https://github.com/YagoBorba/StackCode/issues) first
-- Provide clear reproduction steps
-- Include environment details (OS, Node.js version, etc.)
-- Use the bug report template
-
-### ✨ Feature Requests
-
-- Open an issue to discuss the feature first
-- Explain the use case and benefits
-- Consider if it fits the project's scope
-- Provide implementation ideas if possible
-
-### 📝 Documentation Improvements
-
-- Fix typos, improve clarity, add examples
-- Update docs when adding new features
-- Help with translations (see [Internationalization](#internationalization))
-
-### 🛠️ Code Contributions
-
-- Pick up issues labeled `good-first-issue` or `help-wanted`
-- Follow the [development workflow](#development-workflow)
-- Ensure all tests pass
-- Add tests for new functionality
-
-### 🌐 Adding New Technology Stacks
-
-See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-new-technology-stacks).
-
-## 🔄 Development Workflow
-
-1. **Create a Feature Branch**
-
-   ```bash
-   git checkout develop
-   git pull origin develop
-   git checkout -b feat/your-feature-name
-   ```
-
-2. **Make Your Changes**
-   - Follow coding standards
-   - Add tests for new functionality
-   - Update documentation as needed
-
-3. **Test Thoroughly**
-
-   ```bash
-   npm test
-   npm run lint
-   npm run build
-   ```
-
-4. **Commit Your Changes**
-
-   ```bash
-   # Use conventional commits with emojis
-   git commit -m "feat(cli): ✨ add new project template"
-   ```
-
-5. **Push and Create PR**
-   ```bash
-   git push origin feat/your-feature-name
-   # Open PR against develop branch
-   ```
-
-## 🎨 Coding Standards
-
-### General Principles
-
-- **Clean Code**: Write readable, maintainable code
-- **SOLID Principles**: Follow SOLID design principles
-- **Single Responsibility**: Each function/class should have one purpose
-- **Documentation**: Use TSDoc comments for public APIs
-
-### TypeScript Guidelines
-
-- Use strict TypeScript configuration
-- Prefer explicit types over `any`
-- Use interfaces for object shapes
-- Follow ESLint rules
-
-### Testing Requirements
-
-- Add unit tests for new functionality
-- Maintain or improve test coverage
-- Test both success and error scenarios
-- Use descriptive test names
-
-## 🌐 Internacionalização
-
-Aceitamos contribuições para suporte a mais idiomas:
-
-### Current Structure
-
-```
-packages/i18n/src/locales/
-├── en.json          # English (primary)
-└── pt.json          # Portuguese
-```
-
-### Adding New Languages
-
-1. **Create Locale File**
-
-   ```bash
-   # Example for Spanish
-   cp packages/i18n/src/locales/en.json packages/i18n/src/locales/es.json
-   ```
-
-2. **Translate Strings**
-
-   ```json
-   {
-     "commands": {
-       "init": {
-         "description": "Inicializar un nuevo proyecto"
-       }
-     }
-   }
-   ```
-
-3. **Test the Translation**
-   ```bash
-   STACKCODE_LANG=es node packages/cli/dist/index.js --help
-   ```
-
-### Future Structure (Planned)
-
-```
-docs/
-├── pt-BR/           # Portuguese (Brazil)
-├── es/              # Spanish
-├── fr/              # French
-└── de/              # German
-```
-
-## 📏 Code Review Process
-
-### For Contributors
-
-- Keep PRs focused and small
-- Write clear PR descriptions
-- Respond to feedback promptly
-- Update documentation as needed
-
-### Review Criteria
-
-- Code quality and maintainability
-- Test coverage and quality
-- Documentation completeness
-- Adherence to project standards
-- Breaking change considerations
-
-## 🏷️ Issue Labels
-
-- `good-first-issue` - Perfect for newcomers
-- `help-wanted` - Community help needed
-- `bug` - Something isn't working
-- `enhancement` - New feature or improvement
-- `documentation` - Documentation related
-- `question` - Further information needed
-
-## 📋 Contribution Checklist
-
-Before submitting your PR, ensure:
-
-- [ ] Code follows project standards
-- [ ] Tests are added and passing
-- [ ] Documentation is updated
-- [ ] Commit messages follow convention
-- [ ] PR targets the `develop` branch
-- [ ] Breaking changes are documented
-- [ ] Performance impact is considered
-
-## 🆘 Getting Help
-
-Need help contributing?
-
-- **[GitHub Discussions](https://github.com/YagoBorba/StackCode/discussions)** - Ask questions
-- **[Discord/Slack](#)** - Real-time community chat (if available)
-- **[Issues](https://github.com/YagoBorba/StackCode/issues)** - Report problems
-
-## 🙏 Recognition
-
-All contributors are recognized in:
-
-- [Contributors section](../README.md#contributors) in README
-- Git commit history
-- Release notes for significant contributions
-
-Thank you for helping make StackCode better! 🚀
-
----
-
-For more details, see:
-
-- **[Main README](../README.md)** - Project overview
-- **[Architecture Guide](ARCHITECTURE.md)** - Technical details
-- **[Self-Hosting Guide](SELF_HOSTING_GUIDE.md)** - Deployment options

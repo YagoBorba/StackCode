@@ -2,7 +2,7 @@
 
 Bem-vindo ao hub de documentação do StackCode! Este diretório contém documentação abrangente para desenvolvedores, contribuidores e organizações que usam o StackCode.
 
-## � Navegação Rápida
+## 📋 Navegação Rápida
 
 ### 🏗️ **Documentação Principal**
 
@@ -43,7 +43,7 @@ Comece aqui se você quer contribuir com o StackCode:
 2. [Guia de Arquitetura](ARCHITECTURE.md) - Entenda a base de código
 3. [Diretório ADR](adr/) - Aprenda sobre decisões arquiteturais
 
-### � **Para Organizações**
+### 🏢 **Para Organizações**
 
 Comece aqui se você quer implantar o StackCode internamente:
 

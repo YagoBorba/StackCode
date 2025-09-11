@@ -2,7 +2,7 @@
 
 ¡Bienvenido al hub de documentación de StackCode! Este directorio contiene documentación completa para desarrolladores, contribuidores y organizaciones que usan StackCode.
 
-## � Navegación Rápida
+## 📋 Navegación Rápida
 
 ### 🏗️ **Documentación Principal**
 
@@ -21,7 +21,7 @@
 
 ### 🌐 **Traducciones**
 
-- **[🇪🇸 Español](es/)** - Documentación en español _(actual)_
+- **[🇪🇸 Español](.)** - Documentación en español _(actual)_
 - **[🇧🇷 Português (Brasil)](../pt-BR/)** - Documentação em português
 - **[🇺🇸 English](../)** - English documentation _(original)_
 
@@ -43,7 +43,7 @@ Comienza aquí si quieres contribuir a StackCode:
 2. [Guía de Arquitectura](ARCHITECTURE.md) - Entiende la base de código
 3. [Directorio ADR](adr/) - Aprende sobre decisiones arquitecturales
 
-### � **Para Organizaciones**
+### 🏢 **Para Organizaciones**
 
 Comienza aquí si quieres desplegar StackCode internamente:
 
