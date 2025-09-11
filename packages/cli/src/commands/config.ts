@@ -82,7 +82,7 @@ export async function runInteractiveMode() {
         ? t("config.status.enabled")
         : t("config.status.disabled");
       ui.log.success(t("config.success.set_validation", { status }));
-    } catch (_error) {
+    } catch {
       ui.log.error(t("config.error.no_stackcoderc"));
       return;
     }
