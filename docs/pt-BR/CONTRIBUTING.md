@@ -260,6 +260,7 @@ Para mais detalhes, veja:
 - **[Guia de Arquitetura](ARCHITECTURE.md)** - Detalhes técnicos
 - **[Guia de Auto-hospedagem](SELF_HOSTING_GUIDE.md)** - Opções de deployment
   node packages/cli/dist/index.js --help
+
   ```
 
   ```
