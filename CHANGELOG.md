@@ -1,3 +1,10 @@
+# Changelog
+
+## [Unreleased]
+
+### Added
+- feat: 🦺 add system dependency validation - Intelligent validation of required tools before project initialization with helpful installation instructions
+
 ## (2025-07-27)
 
 - fix: 🐛 Add missing build script to core package ([abe05e0](https://github.com/YagoBorba/StackCode/commit/abe05e0))

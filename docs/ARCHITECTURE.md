@@ -75,10 +75,11 @@ cli/
 
 **Key Components:**
 - **Generators:** Project and file generation logic
-- **Validators:** Commit message and project validation
+- **Validators:** Commit message validation and system dependency validation
 - **GitHub Integration:** API interactions and automation
 - **Release Management:** Semantic versioning and changelog generation
 - **Template System:** Configurable project templates
+- **Dependency Validation:** Intelligent system tool validation
 
 **Architecture:**
 ```typescript
@@ -192,7 +193,61 @@ graph TD
 - System is open for extension (new templates, commands)
 - Closed for modification (core logic remains stable)
 
-## 🛠️ Technology Stack
+## � System Validation Architecture
+
+### Dependency Validation System
+StackCode implements a comprehensive dependency validation system to ensure smooth project initialization across different technology stacks.
+
+#### Core Components
+
+**1. Command Availability Detection (`isCommandAvailable`)**
+```typescript
+// Cross-platform command detection
+const isAvailable = await isCommandAvailable("go");
+// Uses 'which' (Unix) or 'where' (Windows)
+```
+
+**2. Stack Dependency Mapping (`getStackDependencies`)**
+```typescript
+const stackMap = {
+  go: ["go"],
+  php: ["composer", "php"],
+  java: ["mvn", "java"],
+  python: ["pip", "python"],
+  react: ["npm"],
+  vue: ["npm"]
+};
+```
+
+**3. Comprehensive Validation (`validateStackDependencies`)**
+```typescript
+const result = await validateStackDependencies("go");
+// Returns: { isValid, missingDependencies, availableDependencies }
+```
+
+#### Validation Flow
+```mermaid
+graph TD
+    A[User runs 'stc init'] --> B[Select Technology Stack]
+    B --> C[Validate Stack Dependencies]
+    C --> D{All Dependencies Available?}
+    D -->|Yes| E[✅ Proceed with Installation]
+    D -->|No| F[⚠️ Show Missing Dependencies]
+    F --> G[Display Installation Instructions]
+    G --> H{User Chooses to Continue?}
+    H -->|Yes| I[🚧 Create Project Structure Only]
+    H -->|No| J[❌ Cancel Operation]
+    E --> K[🎉 Complete Project Setup]
+    I --> L[⚠️ Manual Dependency Installation Required]
+```
+
+#### Error Handling Strategy
+- **Graceful Degradation:** Project creation succeeds even without dependencies
+- **Informative Messaging:** Clear installation instructions with official URLs
+- **User Choice:** Option to proceed or cancel when dependencies are missing
+- **i18n Support:** Error messages localized in multiple languages
+
+## �🛠️ Technology Stack
 
 ### Core Technologies
 - **TypeScript:** Type safety and modern JavaScript features
@@ -263,7 +318,50 @@ Each package follows consistent patterns:
 - **Template Generation:** Verify output correctness
 - **GitHub Integration:** API interaction testing
 
-## 🚀 Deployment and Distribution
+## �️ Dependency Validation System
+
+### Architecture Overview
+StackCode includes an intelligent dependency validation system that prevents crashes and provides helpful guidance when required tools are missing.
+
+### Components
+
+#### 1. **Command Detection (`isCommandAvailable`)**
+```typescript
+// Checks if a command exists in system PATH
+const isGoAvailable = await isCommandAvailable('go');
+```
+
+#### 2. **Stack Mapping (`getStackDependencies`)**
+```typescript
+// Maps each stack to its required tools
+const goDeps = getStackDependencies('go'); // Returns: ['go']
+const phpDeps = getStackDependencies('php'); // Returns: ['composer', 'php']
+```
+
+#### 3. **Validation Engine (`validateStackDependencies`)**
+```typescript
+// Comprehensive validation with detailed results
+const result = await validateStackDependencies('go');
+// Returns: { isValid: boolean, missingDependencies: string[], availableDependencies: string[] }
+```
+
+### Validation Flow
+1. **Pre-Installation Check:** Before attempting dependency installation
+2. **User Notification:** Clear warnings about missing tools
+3. **Installation Guidance:** Direct links to download missing dependencies
+4. **Graceful Degradation:** Option to continue without tools
+5. **Error Handling:** Controlled failure instead of crashes
+
+### Supported Stack Dependencies
+| Stack | Required Tools | Validation Status |
+|-------|---------------|-------------------|
+| `go` | `go` | ✅ |
+| `php` | `composer`, `php` | ✅ |
+| `java` | `mvn`, `java` | ✅ |
+| `python` | `pip`, `python` | ✅ |
+| `node-js`, `node-ts`, `react`, `vue` | `npm` | ✅ |
+
+## �🚀 Deployment and Distribution
 
 ### NPM Packages
 - **@stackcode/cli:** Published to NPM for global installation

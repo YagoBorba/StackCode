@@ -2,7 +2,31 @@
 
 StackCode supports multiple technology stacks, each designed with best practices and optimal project structures. This document provides an overview of all **currently implemented** stacks based on the available templates in the core package.
 
-## 📋 Currently Available Stacks
+## � Dependency Validation
+
+StackCode automatically validates that all required tools for your chosen stack are installed before proceeding with project creation. This ensures a smooth setup experience and prevents common installation errors.
+
+### How It Works
+1. **Automatic Detection**: When you run `stc init`, StackCode checks if the required tools are available in your system PATH
+2. **Clear Feedback**: If tools are missing, you'll see exactly which ones need to be installed
+3. **Installation Guidance**: Direct links to official installation pages for missing tools
+4. **Flexible Continuation**: Option to proceed with project creation even if some tools are missing
+
+### Stack Dependencies
+| Stack | Required Tools | Validation |
+|-------|----------------|------------|
+| **React + TypeScript** | `npm` | ✅ Automatic |
+| **Vue.js + TypeScript** | `npm` | ✅ Automatic |
+| **Node.js + Express** | `npm` | ✅ Automatic |
+| **Node.js + TypeScript** | `npm` | ✅ Automatic |
+| **Go + Gin** | `go` | ✅ Automatic |
+| **PHP + Laravel** | `composer`, `php` | ✅ Automatic |
+| **Java + Spring Boot** | `mvn`, `java` | ✅ Automatic |
+| **Python + FastAPI** | `pip`, `python` | ✅ Automatic |
+
+> **💡 Tip**: If you see dependency warnings, you can still create the project structure. You'll just need to install the dependencies manually afterward.
+
+## �📋 Currently Available Stacks
 
 ### Frontend Stacks
 

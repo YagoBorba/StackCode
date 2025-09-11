@@ -77,6 +77,46 @@ Checks if a string conforms to the Conventional Commits specification.
 - **`message`**: The commit message string to validate.
 - **Returns**: `true` if valid, `false` otherwise.
 
+#### `isCommandAvailable(command: string): Promise<boolean>`
+
+Checks if a command is available in the system PATH.
+
+- **`command`**: The command to check (e.g., 'go', 'composer', 'mvn').
+- **Returns**: A promise that resolves to `true` if the command is available, `false` otherwise.
+
+#### `getStackDependencies(stack: string): string[]`
+
+Gets the required dependencies for a given stack.
+
+- **`stack`**: The stack name (e.g., 'go', 'php', 'java', 'python').
+- **Returns**: An array of required commands for the stack.
+
+**Example:**
+```typescript
+import { getStackDependencies } from "@stackcode/core";
+
+const deps = getStackDependencies("go"); // Returns: ["go"]
+const phpDeps = getStackDependencies("php"); // Returns: ["composer", "php"]
+```
+
+#### `validateStackDependencies(stack: string): Promise<{isValid: boolean; missingDependencies: string[]; availableDependencies: string[]}>`
+
+Validates if all required dependencies for a stack are available.
+
+- **`stack`**: The stack name to validate.
+- **Returns**: A promise that resolves to an object with validation results.
+
+**Example:**
+```typescript
+import { validateStackDependencies } from "@stackcode/core";
+
+const result = await validateStackDependencies("go");
+if (!result.isValid) {
+  console.log("Missing dependencies:", result.missingDependencies);
+  // Output: ["go"] if Go is not installed
+}
+```
+
 ---
 
 ### Testing

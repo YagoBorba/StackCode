@@ -79,6 +79,11 @@ Understanding the architecture will help you:
 ### 🌐 Adding New Technology Stacks
 See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-new-technology-stacks).
 
+**Important**: When adding new stacks, ensure you update the dependency validation system by:
+- Adding stack dependencies to `getStackDependencies()` in `packages/core/src/utils.ts`
+- Adding installation instructions to i18n files (`packages/i18n/src/locales/`)
+- Testing the validation flow with and without required tools installed
+
 ## 🔄 Development Workflow
 
 1. **Create a Feature Branch**

@@ -2,7 +2,31 @@
 
 O StackCode suporta múltiplos stacks de tecnologia, cada um projetado com as melhores práticas e estruturas de projeto otimizadas. Este documento fornece uma visão geral de todos os stacks **atualmente implementados** baseados nos templates disponíveis no pacote principal.
 
-## 📋 Stacks Atualmente Disponíveis
+## � Validação de Dependências
+
+O StackCode valida automaticamente se todas as ferramentas necessárias para o stack escolhido estão instaladas antes de prosseguir com a criação do projeto. Isso garante uma experiência de configuração tranquila e previne erros comuns de instalação.
+
+### Como Funciona
+1. **Detecção Automática**: Quando você executa `stc init`, o StackCode verifica se as ferramentas necessárias estão disponíveis no PATH do seu sistema
+2. **Feedback Claro**: Se faltarem ferramentas, você verá exatamente quais precisam ser instaladas
+3. **Orientação de Instalação**: Links diretos para páginas oficiais de instalação das ferramentas em falta
+4. **Continuação Flexível**: Opção de prosseguir com a criação do projeto mesmo se algumas ferramentas estiverem ausentes
+
+### Dependências dos Stacks
+| Stack | Ferramentas Necessárias | Validação |
+|-------|-------------------------|-----------|
+| **React + TypeScript** | `npm` | ✅ Automática |
+| **Vue.js + TypeScript** | `npm` | ✅ Automática |
+| **Node.js + Express** | `npm` | ✅ Automática |
+| **Node.js + TypeScript** | `npm` | ✅ Automática |
+| **Go + Gin** | `go` | ✅ Automática |
+| **PHP + Laravel** | `composer`, `php` | ✅ Automática |
+| **Java + Spring Boot** | `mvn`, `java` | ✅ Automática |
+| **Python + FastAPI** | `pip`, `python` | ✅ Automática |
+
+> **💡 Dica**: Se você vir avisos de dependência, ainda pode criar a estrutura do projeto. Você só precisará instalar as dependências manualmente depois.
+
+## �📋 Stacks Atualmente Disponíveis
 
 ### Stacks Frontend
 
