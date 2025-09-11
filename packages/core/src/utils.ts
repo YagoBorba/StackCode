@@ -194,7 +194,7 @@ export async function loadStackCodeConfig(
   try {
     const configContent = await fs.readFile(configPath, "utf8");
     return JSON.parse(configContent) as StackCodeConfig;
-  } catch {
+  } catch (_error) {
     return {
       features: {
         commitValidation: false,
