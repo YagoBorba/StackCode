@@ -7,6 +7,7 @@ StackCode soporta múltiples stacks de tecnología, cada uno diseñado con las m
 ### Stacks Frontend
 
 #### React + TypeScript
+
 **Ubicación de la Plantilla:** `packages/core/src/templates/react/`
 
 - **Framework**: React 18 con TypeScript
@@ -16,6 +17,7 @@ StackCode soporta múltiples stacks de tecnología, cada uno diseñado con las m
 - **Características**: Modern JSX Transform, configuración ESLint, estructura de componentes
 
 **Estructura Generada:**
+
 ```
 ├── src/
 │   ├── components/
@@ -31,6 +33,7 @@ StackCode soporta múltiples stacks de tecnología, cada uno diseñado con las m
 ```
 
 #### Vue.js + TypeScript
+
 **Ubicación de la Plantilla:** `packages/core/src/templates/vue/`
 
 - **Framework**: Vue 3 con Composition API y TypeScript
@@ -40,6 +43,7 @@ StackCode soporta múltiples stacks de tecnología, cada uno diseñado con las m
 - **Características**: SFC (Single File Components), patrones modernos de Vue
 
 **Estructura Generada:**
+
 ```
 ├── src/
 │   ├── components/
@@ -57,6 +61,7 @@ StackCode soporta múltiples stacks de tecnología, cada uno diseñado con las m
 ### Stacks Backend
 
 #### Node.js + JavaScript
+
 **Ubicación de la Plantilla:** `packages/core/src/templates/node-js/`
 
 - **Runtime**: Node.js con ES6+
@@ -65,6 +70,7 @@ StackCode soporta múltiples stacks de tecnología, cada uno diseñado con las m
 - **Características**: estructura Express.js, variables de entorno, configuración de pruebas
 
 **Estructura Generada:**
+
 ```
 ├── src/
 │   ├── controllers/
@@ -81,6 +87,7 @@ StackCode soporta múltiples stacks de tecnología, cada uno diseñado con las m
 ```
 
 #### Node.js + TypeScript
+
 **Ubicación de la Plantilla:** `packages/core/src/templates/node-ts/`
 
 - **Runtime**: Node.js con TypeScript
@@ -88,6 +95,7 @@ StackCode soporta múltiples stacks de tecnología, cada uno diseñado con las m
 - **Características**: desarrollo type-safe, configuración moderna de TypeScript
 
 **Estructura Generada:**
+
 ```
 ├── src/
 │   ├── controllers/
@@ -100,12 +108,14 @@ StackCode soporta múltiples stacks de tecnología, cada uno diseñado con las m
 ```
 
 #### Python + Configuración Moderna
+
 **Ubicación de la Plantilla:** `packages/core/src/templates/python/`
 
 - **Gestión de Paquetes**: pip con pyproject.toml
 - **Características**: estructura de proyecto Python moderna, gestión de dependencias
 
 **Estructura Generada:**
+
 ```
 ├── src/
 │   └── main.py
@@ -113,12 +123,14 @@ StackCode soporta múltiples stacks de tecnología, cada uno diseñado con las m
 ```
 
 #### Java + Maven
+
 **Ubicación de la Plantilla:** `packages/core/src/templates/java/`
 
 - **Herramienta de Build**: Maven
 - **Características**: estructura estándar de proyecto Java, configuración Maven
 
 **Estructura Generada:**
+
 ```
 ├── src/
 │   └── main/
@@ -127,18 +139,21 @@ StackCode soporta múltiples stacks de tecnología, cada uno diseñado con las m
 ```
 
 #### Go + Modules
+
 **Ubicación de la Plantilla:** `packages/core/src/templates/go/`
 
 - **Gestión de Paquetes**: Go modules
 - **Características**: proyecto Go simple con soporte de módulos
 
 **Estructura Generada:**
+
 ```
 ├── main.go
 └── go.mod
 ```
 
 #### PHP + Laravel
+
 **Ubicación de la Plantilla:** `packages/core/src/templates/php/`
 
 - **Framework**: estructura estilo Laravel
@@ -146,6 +161,7 @@ StackCode soporta múltiples stacks de tecnología, cada uno diseñado con las m
 - **Características**: estructura MVC, variables de entorno
 
 **Estructura Generada:**
+
 ```
 ├── app/
 ├── bootstrap/
@@ -162,27 +178,32 @@ Además de las plantillas principales de proyecto, StackCode proporciona soporte
 **Ubicación de la Plantilla:** `packages/core/src/templates/gitignore/`
 
 ### Desarrollo Móvil
+
 - **Android** (`android.tpl`) - Android Studio, Gradle, archivos APK
 - **Flutter** (`flutter.tpl`) - Dart, archivos de build Flutter, archivos específicos de plataforma
 - **React Native** (`react_native.tpl`) - Metro bundler, builds de plataforma
 - **Swift** (`swift.tpl`) - Xcode, archivos de desarrollo iOS
 
 ### Frameworks Frontend
+
 - **Angular** (`angular.tpl`) - Angular CLI, artefactos de build
 - **Svelte** (`svelte.tpl`) - SvelteKit, outputs de build
 
 ### Backend y Lenguajes
+
 - **Go** (`go.tpl`) - binarios Go, directorios vendor
 - **Java** (`java.tpl`) - Maven, Gradle, archivos IDE
 - **Node.js** (`node-js.tpl`, `node-ts.tpl`) - npm, yarn, outputs de build
 - **PHP** (`php.tpl`) - Composer, artefactos Laravel
-- **Python** (`python.tpl`) - pip, entornos virtuales, __pycache__
+- **Python** (`python.tpl`) - pip, entornos virtuales, **pycache**
 - **JavaScript** (`javascript.tpl`) - archivos generales de proyecto JS
 
 ### Herramientas de Desarrollo
+
 - **IDEs** (`ides.tpl`) - configuraciones VS Code, IntelliJ, Eclipse
 
 ### Uso
+
 Al crear proyectos, StackCode selecciona automáticamente la plantilla `.gitignore` apropiada basada en el stack elegido, y puede combinar múltiples plantillas al usar características como Docker o IDEs específicos.
 
 ## 🔧 Características de los Stacks
@@ -206,12 +227,13 @@ StackCode usa automáticamente el gestor de paquetes apropiado basado en el tipo
 - **npm** para stacks basados en Node.js (React, Vue, Node.js, Node-TS)
 - **pip** para proyectos Python (con pyproject.toml)
 - **maven** para proyectos Java
-- **go mod** para proyectos Go  
+- **go mod** para proyectos Go
 - **composer** para proyectos PHP
 
 ### Generación Inteligente de .gitignore
 
 Todo proyecto recibe un archivo `.gitignore` personalizado que combina:
+
 - **Reglas específicas del stack** (basadas en la tecnología elegida)
 - **Reglas específicas del IDE** (entornos de desarrollo comunes)
 - **Reglas de herramientas adicionales** (Docker, gestores de paquetes, artefactos de build)

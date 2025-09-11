@@ -19,6 +19,7 @@ Before contributing, familiarize yourself with the project architecture:
 - **[🛠️ Technology Stacks](STACKS.md)** - Supported frameworks and project templates
 
 Understanding the architecture will help you:
+
 - Choose the right package for your changes
 - Follow established patterns and conventions
 - Understand cross-package dependencies
@@ -27,26 +28,30 @@ Understanding the architecture will help you:
 ## 🚀 Development Setup
 
 1. **Fork and Clone**
+
    ```bash
    git clone https://github.com/your-username/StackCode.git
    cd StackCode
    ```
 
 2. **Install Dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Build the Project**
+
    ```bash
    npm run build
    ```
 
 4. **Test Your Setup**
+
    ```bash
    # Run tests
    npm test
-   
+
    # Test CLI locally
    node packages/cli/dist/index.js --help
    ```
@@ -54,32 +59,38 @@ Understanding the architecture will help you:
 ## 🤝 How to Contribute
 
 ### 🐛 Bug Reports
+
 - Check [existing issues](https://github.com/YagoBorba/StackCode/issues) first
 - Provide clear reproduction steps
 - Include environment details (OS, Node.js version, etc.)
 - Use the bug report template
 
 ### ✨ Feature Requests
+
 - Open an issue to discuss the feature first
 - Explain the use case and benefits
 - Consider if it fits the project's scope
 - Provide implementation ideas if possible
 
 ### 📝 Documentation Improvements
+
 - Fix typos, improve clarity, add examples
 - Update docs when adding new features
 - Help with translations (see [Internationalization](#internationalization))
 
 ### 🛠️ Code Contributions
+
 - Pick up issues labeled `good-first-issue` or `help-wanted`
 - Follow the [development workflow](#development-workflow)
 - Ensure all tests pass
 - Add tests for new functionality
 
 ### 🌐 Adding New Technology Stacks
+
 See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-new-technology-stacks).
 
 **Important**: When adding new stacks, ensure you update the dependency validation system by:
+
 - Adding stack dependencies to `getStackDependencies()` in `packages/core/src/utils.ts`
 - Adding installation instructions to i18n files (`packages/i18n/src/locales/`)
 - Testing the validation flow with and without required tools installed
@@ -87,6 +98,7 @@ See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-
 ## 🔄 Development Workflow
 
 1. **Create a Feature Branch**
+
    ```bash
    git checkout develop
    git pull origin develop
@@ -99,6 +111,7 @@ See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-
    - Update documentation as needed
 
 3. **Test Thoroughly**
+
    ```bash
    npm test
    npm run lint
@@ -106,6 +119,7 @@ See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-
    ```
 
 4. **Commit Your Changes**
+
    ```bash
    # Use conventional commits with emojis
    git commit -m "feat(cli): ✨ add new project template"
@@ -120,18 +134,21 @@ See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-
 ## 🎨 Coding Standards
 
 ### General Principles
+
 - **Clean Code**: Write readable, maintainable code
 - **SOLID Principles**: Follow SOLID design principles
 - **Single Responsibility**: Each function/class should have one purpose
 - **Documentation**: Use TSDoc comments for public APIs
 
 ### TypeScript Guidelines
+
 - Use strict TypeScript configuration
 - Prefer explicit types over `any`
 - Use interfaces for object shapes
 - Follow ESLint rules
 
 ### Testing Requirements
+
 - Add unit tests for new functionality
 - Maintain or improve test coverage
 - Test both success and error scenarios
@@ -142,6 +159,7 @@ See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-
 We welcome contributions to support more languages:
 
 ### Current Structure
+
 ```
 packages/i18n/src/locales/
 ├── en.json          # English (primary)
@@ -151,12 +169,14 @@ packages/i18n/src/locales/
 ### Adding New Languages
 
 1. **Create Locale File**
+
    ```bash
    # Example for Spanish
    cp packages/i18n/src/locales/en.json packages/i18n/src/locales/es.json
    ```
 
 2. **Translate Strings**
+
    ```json
    {
      "commands": {
@@ -173,6 +193,7 @@ packages/i18n/src/locales/
    ```
 
 ### Future Structure (Planned)
+
 ```
 docs/
 ├── pt-BR/           # Portuguese (Brazil)
@@ -184,12 +205,14 @@ docs/
 ## 📏 Code Review Process
 
 ### For Contributors
+
 - Keep PRs focused and small
 - Write clear PR descriptions
 - Respond to feedback promptly
 - Update documentation as needed
 
 ### Review Criteria
+
 - Code quality and maintainability
 - Test coverage and quality
 - Documentation completeness
@@ -228,6 +251,7 @@ Need help contributing?
 ## 🙏 Recognition
 
 All contributors are recognized in:
+
 - [Contributors section](../README.md#contributors) in README
 - Git commit history
 - Release notes for significant contributions
@@ -237,6 +261,7 @@ Thank you for helping make StackCode better! 🚀
 ---
 
 For more details, see:
+
 - **[Main README](../README.md)** - Project overview
 - **[Architecture Guide](ARCHITECTURE.md)** - Technical details
 - **[Self-Hosting Guide](SELF_HOSTING_GUIDE.md)** - Deployment options

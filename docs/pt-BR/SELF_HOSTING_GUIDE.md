@@ -39,12 +39,14 @@ npm link
 Para organizações com registros NPM privados:
 
 1. **Fork do Repositório**
+
    ```bash
    git clone https://github.com/sua-org/StackCode.git
    cd StackCode
    ```
 
 2. **Personalizar Configuração do Pacote**
+
    ```json
    // Em packages/cli/package.json
    {
@@ -89,15 +91,17 @@ docker run -it sua-org/stackcode init
 ### Personalização de Templates
 
 1. **Adicionar Templates Personalizados**
+
    ```bash
    # Criar templates da sua organização
    mkdir packages/core/src/templates/seu-stack-org
-   
+
    # Adicionar arquivos de template com extensão .tpl
    # Use {{nomeVariavel}} para substituições
    ```
 
 2. **Modificar Templates Existentes**
+
    ```bash
    # Editar templates existentes em packages/core/src/templates/
    # Atualizar dependências package.json
@@ -107,15 +111,13 @@ docker run -it sua-org/stackcode init
 3. **Atualizar Definições de Tipo**
    ```typescript
    // Em packages/core/src/types.ts
-   export type SupportedStack = 
-     | "node-js"
-     | "react" 
-     | "seu-stack-personalizado"  // Adicionar seu stack
+   export type SupportedStack = "node-js" | "react" | "seu-stack-personalizado"; // Adicionar seu stack
    ```
 
 ### Personalização de Configuração
 
 1. **Configuração Padrão**
+
    ```json
    // Criar .stackcoderc nos diretórios home dos usuários
    {
@@ -213,6 +215,7 @@ Configuração da Organização:
 ### Problemas Comuns
 
 1. **Erros de Permissão**
+
    ```bash
    # Corrigir permissões NPM
    sudo chown -R $(whoami) ~/.npm
@@ -220,19 +223,21 @@ Configuração da Organização:
    ```
 
 2. **Template Não Encontrado**
+
    ```bash
    # Verificar localização do template
    ls packages/core/src/templates/
-   
+
    # Verificar saída do build
    ls packages/core/dist/templates/
    ```
 
 3. **Problemas de Registro**
+
    ```bash
    # Verificar configuração do registro
    npm config get registry
-   
+
    # Testar conectividade do registro
    npm ping --registry https://seu-registro.com
    ```
@@ -273,12 +278,14 @@ Para suporte de auto-hospedagem:
 
 ---
 
-*Para mais informações sobre arquitetura e desenvolvimento do StackCode, veja o [Guia de Arquitetura](ARCHITECTURE.md).*
+_Para mais informações sobre arquitetura e desenvolvimento do StackCode, veja o [Guia de Arquitetura](ARCHITECTURE.md)._
 
 # Link for global usage
+
 cd packages/cli
 npm link
-```
+
+````
 
 ### Option 2: NPM Registry Mirror
 
@@ -288,9 +295,10 @@ For organizations with private NPM registries:
    ```bash
    git clone https://github.com/your-org/StackCode.git
    cd StackCode
-   ```
+````
 
 2. **Customize Package Configuration**
+
    ```json
    // In packages/cli/package.json
    {
@@ -335,15 +343,17 @@ docker run -it your-org/stackcode init
 ### Template Customization
 
 1. **Add Custom Templates**
+
    ```bash
    # Create your organization's templates
    mkdir packages/core/src/templates/your-org-stack
-   
+
    # Add template files with .tpl extension
    # Use {{variableName}} for replacements
    ```
 
 2. **Modify Existing Templates**
+
    ```bash
    # Edit existing templates in packages/core/src/templates/
    # Update package.json dependencies
@@ -353,15 +363,13 @@ docker run -it your-org/stackcode init
 3. **Update Type Definitions**
    ```typescript
    // In packages/core/src/types.ts
-   export type SupportedStack = 
-     | "node-js"
-     | "react" 
-     | "your-custom-stack"  // Add your stack
+   export type SupportedStack = "node-js" | "react" | "your-custom-stack"; // Add your stack
    ```
 
 ### Configuration Customization
 
 1. **Default Configuration**
+
    ```json
    // Create .stackcoderc in your users' home directories
    {
@@ -459,6 +467,7 @@ Organization Setup:
 ### Common Issues
 
 1. **Permission Errors**
+
    ```bash
    # Fix NPM permissions
    sudo chown -R $(whoami) ~/.npm
@@ -466,19 +475,21 @@ Organization Setup:
    ```
 
 2. **Template Not Found**
+
    ```bash
    # Verify template location
    ls packages/core/src/templates/
-   
+
    # Check build output
    ls packages/core/dist/templates/
    ```
 
 3. **Registry Issues**
+
    ```bash
    # Check registry configuration
    npm config get registry
-   
+
    # Test registry connectivity
    npm ping --registry https://your-registry.com
    ```
@@ -519,4 +530,4 @@ For self-hosting support:
 
 ---
 
-*For more information about StackCode architecture and development, see the [Architecture Guide](ARCHITECTURE.md).*
+_For more information about StackCode architecture and development, see the [Architecture Guide](ARCHITECTURE.md)._

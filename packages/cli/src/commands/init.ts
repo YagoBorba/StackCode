@@ -13,6 +13,11 @@ import {
 import { t } from "@stackcode/i18n";
 import * as ui from "./ui.js";
 
+/**
+ * Creates and returns the init command configuration for yargs.
+ * This command initializes a new project with the selected stack and configurations.
+ * @returns The yargs command module for the init command.
+ */
 export const getInitCommand = (): CommandModule => ({
   command: "init",
   describe: t("init.command_description"),
@@ -32,7 +37,7 @@ export const getInitCommand = (): CommandModule => ({
         return;
       }
     } catch {
-      // Intentionally ignored
+      // Directory doesn't exist - proceed with creation
     }
 
     ui.log.divider();
@@ -84,33 +89,33 @@ export const getInitCommand = (): CommandModule => ({
     ui.log.info(`  ${t("init.step.git")}`);
     await runCommand("git", ["init"], { cwd: projectPath });
 
-    // Validate dependencies before attempting to install them
     ui.log.info(`  ${t("init.step.validate_deps")}`);
     const dependencyValidation = await validateStackDependencies(answers.stack);
-    
+
     if (!dependencyValidation.isValid) {
       ui.log.warning(t("init.dependencies.missing", { stack: answers.stack }));
-      dependencyValidation.missingDependencies.forEach(dep => {
+      dependencyValidation.missingDependencies.forEach((dep) => {
         ui.log.raw(t("init.dependencies.missing_detail", { command: dep }));
       });
-      
+
       ui.log.raw("\n" + t("init.dependencies.install_instructions"));
-      dependencyValidation.missingDependencies.forEach(dep => {
+      dependencyValidation.missingDependencies.forEach((dep) => {
         const installKey = `init.dependencies.install_${dep}`;
         try {
           ui.log.raw(t(installKey));
         } catch {
-          // If no specific install instruction exists, show generic message
-          ui.log.raw(`  - ${dep}: Check the official documentation for installation instructions`);
+          ui.log.raw(
+            `  - ${dep}: Check the official documentation for installation instructions`,
+          );
         }
       });
-      
+
       ui.log.warning("\n" + t("init.dependencies.optional_skip"));
       const shouldContinue = await ui.promptForConfirmation(
         t("init.dependencies.prompt_continue"),
-        false
+        false,
       );
-      
+
       if (!shouldContinue) {
         ui.log.info(t("common.operation_cancelled"));
         return;
@@ -133,12 +138,14 @@ export const getInitCommand = (): CommandModule => ({
         await runCommand("npm", ["install"], { cwd: projectPath });
       }
     } catch (error) {
-      ui.log.error(`\n${t("init.error.deps_install_failed", { 
-        error: error instanceof Error ? error.message : String(error) 
-      })}`);
+      ui.log.error(
+        `\n${t("init.error.deps_install_failed", {
+          error: error instanceof Error ? error.message : String(error),
+        })}`,
+      );
       ui.log.warning(t("init.error.deps_install_manual"));
       ui.log.info(t("init.error.suggested_command"));
-      
+
       if (answers.stack === "python") {
         ui.log.raw("  pip install -e .");
       } else if (answers.stack === "java") {
@@ -155,7 +162,9 @@ export const getInitCommand = (): CommandModule => ({
     ui.log.divider();
     ui.log.success(t("init.success.ready"));
     ui.log.info(`\n${t("init.success.next_steps")}`);
-    ui.log.raw(`  ${t("init.success.step1", { projectName: answers.projectName })}`);
+    ui.log.raw(
+      `  ${t("init.success.step1", { projectName: answers.projectName })}`,
+    );
     ui.log.raw(`  ${t("init.success.step2")}`);
     ui.log.raw(`  ${t("init.success.step3")}`);
   },

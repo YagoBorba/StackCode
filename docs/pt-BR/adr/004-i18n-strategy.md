@@ -1,10 +1,13 @@
 # ADR-004: Estratégia de Internacionalização
 
 ## Status
+
 Aceito
 
 ## Contexto
+
 O StackCode é projetado para ser usado por desenvolvedores mundialmente e precisa:
+
 - Suportar múltiplos idiomas para todo texto voltado ao usuário
 - Fornecer mensagens de erro e prompts localizados
 - Suportar tanto interfaces CLI quanto extensão VS Code
@@ -13,6 +16,7 @@ O StackCode é projetado para ser usado por desenvolvedores mundialmente e preci
 - Suportar troca dinâmica de idioma
 
 Precisávamos decidir:
+
 - Biblioteca e abordagem i18n
 - Organização de arquivos de locale
 - Estratégia de detecção de idioma
@@ -20,9 +24,11 @@ Precisávamos decidir:
 - Integração entre pacotes
 
 ## Decisão
+
 Implementaremos um sistema i18n customizado com um pacote dedicado:
 
 ### Pacote @stackcode/i18n
+
 - Lógica centralizada de internacionalização
 - Arquivos de locale baseados em JSON
 - Troca de locale em runtime
@@ -30,6 +36,7 @@ Implementaremos um sistema i18n customizado com um pacote dedicado:
 - Compartilhado entre todos os pacotes
 
 ### Estrutura de Locales
+
 ```
 packages/i18n/src/locales/
 ├── en.json     # Inglês (padrão)
@@ -39,6 +46,7 @@ packages/i18n/src/locales/
 ```
 
 ### Detecção de Idioma
+
 1. **Configuração explícita**: Configuração do usuário em `~/.stackcoderc`
 2. **Variável de ambiente**: `STACKCODE_LANG` ou `LANG`
 3. **Detecção do sistema**: `process.env.LANG` ou APIs do sistema
@@ -47,6 +55,7 @@ packages/i18n/src/locales/
 ## Fundamentos
 
 ### Benefícios do Sistema Customizado
+
 1. **Controle Total**: Controle completo sobre funcionalidades
 2. **Performance**: Carregamento otimizado de locales
 3. **Flexibilidade**: Customização específica para nossas necessidades
@@ -54,6 +63,7 @@ packages/i18n/src/locales/
 5. **Type Safety**: Integração com TypeScript para type safety
 
 ### Estrutura de Tradução
+
 ```typescript
 interface LocaleMessages {
   // Comandos CLI
@@ -119,11 +129,12 @@ interface LocaleMessages {
 ## Implementação
 
 ### API Principal do i18n
+
 ```typescript
 export class I18nManager {
-  private currentLocale: string = 'en';
+  private currentLocale: string = "en";
   private messages: Map<string, LocaleMessages> = new Map();
-  private fallbackLocale: string = 'en';
+  private fallbackLocale: string = "en";
 
   constructor() {
     this.loadLocale(this.fallbackLocale);
@@ -133,9 +144,9 @@ export class I18nManager {
   // Traduzir chave com interpolação
   t(key: string, params?: Record<string, any>): string {
     const message = this.getMessage(key);
-    
+
     if (!params) return message;
-    
+
     return message.replace(/{{(\w+)}}/g, (match, paramName) => {
       return params[paramName] ?? match;
     });
@@ -161,7 +172,7 @@ export class I18nManager {
 
   // Buscar mensagem com fallback
   private getMessage(key: string): string {
-    const keys = key.split('.');
+    const keys = key.split(".");
     const currentMessages = this.messages.get(this.currentLocale);
     const fallbackMessages = this.messages.get(this.fallbackLocale);
 
@@ -169,9 +180,9 @@ export class I18nManager {
       return path.reduce((current, segment) => current?.[segment], obj);
     };
 
-    return getValue(currentMessages, keys) || 
-           getValue(fallbackMessages, keys) || 
-           key; // Retorna a chave se nenhuma tradução for encontrada
+    return (
+      getValue(currentMessages, keys) || getValue(fallbackMessages, keys) || key
+    ); // Retorna a chave se nenhuma tradução for encontrada
   }
 
   // Detecção automática de idioma
@@ -180,22 +191,23 @@ export class I18nManager {
     const envLocale = process.env.STACKCODE_LANG || process.env.LANG;
     const systemLocale = this.getSystemLocale();
 
-    const locale = configLocale || 
-                   this.normalizeLocale(envLocale) || 
-                   this.normalizeLocale(systemLocale) || 
-                   this.fallbackLocale;
+    const locale =
+      configLocale ||
+      this.normalizeLocale(envLocale) ||
+      this.normalizeLocale(systemLocale) ||
+      this.fallbackLocale;
 
     this.setLocale(locale);
   }
 
   private normalizeLocale(locale?: string): string | undefined {
     if (!locale) return undefined;
-    
+
     // pt_BR -> pt, en_US -> en, etc.
-    const normalized = locale.split('_')[0].toLowerCase();
-    
+    const normalized = locale.split("_")[0].toLowerCase();
+
     // Verificar se temos suporte para o idioma
-    const supportedLocales = ['en', 'pt', 'es'];
+    const supportedLocales = ["en", "pt", "es"];
     return supportedLocales.includes(normalized) ? normalized : undefined;
   }
 }
@@ -210,39 +222,44 @@ export const t = (key: string, params?: Record<string, any>): string => {
 ```
 
 ### Integração CLI
+
 ```typescript
-import { t } from '@stackcode/i18n';
+import { t } from "@stackcode/i18n";
 
 const initCommand: CommandModule = {
-  command: 'init [template]',
-  describe: t('commands.init.description'),
-  
+  command: "init [template]",
+  describe: t("commands.init.description"),
+
   builder: (yargs) => {
-    return yargs
-      .positional('template', {
-        describe: t('commands.init.prompts.template'),
-        type: 'string'
-      });
+    return yargs.positional("template", {
+      describe: t("commands.init.prompts.template"),
+      type: "string",
+    });
   },
 
   handler: async (argv) => {
     try {
       await executeInit(argv);
-      console.log(t('commands.init.success', { 
-        projectName: argv.projectName 
-      }));
+      console.log(
+        t("commands.init.success", {
+          projectName: argv.projectName,
+        }),
+      );
     } catch (error) {
-      console.error(t('commands.init.errors.general', { 
-        error: error.message 
-      }));
+      console.error(
+        t("commands.init.errors.general", {
+          error: error.message,
+        }),
+      );
     }
-  }
+  },
 };
 ```
 
 ### Integração VS Code Extension
+
 ```typescript
-import { t } from '@stackcode/i18n';
+import { t } from "@stackcode/i18n";
 
 export class DashboardProvider implements vscode.WebviewViewProvider {
   resolveWebviewView(webviewView: vscode.WebviewView): void {
@@ -254,12 +271,12 @@ export class DashboardProvider implements vscode.WebviewViewProvider {
       <!DOCTYPE html>
       <html>
         <head>
-          <title>${t('extension.dashboard.title')}</title>
+          <title>${t("extension.dashboard.title")}</title>
         </head>
         <body>
-          <h1>${t('extension.dashboard.welcome')}</h1>
+          <h1>${t("extension.dashboard.welcome")}</h1>
           <section>
-            <h2>${t('extension.dashboard.recentProjects')}</h2>
+            <h2>${t("extension.dashboard.recentProjects")}</h2>
             <!-- ... conteúdo do dashboard ... -->
           </section>
         </body>
@@ -272,6 +289,7 @@ export class DashboardProvider implements vscode.WebviewViewProvider {
 ## Arquivos de Locale
 
 ### Estrutura en.json (Inglês - Base)
+
 ```json
 {
   "commands": {
@@ -309,6 +327,7 @@ export class DashboardProvider implements vscode.WebviewViewProvider {
 ```
 
 ### Estrutura pt.json (Português)
+
 ```json
 {
   "commands": {
@@ -348,62 +367,65 @@ export class DashboardProvider implements vscode.WebviewViewProvider {
 ## Type Safety
 
 ### Tipos TypeScript para i18n
+
 ```typescript
 // Geração automática de tipos a partir de en.json
-type LocaleKey = 
-  | 'commands.init.description'
-  | 'commands.init.prompts.template'
-  | 'commands.init.success'
-  | 'common.success'
-  | 'common.error'
-  // ... todas as chaves possíveis
+type LocaleKey =
+  | "commands.init.description"
+  | "commands.init.prompts.template"
+  | "commands.init.success"
+  | "common.success"
+  | "common.error";
+// ... todas as chaves possíveis
 
 // Função tipada para tradução
 export function t(key: LocaleKey, params?: Record<string, any>): string;
 
 // Validação em tempo de compilação
-const message = t('commands.init.description'); // ✅ Válido
-const invalid = t('commands.invalid.key');      // ❌ Erro TypeScript
+const message = t("commands.init.description"); // ✅ Válido
+const invalid = t("commands.invalid.key"); // ❌ Erro TypeScript
 ```
 
 ### Script de Geração de Tipos
+
 ```typescript
 // scripts/generate-i18n-types.ts
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
-function generateTypesFromLocale(localeObject: any, prefix = ''): string[] {
+function generateTypesFromLocale(localeObject: any, prefix = ""): string[] {
   const keys: string[] = [];
-  
+
   for (const [key, value] of Object.entries(localeObject)) {
     const fullKey = prefix ? `${prefix}.${key}` : key;
-    
-    if (typeof value === 'string') {
+
+    if (typeof value === "string") {
       keys.push(`'${fullKey}'`);
-    } else if (typeof value === 'object') {
+    } else if (typeof value === "object") {
       keys.push(...generateTypesFromLocale(value, fullKey));
     }
   }
-  
+
   return keys;
 }
 
 // Executar para gerar types/i18n.d.ts
-const enLocale = JSON.parse(fs.readFileSync('./src/locales/en.json', 'utf8'));
+const enLocale = JSON.parse(fs.readFileSync("./src/locales/en.json", "utf8"));
 const keys = generateTypesFromLocale(enLocale);
 
 const typeDefinition = `
-export type LocaleKey = ${keys.join(' | ')};
+export type LocaleKey = ${keys.join(" | ")};
 
 export function t(key: LocaleKey, params?: Record<string, any>): string;
 `;
 
-fs.writeFileSync('./types/i18n.d.ts', typeDefinition);
+fs.writeFileSync("./types/i18n.d.ts", typeDefinition);
 ```
 
 ## Processo de Tradução
 
 ### Fluxo de Adição de Novas Strings
+
 1. **Adicionar em en.json**: Sempre começar com versão em inglês
 2. **Gerar Tipos**: Executar script de geração de tipos
 3. **Implementar Uso**: Usar a nova chave no código
@@ -411,6 +433,7 @@ fs.writeFileSync('./types/i18n.d.ts', typeDefinition);
 5. **Testar**: Verificar todas as traduções funcionam
 
 ### Guidelines de Tradução
+
 - **Consistência**: Manter terminologia consistente
 - **Contexto**: Fornecer contexto para tradutores
 - **Interpolação**: Usar {{parameter}} para valores dinâmicos
@@ -418,29 +441,30 @@ fs.writeFileSync('./types/i18n.d.ts', typeDefinition);
 - **Formatação**: Preservar formatação (negrito, itálico, etc.)
 
 ### Ferramentas de Tradução
+
 ```typescript
 // Utilitário para encontrar chaves ausentes
 export function findMissingTranslations(
-  baseLocale: string, 
-  targetLocale: string
+  baseLocale: string,
+  targetLocale: string,
 ): string[] {
   const base = loadLocale(baseLocale);
   const target = loadLocale(targetLocale);
-  
+
   const missingKeys: string[] = [];
-  
-  function traverse(obj: any, target: any, path = '') {
+
+  function traverse(obj: any, target: any, path = "") {
     for (const key in obj) {
       const currentPath = path ? `${path}.${key}` : key;
-      
-      if (typeof obj[key] === 'object') {
+
+      if (typeof obj[key] === "object") {
         traverse(obj[key], target?.[key] || {}, currentPath);
       } else if (!target || !(key in target)) {
         missingKeys.push(currentPath);
       }
     }
   }
-  
+
   traverse(base, target);
   return missingKeys;
 }
@@ -449,6 +473,7 @@ export function findMissingTranslations(
 ## Consequências
 
 ### Positivas
+
 - **Acessibilidade Global**: Suporte para desenvolvedores de diferentes idiomas
 - **Experiência Consistente**: Tradução unificada em CLI e VS Code
 - **Extensibilidade**: Fácil adição de novos idiomas
@@ -456,44 +481,49 @@ export function findMissingTranslations(
 - **Performance**: Carregamento otimizado de locales
 
 ### Negativas
+
 - **Manutenção**: Necessidade de manter múltiplos arquivos de tradução
 - **Complexidade**: Lógica adicional para gerenciamento de idiomas
 - **Sincronização**: Risco de traduções desatualizadas
 - **Tamanho**: Bundle ligeiramente maior com múltiplos locales
 
 ### Neutras
+
 - **Detecção**: Detecção automática pode não ser sempre precisa
 - **Fallback**: Usuários podem ver mistura de idiomas em casos extremos
 
 ## Monitoramento
 
 ### Métricas de Uso
+
 - Distribuição de idiomas entre usuários
 - Frequência de troca de idioma
 - Chaves mais utilizadas
 
 ### Qualidade das Traduções
+
 - Feedback de usuários sobre traduções
 - Relatórios de chaves ausentes
 - Análise de contexto perdido em traduções
 
 ### Automatização
+
 ```typescript
 // CI/CD check para translations
 export function validateTranslations(): boolean {
-  const locales = ['en', 'pt', 'es'];
-  const baseLocale = 'en';
-  
+  const locales = ["en", "pt", "es"];
+  const baseLocale = "en";
+
   for (const locale of locales) {
     if (locale === baseLocale) continue;
-    
+
     const missing = findMissingTranslations(baseLocale, locale);
     if (missing.length > 0) {
       console.error(`Missing translations in ${locale}:`, missing);
       return false;
     }
   }
-  
+
   return true;
 }
 ```
@@ -501,17 +531,20 @@ export function validateTranslations(): boolean {
 ## Roadmap de Idiomas
 
 ### Fase 1 (Atual)
+
 - [x] Inglês (en) - Base
 - [x] Português (pt) - Brasileiro
 - [x] Espanhol (es) - Internacional
 
 ### Fase 2 (Futuro)
+
 - [ ] Francês (fr)
 - [ ] Alemão (de)
 - [ ] Japonês (ja)
 - [ ] Chinês Simplificado (zh-CN)
 
 ### Fase 3 (Expansão)
+
 - [ ] Russo (ru)
 - [ ] Italiano (it)
 - [ ] Coreano (ko)
@@ -519,27 +552,31 @@ export function validateTranslations(): boolean {
 
 ---
 
-*Este ADR será atualizado conforme expandimos o suporte a idiomas e recebemos feedback da comunidade.*
+_Este ADR será atualizado conforme expandimos o suporte a idiomas e recebemos feedback da comunidade._
 
 ### Locale Management
+
 - JSON files for each supported language in `locales/` directory
 - Hierarchical key structure for organization
 - Support for interpolation and pluralization
 - Template literal style for better developer experience
 
 ### Language Detection
+
 - Environment variable (`STACKCODE_LANG`)
 - System locale detection as fallback
 - User configuration override
 - VS Code extension uses VS Code's locale
 
 ### Supported Languages (Initial)
+
 - English (en) - Primary/fallback language
 - Portuguese (pt) - Secondary language
 
 ## Consequences
 
 ### Positive
+
 - **Global Accessibility**: Supports international developer community
 - **Consistent Localization**: Same i18n system across CLI and VS Code extension
 - **Extensible**: Easy to add new languages by adding JSON files
@@ -548,6 +585,7 @@ export function validateTranslations(): boolean {
 - **Developer Experience**: Simple API for developers
 
 ### Negative
+
 - **Maintenance Overhead**: All user-facing strings need translation
 - **Coordination**: Changes require updates to all locale files
 - **Testing Complexity**: Need to test multiple language scenarios
@@ -555,6 +593,7 @@ export function validateTranslations(): boolean {
 ### Technical Implementation
 
 #### Locale File Structure
+
 ```json
 {
   "commands": {
@@ -580,18 +619,20 @@ export function validateTranslations(): boolean {
 ```
 
 #### API Design
+
 ```typescript
 // Basic translation
-t('commands.init.description')
+t("commands.init.description");
 
 // With interpolation
-t('errors.fileNotFound', { filename: 'package.json' })
+t("errors.fileNotFound", { filename: "package.json" });
 
 // Pluralization
-t('files.count', { count: 5 })
+t("files.count", { count: 5 });
 ```
 
 ### Language Detection Priority
+
 1. `STACKCODE_LANG` environment variable
 2. User configuration file
 3. System locale (`process.env.LANG`)
@@ -600,21 +641,25 @@ t('files.count', { count: 5 })
 ### Package Integration
 
 #### CLI Package
+
 - Initialize i18n before command parsing
 - Use locale for help text and prompts
 - Support `--lang` flag for temporary override
 
 #### VS Code Extension
+
 - Use VS Code's built-in locale detection
 - Respect VS Code's language settings
 - Provide language switching in extension settings
 
 #### Core Package
+
 - All user-facing error messages support i18n
 - Template descriptions and comments localized
 - GitHub integration messages localized
 
 ### File Organization
+
 ```
 packages/i18n/
 ├── src/
@@ -625,6 +670,7 @@ packages/i18n/
 ```
 
 ### Future Expansion Strategy
+
 - Additional languages in `locales/` directory
 - Community contributions for translations
 - Possible locale validation tools
@@ -633,38 +679,45 @@ packages/i18n/
 ## Alternatives Considered
 
 ### i18next
+
 - **Pros**: Mature, feature-rich, ecosystem support
 - **Cons**: Heavy dependency, over-engineered for our needs
 
 ### React i18n (for VS Code extension only)
+
 - **Pros**: React ecosystem integration
 - **Cons**: Doesn't solve CLI internationalization
 
 ### No internationalization
+
 - **Pros**: Simpler development and maintenance
 - **Cons**: Limits global adoption and accessibility
 
 ## Implementation Guidelines
 
 ### Translation Keys
+
 - Use hierarchical dot notation for organization
 - Descriptive key names that indicate context
 - Consistent naming patterns across components
 - Avoid deeply nested structures
 
 ### String Management
+
 - All user-facing strings must use i18n system
 - No hardcoded English strings in code
 - Include context comments for translators
 - Use interpolation for dynamic content
 
 ### Testing Strategy
+
 - Test default (English) locale thoroughly
 - Spot check key translations
 - Test locale switching functionality
 - Ensure fallbacks work correctly
 
 ### Contribution Guidelines
+
 - Native speakers preferred for translations
 - Translation reviews by multiple contributors
 - Consistent terminology across all strings

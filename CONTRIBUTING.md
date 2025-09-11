@@ -23,6 +23,7 @@ Before contributing, please familiarize yourself with the project architecture:
 - **[🛠️ Technology Stacks](docs/STACKS.md)** - Supported frameworks and project templates
 
 Understanding the architecture will help you:
+
 - Choose the right package for your changes
 - Follow established patterns and conventions
 - Understand cross-package dependencies
@@ -292,13 +293,13 @@ StackCode now includes intelligent dependency validation that checks if required
 
 #### Supported Stack Dependencies
 
-| Stack | Required Tools | Validation |
-|-------|---------------|------------|
-| `go` | `go` | ✅ |
-| `php` | `composer`, `php` | ✅ |
-| `java` | `mvn`, `java` | ✅ |
-| `python` | `pip`, `python` | ✅ |
-| `node-js`, `node-ts`, `react`, `vue` | `npm` | ✅ |
+| Stack                                | Required Tools    | Validation |
+| ------------------------------------ | ----------------- | ---------- |
+| `go`                                 | `go`              | ✅         |
+| `php`                                | `composer`, `php` | ✅         |
+| `java`                               | `mvn`, `java`     | ✅         |
+| `python`                             | `pip`, `python`   | ✅         |
+| `node-js`, `node-ts`, `react`, `vue` | `npm`             | ✅         |
 
 #### Testing Dependency Validation
 
@@ -313,7 +314,7 @@ stc init
 # Test validation programmatically
 node -e "
 const { validateStackDependencies } = require('@stackcode/core');
-validateStackDependencies('go').then(result => 
+validateStackDependencies('go').then(result =>
   console.log('Result:', result)
 );
 "
@@ -469,5 +470,6 @@ Thank you again for your interest in contributing!
 ---
 
 ## Documentation
+
 - [Architecture Guide](docs/ARCHITECTURE.md)
 - [Self-Hosting Guide](docs/SELF_HOSTING_GUIDE.md)

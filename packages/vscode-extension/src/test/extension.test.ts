@@ -13,7 +13,6 @@ describe("ProactiveNotificationManager Test Suite", () => {
   });
 
   it("Should detect conventional commit messages correctly", () => {
-    // Access private method through any for testing
     const manager = notificationManager as unknown as {
       isConventionalCommit: (msg: string) => boolean;
     };

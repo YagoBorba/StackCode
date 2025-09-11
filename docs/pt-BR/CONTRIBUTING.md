@@ -19,6 +19,7 @@ Antes de contribuir, familiarize-se com a arquitetura do projeto:
 - **[🛠️ Stacks de Tecnologia](STACKS.md)** - Frameworks suportados e templates de projeto
 
 Entender a arquitetura ajudará você a:
+
 - Escolher o pacote certo para suas mudanças
 - Seguir padrões e convenções estabelecidos
 - Entender dependências entre pacotes
@@ -27,26 +28,30 @@ Entender a arquitetura ajudará você a:
 ## 🚀 Configuração de Desenvolvimento
 
 1. **Fork e Clone**
+
    ```bash
    git clone https://github.com/seu-usuario/StackCode.git
    cd StackCode
    ```
 
 2. **Instalar Dependências**
+
    ```bash
    npm install
    ```
 
 3. **Construir o Projeto**
+
    ```bash
    npm run build
    ```
 
 4. **Testar sua Configuração**
+
    ```bash
    # Executar testes
    npm test
-   
+
    # Testar CLI localmente
    node packages/cli/dist/index.js --help
    ```
@@ -54,34 +59,40 @@ Entender a arquitetura ajudará você a:
 ## 🤝 Como Contribuir
 
 ### 🐛 Relatórios de Bug
+
 - Verifique [issues existentes](https://github.com/YagoBorba/StackCode/issues) primeiro
 - Forneça passos claros de reprodução
 - Inclua detalhes do ambiente (OS, versão Node.js, etc.)
 - Use o template de relatório de bug
 
 ### ✨ Solicitações de Recursos
+
 - Abra uma issue para discutir o recurso primeiro
 - Explique o caso de uso e benefícios
 - Considere se se encaixa no escopo do projeto
 - Forneça ideias de implementação se possível
 
 ### 📝 Melhorias na Documentação
+
 - Corrija erros de digitação, melhore a clareza, adicione exemplos
 - Atualize docs ao adicionar novos recursos
 - Ajude com traduções (veja [Internacionalização](#internationalization))
 
 ### 🛠️ Contribuições de Código
+
 - Escolha issues marcadas com `good-first-issue` ou `help-wanted`
 - Siga o [fluxo de trabalho de desenvolvimento](#development-workflow)
 - Garanta que todos os testes passem
 - Adicione testes para nova funcionalidade
 
 ### 🌐 Adicionando Novos Stacks de Tecnologia
+
 Veja o guia abrangente em [CONTRIBUTING.md principal](../../CONTRIBUTING.md#adding-new-technology-stacks).
 
 ## � Fluxo de Trabalho de Desenvolvimento
 
 1. **Criar um Branch de Feature**
+
    ```bash
    git checkout develop
    git pull origin develop
@@ -94,6 +105,7 @@ Veja o guia abrangente em [CONTRIBUTING.md principal](../../CONTRIBUTING.md#addi
    - Atualize documentação conforme necessário
 
 3. **Testar Completamente**
+
    ```bash
    npm test
    npm run lint
@@ -101,6 +113,7 @@ Veja o guia abrangente em [CONTRIBUTING.md principal](../../CONTRIBUTING.md#addi
    ```
 
 4. **Commit suas Mudanças**
+
    ```bash
    # Use commits convencionais com emojis
    git commit -m "feat(cli): ✨ adicionar novo template de projeto"
@@ -115,18 +128,21 @@ Veja o guia abrangente em [CONTRIBUTING.md principal](../../CONTRIBUTING.md#addi
 ## 🎨 Padrões de Codificação
 
 ### Princípios Gerais
+
 - **Código Limpo**: Escreva código legível e manutenível
 - **Princípios SOLID**: Siga princípios de design SOLID
 - **Responsabilidade Única**: Cada função/classe deve ter um propósito
 - **Documentação**: Use comentários TSDoc para APIs públicas
 
 ### Diretrizes TypeScript
+
 - Use configuração TypeScript estrita
 - Prefira tipos explícitos sobre `any`
 - Use interfaces para formas de objeto
 - Siga regras ESLint
 
 ### Requisitos de Teste
+
 - Adicione testes unitários para nova funcionalidade
 - Mantenha ou melhore cobertura de testes
 - Teste tanto cenários de sucesso quanto de erro
@@ -137,6 +153,7 @@ Veja o guia abrangente em [CONTRIBUTING.md principal](../../CONTRIBUTING.md#addi
 Acolhemos contribuições para suportar mais idiomas:
 
 ### Estrutura Atual
+
 ```
 packages/i18n/src/locales/
 ├── en.json          # Inglês (primário)
@@ -146,12 +163,14 @@ packages/i18n/src/locales/
 ### Adicionando Novos Idiomas
 
 1. **Criar Arquivo de Locale**
+
    ```bash
    # Exemplo para espanhol
    cp packages/i18n/src/locales/en.json packages/i18n/src/locales/es.json
    ```
 
 2. **Traduzir Strings**
+
    ```json
    {
      "commands": {
@@ -168,6 +187,7 @@ packages/i18n/src/locales/
    ```
 
 ### Estrutura Futura (Planejada)
+
 ```
 docs/
 ├── pt-BR/           # Português (Brasil)
@@ -179,12 +199,14 @@ docs/
 ## 📏 Processo de Revisão de Código
 
 ### Para Contribuidores
+
 - Mantenha PRs focados e pequenos
 - Escreva descrições claras de PR
 - Responda ao feedback prontamente
 - Atualize documentação conforme necessário
 
 ### Critérios de Revisão
+
 - Qualidade e manutenibilidade do código
 - Cobertura e qualidade de testes
 - Completude da documentação
@@ -223,6 +245,7 @@ Precisa de ajuda contribuindo?
 ## 🙏 Reconhecimento
 
 Todos os contribuidores são reconhecidos em:
+
 - [Seção de contribuidores](../../README.md#contributors) no README
 - Histórico de commits do Git
 - Notas de release para contribuições significativas
@@ -232,43 +255,52 @@ Obrigado por ajudar a tornar o StackCode melhor! 🚀
 ---
 
 Para mais detalhes, veja:
+
 - **[README Principal](../../README.md)** - Visão geral do projeto
 - **[Guia de Arquitetura](ARCHITECTURE.md)** - Detalhes técnicos
 - **[Guia de Auto-hospedagem](SELF_HOSTING_GUIDE.md)** - Opções de deployment
-   node packages/cli/dist/index.js --help
-   ```
+  node packages/cli/dist/index.js --help
+  ```
+
+  ```
 
 ## 🤝 How to Contribute
 
 ### 🐛 Bug Reports
+
 - Check [existing issues](https://github.com/YagoBorba/StackCode/issues) first
 - Provide clear reproduction steps
 - Include environment details (OS, Node.js version, etc.)
 - Use the bug report template
 
 ### ✨ Feature Requests
+
 - Open an issue to discuss the feature first
 - Explain the use case and benefits
 - Consider if it fits the project's scope
 - Provide implementation ideas if possible
 
 ### 📝 Documentation Improvements
+
 - Fix typos, improve clarity, add examples
 - Update docs when adding new features
 - Help with translations (see [Internationalization](#internationalization))
 
 ### 🛠️ Code Contributions
+
 - Pick up issues labeled `good-first-issue` or `help-wanted`
 - Follow the [development workflow](#development-workflow)
 - Ensure all tests pass
 - Add tests for new functionality
 
 ### 🌐 Adding New Technology Stacks
+
 See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-new-technology-stacks).
 
 ## 🔄 Development Workflow
 
 1. **Create a Feature Branch**
+
    ```bash
    git checkout develop
    git pull origin develop
@@ -281,6 +313,7 @@ See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-
    - Update documentation as needed
 
 3. **Test Thoroughly**
+
    ```bash
    npm test
    npm run lint
@@ -288,6 +321,7 @@ See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-
    ```
 
 4. **Commit Your Changes**
+
    ```bash
    # Use conventional commits with emojis
    git commit -m "feat(cli): ✨ add new project template"
@@ -302,18 +336,21 @@ See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-
 ## 🎨 Coding Standards
 
 ### General Principles
+
 - **Clean Code**: Write readable, maintainable code
 - **SOLID Principles**: Follow SOLID design principles
 - **Single Responsibility**: Each function/class should have one purpose
 - **Documentation**: Use TSDoc comments for public APIs
 
 ### TypeScript Guidelines
+
 - Use strict TypeScript configuration
 - Prefer explicit types over `any`
 - Use interfaces for object shapes
 - Follow ESLint rules
 
 ### Testing Requirements
+
 - Add unit tests for new functionality
 - Maintain or improve test coverage
 - Test both success and error scenarios
@@ -324,6 +361,7 @@ See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-
 We welcome contributions to support more languages:
 
 ### Current Structure
+
 ```
 packages/i18n/src/locales/
 ├── en.json          # English (primary)
@@ -333,12 +371,14 @@ packages/i18n/src/locales/
 ### Adding New Languages
 
 1. **Create Locale File**
+
    ```bash
    # Example for Spanish
    cp packages/i18n/src/locales/en.json packages/i18n/src/locales/es.json
    ```
 
 2. **Translate Strings**
+
    ```json
    {
      "commands": {
@@ -355,6 +395,7 @@ packages/i18n/src/locales/
    ```
 
 ### Future Structure (Planned)
+
 ```
 docs/
 ├── pt-BR/           # Portuguese (Brazil)
@@ -366,12 +407,14 @@ docs/
 ## 📏 Code Review Process
 
 ### For Contributors
+
 - Keep PRs focused and small
 - Write clear PR descriptions
 - Respond to feedback promptly
 - Update documentation as needed
 
 ### Review Criteria
+
 - Code quality and maintainability
 - Test coverage and quality
 - Documentation completeness
@@ -410,6 +453,7 @@ Need help contributing?
 ## 🙏 Recognition
 
 All contributors are recognized in:
+
 - [Contributors section](../README.md#contributors) in README
 - Git commit history
 - Release notes for significant contributions
@@ -419,6 +463,7 @@ Thank you for helping make StackCode better! 🚀
 ---
 
 For more details, see:
+
 - **[Main README](../README.md)** - Project overview
 - **[Architecture Guide](ARCHITECTURE.md)** - Technical details
 - **[Self-Hosting Guide](SELF_HOSTING_GUIDE.md)** - Deployment options

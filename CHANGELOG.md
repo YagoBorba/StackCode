@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Added
+
 - feat: 🦺 add system dependency validation - Intelligent validation of required tools before project initialization with helpful installation instructions
 
 ## (2025-07-27)

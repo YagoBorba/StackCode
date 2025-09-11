@@ -4,7 +4,14 @@ import { ProgressCallback } from "../types";
 import { t } from "@stackcode/i18n";
 import * as path from "path";
 
+/**
+ * Command to initialize a new project through VS Code interface.
+ * Provides interactive project setup with stack selection and configuration.
+ */
 export class InitCommand extends BaseCommand {
+  /**
+   * Executes the project initialization workflow with user prompts.
+   */
   async execute(): Promise<void> {
     try {
       const projectName = await vscode.window.showInputBox({
@@ -86,7 +93,7 @@ export class InitCommand extends BaseCommand {
           return;
         }
       } catch {
-        // Directory doesn't exist, which is fine
+        // Directory doesn't exist - proceed with creation
       }
 
       vscode.window.withProgress(

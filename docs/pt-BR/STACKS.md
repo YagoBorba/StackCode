@@ -7,22 +7,24 @@ O StackCode suporta múltiplos stacks de tecnologia, cada um projetado com as me
 O StackCode valida automaticamente se todas as ferramentas necessárias para o stack escolhido estão instaladas antes de prosseguir com a criação do projeto. Isso garante uma experiência de configuração tranquila e previne erros comuns de instalação.
 
 ### Como Funciona
+
 1. **Detecção Automática**: Quando você executa `stc init`, o StackCode verifica se as ferramentas necessárias estão disponíveis no PATH do seu sistema
 2. **Feedback Claro**: Se faltarem ferramentas, você verá exatamente quais precisam ser instaladas
 3. **Orientação de Instalação**: Links diretos para páginas oficiais de instalação das ferramentas em falta
 4. **Continuação Flexível**: Opção de prosseguir com a criação do projeto mesmo se algumas ferramentas estiverem ausentes
 
 ### Dependências dos Stacks
-| Stack | Ferramentas Necessárias | Validação |
-|-------|-------------------------|-----------|
-| **React + TypeScript** | `npm` | ✅ Automática |
-| **Vue.js + TypeScript** | `npm` | ✅ Automática |
-| **Node.js + Express** | `npm` | ✅ Automática |
-| **Node.js + TypeScript** | `npm` | ✅ Automática |
-| **Go + Gin** | `go` | ✅ Automática |
-| **PHP + Laravel** | `composer`, `php` | ✅ Automática |
-| **Java + Spring Boot** | `mvn`, `java` | ✅ Automática |
-| **Python + FastAPI** | `pip`, `python` | ✅ Automática |
+
+| Stack                    | Ferramentas Necessárias | Validação     |
+| ------------------------ | ----------------------- | ------------- |
+| **React + TypeScript**   | `npm`                   | ✅ Automática |
+| **Vue.js + TypeScript**  | `npm`                   | ✅ Automática |
+| **Node.js + Express**    | `npm`                   | ✅ Automática |
+| **Node.js + TypeScript** | `npm`                   | ✅ Automática |
+| **Go + Gin**             | `go`                    | ✅ Automática |
+| **PHP + Laravel**        | `composer`, `php`       | ✅ Automática |
+| **Java + Spring Boot**   | `mvn`, `java`           | ✅ Automática |
+| **Python + FastAPI**     | `pip`, `python`         | ✅ Automática |
 
 > **💡 Dica**: Se você vir avisos de dependência, ainda pode criar a estrutura do projeto. Você só precisará instalar as dependências manualmente depois.
 
@@ -31,6 +33,7 @@ O StackCode valida automaticamente se todas as ferramentas necessárias para o s
 ### Stacks Frontend
 
 #### React + TypeScript
+
 **Localização do Template:** `packages/core/src/templates/react/`
 
 - **Framework**: React 18 com TypeScript
@@ -40,6 +43,7 @@ O StackCode valida automaticamente se todas as ferramentas necessárias para o s
 - **Recursos**: Modern JSX Transform, configuração ESLint, estrutura de componentes
 
 **Estrutura Gerada:**
+
 ```
 ├── src/
 │   ├── components/
@@ -55,6 +59,7 @@ O StackCode valida automaticamente se todas as ferramentas necessárias para o s
 ```
 
 #### Vue.js + TypeScript
+
 **Localização do Template:** `packages/core/src/templates/vue/`
 
 - **Framework**: Vue 3 com Composition API e TypeScript
@@ -64,6 +69,7 @@ O StackCode valida automaticamente se todas as ferramentas necessárias para o s
 - **Recursos**: SFC (Single File Components), padrões modernos do Vue
 
 **Estrutura Gerada:**
+
 ```
 ├── src/
 │   ├── components/
@@ -81,6 +87,7 @@ O StackCode valida automaticamente se todas as ferramentas necessárias para o s
 ### Stacks Backend
 
 #### Node.js + JavaScript
+
 **Localização do Template:** `packages/core/src/templates/node-js/`
 
 - **Runtime**: Node.js com ES6+
@@ -89,6 +96,7 @@ O StackCode valida automaticamente se todas as ferramentas necessárias para o s
 - **Recursos**: estrutura Express.js, variáveis de ambiente, configuração de testes
 
 **Estrutura Gerada:**
+
 ```
 ├── src/
 │   ├── controllers/
@@ -105,6 +113,7 @@ O StackCode valida automaticamente se todas as ferramentas necessárias para o s
 ```
 
 #### Node.js + TypeScript
+
 **Localização do Template:** `packages/core/src/templates/node-ts/`
 
 - **Runtime**: Node.js com TypeScript
@@ -112,6 +121,7 @@ O StackCode valida automaticamente se todas as ferramentas necessárias para o s
 - **Recursos**: desenvolvimento type-safe, configuração moderna do TypeScript
 
 **Estrutura Gerada:**
+
 ```
 ├── src/
 │   ├── controllers/
@@ -124,12 +134,14 @@ O StackCode valida automaticamente se todas as ferramentas necessárias para o s
 ```
 
 #### Python + Configuração Moderna
+
 **Localização do Template:** `packages/core/src/templates/python/`
 
 - **Gerenciamento de Pacotes**: pip com pyproject.toml
 - **Recursos**: estrutura de projeto Python moderna, gerenciamento de dependências
 
 **Estrutura Gerada:**
+
 ```
 ├── src/
 │   └── main.py
@@ -137,12 +149,14 @@ O StackCode valida automaticamente se todas as ferramentas necessárias para o s
 ```
 
 #### Java + Maven
+
 **Localização do Template:** `packages/core/src/templates/java/`
 
 - **Ferramenta de Build**: Maven
 - **Recursos**: estrutura padrão de projeto Java, configuração Maven
 
 **Estrutura Gerada:**
+
 ```
 ├── src/
 │   └── main/
@@ -151,18 +165,21 @@ O StackCode valida automaticamente se todas as ferramentas necessárias para o s
 ```
 
 #### Go + Modules
+
 **Localização do Template:** `packages/core/src/templates/go/`
 
 - **Gerenciamento de Pacotes**: Go modules
 - **Recursos**: projeto Go simples com suporte a módulos
 
 **Estrutura Gerada:**
+
 ```
 ├── main.go
 └── go.mod
 ```
 
 #### PHP + Laravel
+
 **Localização do Template:** `packages/core/src/templates/php/`
 
 - **Framework**: estrutura estilo Laravel
@@ -170,6 +187,7 @@ O StackCode valida automaticamente se todas as ferramentas necessárias para o s
 - **Recursos**: estrutura MVC, variáveis de ambiente
 
 **Estrutura Gerada:**
+
 ```
 ├── app/
 ├── bootstrap/
@@ -186,27 +204,32 @@ Além dos templates de projeto principais, o StackCode fornece suporte abrangent
 **Localização do Template:** `packages/core/src/templates/gitignore/`
 
 ### Desenvolvimento Mobile
+
 - **Android** (`android.tpl`) - Android Studio, Gradle, arquivos APK
 - **Flutter** (`flutter.tpl`) - Dart, arquivos de build Flutter, arquivos específicos da plataforma
 - **React Native** (`react_native.tpl`) - Metro bundler, builds de plataforma
 - **Swift** (`swift.tpl`) - Xcode, arquivos de desenvolvimento iOS
 
 ### Frameworks Frontend
+
 - **Angular** (`angular.tpl`) - Angular CLI, artefatos de build
 - **Svelte** (`svelte.tpl`) - SvelteKit, outputs de build
 
 ### Backend & Linguagens
+
 - **Go** (`go.tpl`) - binários Go, diretórios vendor
 - **Java** (`java.tpl`) - Maven, Gradle, arquivos IDE
 - **Node.js** (`node-js.tpl`, `node-ts.tpl`) - npm, yarn, outputs de build
 - **PHP** (`php.tpl`) - Composer, artefatos Laravel
-- **Python** (`python.tpl`) - pip, ambientes virtuais, __pycache__
+- **Python** (`python.tpl`) - pip, ambientes virtuais, **pycache**
 - **JavaScript** (`javascript.tpl`) - arquivos gerais de projeto JS
 
 ### Ferramentas de Desenvolvimento
+
 - **IDEs** (`ides.tpl`) - configurações VS Code, IntelliJ, Eclipse
 
 ### Uso
+
 Ao criar projetos, o StackCode seleciona automaticamente o template `.gitignore` apropriado baseado no stack escolhido, e pode combinar múltiplos templates ao usar recursos como Docker ou IDEs específicas.
 
 ## 🔧 Recursos dos Stacks
@@ -230,12 +253,13 @@ O StackCode usa automaticamente o gerenciador de pacotes apropriado baseado no t
 - **npm** para stacks baseados em Node.js (React, Vue, Node.js, Node-TS)
 - **pip** para projetos Python (com pyproject.toml)
 - **maven** para projetos Java
-- **go mod** para projetos Go  
+- **go mod** para projetos Go
 - **composer** para projetos PHP
 
 ### Geração Inteligente de .gitignore
 
 Todo projeto recebe um arquivo `.gitignore` personalizado que combina:
+
 - **Regras específicas do stack** (baseadas na tecnologia escolhida)
 - **Regras específicas da IDE** (ambientes de desenvolvimento comuns)
 - **Regras de ferramentas adicionais** (Docker, gerenciadores de pacotes, artefatos de build)

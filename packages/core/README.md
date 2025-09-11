@@ -92,6 +92,7 @@ Gets the required dependencies for a given stack.
 - **Returns**: An array of required commands for the stack.
 
 **Example:**
+
 ```typescript
 import { getStackDependencies } from "@stackcode/core";
 
@@ -107,6 +108,7 @@ Validates if all required dependencies for a stack are available.
 - **Returns**: A promise that resolves to an object with validation results.
 
 **Example:**
+
 ```typescript
 import { validateStackDependencies } from "@stackcode/core";
 

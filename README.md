@@ -114,10 +114,10 @@ For detailed information about the project:
 
 ### 🌐 Documentation in Other Languages
 
-- **[🇧🇷 Português (Brasil)](docs/pt-BR/)** - Documentação em português *(em desenvolvimento)*
-- **[🇪🇸 Español](docs/es/)** - Documentación en español *(en desarrollo)*
+- **[🇧🇷 Português (Brasil)](docs/pt-BR/)** - Documentação em português _(em desenvolvimento)_
+- **[🇪🇸 Español](docs/es/)** - Documentación en español _(en desarrollo)_
 
-*Want to help translate the documentation? Check our [contribution guide](docs/CONTRIBUTING.md#internationalization)!*
+_Want to help translate the documentation? Check our [contribution guide](docs/CONTRIBUTING.md#internationalization)!_
 
 ## 🤝 Want to Contribute?
 

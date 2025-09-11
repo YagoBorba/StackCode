@@ -3,13 +3,13 @@
  * It exports all the public-facing functions and types.
  */
 
-export { 
-  runCommand, 
-  getCommandOutput, 
-  getErrorMessage, 
+export {
+  runCommand,
+  getCommandOutput,
+  getErrorMessage,
   isCommandAvailable,
   getStackDependencies,
-  validateStackDependencies 
+  validateStackDependencies,
 } from "./utils.js";
 export {
   generateGitignoreContent,

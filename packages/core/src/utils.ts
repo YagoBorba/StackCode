@@ -112,7 +112,6 @@ export function getStackDependencies(stack: string): string[] {
     php: ["composer", "php"],
     java: ["mvn", "java"],
     python: ["pip", "python"],
-    // Node.js stacks use npm which should be available if Node.js is installed
     "node-js": ["npm"],
     "node-ts": ["npm"],
     react: ["npm"],
@@ -139,16 +138,16 @@ export async function validateStackDependencies(stack: string): Promise<{
     dependencies.map(async (dep) => ({
       command: dep,
       available: await isCommandAvailable(dep),
-    }))
+    })),
   );
 
   const missingDependencies = results
-    .filter(result => !result.available)
-    .map(result => result.command);
-  
+    .filter((result) => !result.available)
+    .map((result) => result.command);
+
   const availableDependencies = results
-    .filter(result => result.available)
-    .map(result => result.command);
+    .filter((result) => result.available)
+    .map((result) => result.command);
 
   return {
     isValid: missingDependencies.length === 0,
@@ -157,6 +156,11 @@ export async function validateStackDependencies(stack: string): Promise<{
   };
 }
 
+/**
+ * Extracts a readable error message from various error types.
+ * @param error - The error object to extract message from.
+ * @returns A human-readable error message string.
+ */
 export function getErrorMessage(error: unknown): string {
   if (
     typeof error === "object" &&
