@@ -8,6 +8,7 @@ import {
   generateGitignoreContent,
   runCommand,
   validateStackDependencies,
+  saveStackCodeConfig,
 } from "@stackcode/core";
 import { getInitCommand } from "../../src/commands/init";
 
@@ -18,6 +19,7 @@ vi.mock("@stackcode/core", () => ({
   generateGitignoreContent: vi.fn(),
   runCommand: vi.fn(),
   validateStackDependencies: vi.fn(),
+  saveStackCodeConfig: vi.fn(),
 }));
 
 vi.mock("inquirer");
@@ -33,6 +35,7 @@ const mockedCore = {
   generateGitignoreContent: vi.mocked(generateGitignoreContent),
   runCommand: vi.mocked(runCommand),
   validateStackDependencies: vi.mocked(validateStackDependencies),
+  saveStackCodeConfig: vi.mocked(saveStackCodeConfig),
 };
 
 describe("Init Command", () => {
@@ -78,17 +81,21 @@ describe("Init Command", () => {
       },
     });
 
-    expect(mockedFs.writeFile).toHaveBeenCalledWith(
-      expect.stringContaining(".stackcoderc.json"),
-      expect.stringContaining('"commitValidation": true'),
+    expect(mockedCore.saveStackCodeConfig).toHaveBeenCalledWith(
+      projectPath,
+      expect.objectContaining({
+        defaultAuthor: mockAnswers.authorName,
+        defaultLicense: "MIT",
+        features: { commitValidation: true },
+      }),
     );
 
     expect(mockedFs.writeFile).toHaveBeenCalledWith(
-      projectPath,
+      expect.stringContaining("README.md"),
       "# Test Project",
     );
     expect(mockedFs.writeFile).toHaveBeenCalledWith(
-      projectPath,
+      expect.stringContaining(".gitignore"),
       "node_modules",
     );
 

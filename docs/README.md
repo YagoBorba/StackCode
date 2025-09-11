@@ -21,8 +21,8 @@ Welcome to the StackCode documentation hub! This directory contains comprehensiv
 
 ### 🌐 **Translations**
 
-- **[🇧🇷 Português (Brasil)](pt-BR/)** - Documentação em português _(em desenvolvimento)_
-- **[🇪🇸 Español](es/)** - Documentación en español _(en desarrollo)_
+- **[🇧🇷 Português (Brasil)](pt-BR/)** - Documentação em português
+- **[🇪🇸 Español](es/)** - Documentación en español
 
 ## 🎯 **Documentation by Audience**
 

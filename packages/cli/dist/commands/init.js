@@ -1,8 +1,13 @@
 import fs from "fs/promises";
 import path from "path";
-import { scaffoldProject, setupHusky, generateReadmeContent, generateGitignoreContent, runCommand, validateStackDependencies, } from "@stackcode/core";
+import { scaffoldProject, setupHusky, generateReadmeContent, generateGitignoreContent, runCommand, validateStackDependencies, saveStackCodeConfig, } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
 import * as ui from "./ui.js";
+/**
+ * Creates and returns the init command configuration for yargs.
+ * This command initializes a new project with the selected stack and configurations.
+ * @returns The yargs command module for the init command.
+ */
 export const getInitCommand = () => ({
     command: "init",
     describe: t("init.command_description"),
@@ -21,7 +26,7 @@ export const getInitCommand = () => ({
             }
         }
         catch {
-            // Intentionally ignored
+            // Directory doesn't exist - proceed with creation
         }
         ui.log.divider();
         ui.log.success(t("init.setup_start"));
@@ -41,10 +46,11 @@ export const getInitCommand = () => ({
         if (answers.features.includes("husky") &&
             answers.commitValidation !== undefined) {
             const config = {
-                stack: answers.stack,
+                defaultAuthor: answers.authorName,
+                defaultLicense: "MIT", // Default license, could be prompted in future
                 features: { commitValidation: answers.commitValidation },
             };
-            await fs.writeFile(path.join(projectPath, ".stackcoderc.json"), JSON.stringify(config, null, 2));
+            await saveStackCodeConfig(projectPath, config);
         }
         ui.log.info(`  ${t("init.step.readme")}`);
         const readmeContent = await generateReadmeContent();
@@ -58,22 +64,20 @@ export const getInitCommand = () => ({
         }
         ui.log.info(`  ${t("init.step.git")}`);
         await runCommand("git", ["init"], { cwd: projectPath });
-        // Validate dependencies before attempting to install them
         ui.log.info(`  ${t("init.step.validate_deps")}`);
         const dependencyValidation = await validateStackDependencies(answers.stack);
         if (!dependencyValidation.isValid) {
             ui.log.warning(t("init.dependencies.missing", { stack: answers.stack }));
-            dependencyValidation.missingDependencies.forEach(dep => {
+            dependencyValidation.missingDependencies.forEach((dep) => {
                 ui.log.raw(t("init.dependencies.missing_detail", { command: dep }));
             });
             ui.log.raw("\n" + t("init.dependencies.install_instructions"));
-            dependencyValidation.missingDependencies.forEach(dep => {
+            dependencyValidation.missingDependencies.forEach((dep) => {
                 const installKey = `init.dependencies.install_${dep}`;
                 try {
                     ui.log.raw(t(installKey));
                 }
                 catch {
-                    // If no specific install instruction exists, show generic message
                     ui.log.raw(`  - ${dep}: Check the official documentation for installation instructions`);
                 }
             });
@@ -107,7 +111,7 @@ export const getInitCommand = () => ({
         }
         catch (error) {
             ui.log.error(`\n${t("init.error.deps_install_failed", {
-                error: error instanceof Error ? error.message : String(error)
+                error: error instanceof Error ? error.message : String(error),
             })}`);
             ui.log.warning(t("init.error.deps_install_manual"));
             ui.log.info(t("init.error.suggested_command"));

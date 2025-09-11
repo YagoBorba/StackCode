@@ -1,6 +1,7 @@
 import Configstore from "configstore";
 import fs from "fs/promises";
 import path from "path";
+import { loadStackCodeConfig, saveStackCodeConfig, } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
 import * as ui from "./ui.js";
 const globalConfig = new Configstore("@stackcode/cli");
@@ -48,23 +49,26 @@ export async function runInteractiveMode() {
             ui.log.error(t("config.error.not_in_project"));
             return;
         }
-        const localConfigPath = path.join(projectRoot, ".stackcoderc.json");
         try {
-            await fs.access(localConfigPath);
+            const localConfig = await loadStackCodeConfig(projectRoot);
+            const enable = await ui.promptToEnableValidation();
+            const updatedConfig = {
+                ...localConfig,
+                features: {
+                    ...localConfig.features,
+                    commitValidation: enable,
+                },
+            };
+            await saveStackCodeConfig(projectRoot, updatedConfig);
+            const status = enable
+                ? t("config.status.enabled")
+                : t("config.status.disabled");
+            ui.log.success(t("config.success.set_validation", { status }));
         }
         catch {
             ui.log.error(t("config.error.no_stackcoderc"));
             return;
         }
-        const enable = await ui.promptToEnableValidation();
-        const localConfigContent = await fs.readFile(localConfigPath, "utf-8");
-        const localConfig = JSON.parse(localConfigContent);
-        localConfig.features.commitValidation = enable;
-        await fs.writeFile(localConfigPath, JSON.stringify(localConfig, null, 2));
-        const status = enable
-            ? t("config.status.enabled")
-            : t("config.status.disabled");
-        ui.log.success(t("config.success.set_validation", { status }));
     }
 }
 export const getConfigCommand = () => ({

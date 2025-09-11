@@ -114,28 +114,6 @@ docker run -it sua-org/stackcode init
    export type SupportedStack = "node-js" | "react" | "seu-stack-personalizado"; // Adicionar seu stack
    ```
 
-### Personalização de Configuração
-
-1. **Configuração Padrão**
-
-   ```json
-   // Criar .stackcoderc nos diretórios home dos usuários
-   {
-     "defaultAuthor": "Sua Organização",
-     "defaultLicense": "Proprietário",
-     "organizationTemplates": true,
-     "privateRegistry": "https://seu-registro-npm.com"
-   }
-   ```
-
-2. **Variáveis de Ambiente**
-   ```bash
-   # Definir padrões da organização
-   export STACKCODE_DEFAULT_AUTHOR="Sua Organização"
-   export STACKCODE_PRIVATE_REGISTRY="https://seu-registro-npm.com"
-   export STACKCODE_TEMPLATE_PATH="/caminho/para/templates/personalizados"
-   ```
-
 ### Internacionalização
 
 Adicione suporte para os idiomas da sua organização:
@@ -189,26 +167,6 @@ npm run build
 # Implantar para sua organização
 npm publish --registry https://seu-registro-npm.com
 ```
-
-## 🏗️ Arquitetura para Organizações
-
-### Configuração Centralizada
-
-```
-Configuração da Organização:
-├── stackcode-config/
-│   ├── templates/           # Templates personalizados da organização
-│   ├── configs/            # Configurações padrão
-│   └── policies/           # Políticas de desenvolvimento
-├── private-registry/       # Registro NPM interno
-└── deployment/            # Scripts de implantação
-```
-
-### Integração de Equipes
-
-1. **Templates de Equipe**: Criar templates específicos para diferentes equipes
-2. **Fluxos de Aprovação**: Implementar processos de aprovação para novos templates
-3. **Analytics de Uso**: Rastrear uso de templates entre equipes
 
 ## 🛠️ Solução de Problemas
 
@@ -366,28 +324,6 @@ docker run -it your-org/stackcode init
    export type SupportedStack = "node-js" | "react" | "your-custom-stack"; // Add your stack
    ```
 
-### Configuration Customization
-
-1. **Default Configuration**
-
-   ```json
-   // Create .stackcoderc in your users' home directories
-   {
-     "defaultAuthor": "Your Organization",
-     "defaultLicense": "Proprietary",
-     "organizationTemplates": true,
-     "privateRegistry": "https://your-npm-registry.com"
-   }
-   ```
-
-2. **Environment Variables**
-   ```bash
-   # Set organization defaults
-   export STACKCODE_DEFAULT_AUTHOR="Your Organization"
-   export STACKCODE_PRIVATE_REGISTRY="https://your-npm-registry.com"
-   export STACKCODE_TEMPLATE_PATH="/path/to/custom/templates"
-   ```
-
 ### Internationalization
 
 Add support for your organization's languages:
@@ -398,71 +334,7 @@ echo '{"welcome": "Bienvenido"}' > packages/i18n/src/locales/es.json
 echo '{"welcome": "Willkommen"}' > packages/i18n/src/locales/de.json
 ```
 
-## 🔒 Security Considerations
-
-### Code Review Process
-
-1. **Fork and Review**: Always fork the repository and review changes
-2. **Dependency Scanning**: Regularly scan dependencies for vulnerabilities
-3. **Access Control**: Restrict who can modify templates and configurations
-
-### Network Security
-
-1. **Private Registries**: Use private NPM registries for internal packages
-2. **VPN Access**: Require VPN for accessing internal StackCode instances
-3. **Audit Logging**: Log all template generations and modifications
-
-### Template Security
-
-1. **Sanitize Inputs**: Validate all user inputs in templates
-2. **Restrict File Access**: Limit template file system access
-3. **Code Review Templates**: Review all custom templates for security issues
-
-## 🔄 Update Management
-
-### Versioning Strategy
-
-1. **Semantic Versioning**: Follow semver for your organization's version
-2. **Release Notes**: Maintain detailed changelog for internal releases
-3. **Testing Pipeline**: Test all changes before deploying to teams
-
-### Update Process
-
-```bash
-# Update from upstream
-git remote add upstream https://github.com/YagoBorba/StackCode.git
-git fetch upstream
-git merge upstream/develop
-
-# Review changes and test
-npm test
-npm run build
-
-# Deploy to your organization
-npm publish --registry https://your-npm-registry.com
-```
-
-## 🏗️ Architecture for Organizations
-
-### Centralized Configuration
-
-```
-Organization Setup:
-├── stackcode-config/
-│   ├── templates/           # Custom organization templates
-│   ├── configs/            # Default configurations
-│   └── policies/           # Development policies
-├── private-registry/       # Internal NPM registry
-└── deployment/            # Deployment scripts
-```
-
-### Team Integration
-
-1. **Team Templates**: Create templates specific to different teams
-2. **Approval Workflows**: Implement approval processes for new templates
-3. **Usage Analytics**: Track template usage across teams
-
-## 🛠️ Troubleshooting
+## ️ Troubleshooting
 
 ### Common Issues
 
@@ -494,23 +366,13 @@ Organization Setup:
    npm ping --registry https://your-registry.com
    ```
 
-### Support and Maintenance
-
-1. **Internal Documentation**: Maintain organization-specific documentation
-2. **Support Channels**: Set up internal support channels for StackCode issues
-3. **Regular Updates**: Schedule regular updates from the upstream repository
-
 ## 📋 Deployment Checklist
 
 - [ ] Repository forked and customized
 - [ ] Custom templates created and tested
-- [ ] Configuration files distributed to teams
-- [ ] Private registry configured (if applicable)
-- [ ] Security review completed
-- [ ] Team training conducted
-- [ ] Monitoring and logging set up
-- [ ] Update process documented
-- [ ] Support process established
+- [ ] Build process completed successfully
+- [ ] Tests passing
+- [ ] Documentation updated for customizations
 
 ## 🤝 Contributing Back
 
