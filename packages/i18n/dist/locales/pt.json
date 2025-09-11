@@ -195,11 +195,37 @@
       "gitignore": "-> Gerando .gitignore...",
       "husky": "-> Configurando o Husky...",
       "git": "-> Inicializando o repositório Git...",
-      "deps": "-> Instalando dependências (isso pode levar um momento)..."
+      "deps": "-> Instalando dependências (isso pode levar um momento)...",
+      "validate_deps": "-> Verificando dependências do sistema..."
+    },
+    "dependencies": {
+      "checking": "Verificando se as ferramentas necessárias estão instaladas...",
+      "missing": "⚠️ Ferramentas ausentes detectadas para a stack '{stack}':",
+      "missing_detail": "  - {command}: Não encontrado no sistema",
+      "install_instructions": "📋 Para continuar, instale as ferramentas em falta:",
+      "install_go": "  - Go: https://golang.org/dl/",
+      "install_composer": "  - Composer: https://getcomposer.org/download/",
+      "install_maven": "  - Maven: https://maven.apache.org/install.html",
+      "install_python": "  - Python/pip: https://python.org/downloads/",
+      "install_pip": "  - Python/pip: https://python.org/downloads/",
+      "install_php": "  - PHP: https://php.net/downloads/",
+      "install_java": "  - Java: https://adoptium.net/",
+      "install_mvn": "  - Maven: https://maven.apache.org/install.html",
+      "all_available": "✅ Todas as ferramentas necessárias estão disponíveis.",
+      "optional_skip": "⚠️ Você pode continuar sem instalar as dependências, mas a instalação de pacotes falhará.",
+      "prompt_continue": "Deseja continuar mesmo assim?"
+    },
+    "error": {
+      "deps_install_failed": "⚠️ Falha na instalação de dependências: {error}",
+      "deps_install_manual": "O projeto foi criado com sucesso, mas você precisará instalar as dependências manualmente.",
+      "suggested_command": "Comando sugerido:"
     },
     "success": {
       "ready": "✅ Sucesso! Seu projeto está pronto.",
-      "next_steps": "Próximos passos:"
+      "next_steps": "Próximos passos:",
+      "step1": "1. cd {projectName}",
+      "step2": "2. Abra o projeto no seu editor favorito.",
+      "step3": "3. Comece a codar! 🎉"
     }
   },
   "release": {

@@ -19,5 +19,27 @@ export declare function runCommand(command: string, args: string[], options: Run
  * @returns A promise that resolves with the command's stdout string.
  */
 export declare function getCommandOutput(command: string, args: string[], options: RunCommandOptions): Promise<string>;
+/**
+ * Checks if a command is available in the system PATH.
+ * @param command - The command to check (e.g., 'go', 'composer', 'mvn').
+ * @returns A promise that resolves to true if the command is available, false otherwise.
+ */
+export declare function isCommandAvailable(command: string): Promise<boolean>;
+/**
+ * Gets the required dependencies for a given stack.
+ * @param stack - The stack name (e.g., 'go', 'php', 'java', 'python').
+ * @returns An array of required commands for the stack.
+ */
+export declare function getStackDependencies(stack: string): string[];
+/**
+ * Validates if all required dependencies for a stack are available.
+ * @param stack - The stack name to validate.
+ * @returns A promise that resolves to an object with validation results.
+ */
+export declare function validateStackDependencies(stack: string): Promise<{
+    isValid: boolean;
+    missingDependencies: string[];
+    availableDependencies: string[];
+}>;
 export declare function getErrorMessage(error: unknown): string;
 export {};

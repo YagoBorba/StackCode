@@ -7,6 +7,7 @@ import {
   generateReadmeContent,
   generateGitignoreContent,
   runCommand,
+  validateStackDependencies,
   type ProjectOptions,
 } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
@@ -83,24 +84,79 @@ export const getInitCommand = (): CommandModule => ({
     ui.log.info(`  ${t("init.step.git")}`);
     await runCommand("git", ["init"], { cwd: projectPath });
 
-    ui.log.info(`  ${t("init.step.deps")}`);
-    if (answers.stack === "python") {
-      await runCommand("pip", ["install", "-e", "."], { cwd: projectPath });
-    } else if (answers.stack === "java") {
-      await runCommand("mvn", ["install"], { cwd: projectPath });
-    } else if (answers.stack === "go") {
-      await runCommand("go", ["mod", "tidy"], { cwd: projectPath });
-    } else if (answers.stack === "php") {
-      await runCommand("composer", ["install"], { cwd: projectPath });
+    // Validate dependencies before attempting to install them
+    ui.log.info(`  ${t("init.step.validate_deps")}`);
+    const dependencyValidation = await validateStackDependencies(answers.stack);
+    
+    if (!dependencyValidation.isValid) {
+      ui.log.warning(t("init.dependencies.missing", { stack: answers.stack }));
+      dependencyValidation.missingDependencies.forEach(dep => {
+        ui.log.raw(t("init.dependencies.missing_detail", { command: dep }));
+      });
+      
+      ui.log.raw("\n" + t("init.dependencies.install_instructions"));
+      dependencyValidation.missingDependencies.forEach(dep => {
+        const installKey = `init.dependencies.install_${dep}`;
+        try {
+          ui.log.raw(t(installKey));
+        } catch {
+          // If no specific install instruction exists, show generic message
+          ui.log.raw(`  - ${dep}: Check the official documentation for installation instructions`);
+        }
+      });
+      
+      ui.log.warning("\n" + t("init.dependencies.optional_skip"));
+      const shouldContinue = await ui.promptForConfirmation(
+        t("init.dependencies.prompt_continue"),
+        false
+      );
+      
+      if (!shouldContinue) {
+        ui.log.info(t("common.operation_cancelled"));
+        return;
+      }
     } else {
-      await runCommand("npm", ["install"], { cwd: projectPath });
+      ui.log.success(`  ${t("init.dependencies.all_available")}`);
+    }
+
+    ui.log.info(`  ${t("init.step.deps")}`);
+    try {
+      if (answers.stack === "python") {
+        await runCommand("pip", ["install", "-e", "."], { cwd: projectPath });
+      } else if (answers.stack === "java") {
+        await runCommand("mvn", ["install"], { cwd: projectPath });
+      } else if (answers.stack === "go") {
+        await runCommand("go", ["mod", "tidy"], { cwd: projectPath });
+      } else if (answers.stack === "php") {
+        await runCommand("composer", ["install"], { cwd: projectPath });
+      } else {
+        await runCommand("npm", ["install"], { cwd: projectPath });
+      }
+    } catch (error) {
+      ui.log.error(`\n${t("init.error.deps_install_failed", { 
+        error: error instanceof Error ? error.message : String(error) 
+      })}`);
+      ui.log.warning(t("init.error.deps_install_manual"));
+      ui.log.info(t("init.error.suggested_command"));
+      
+      if (answers.stack === "python") {
+        ui.log.raw("  pip install -e .");
+      } else if (answers.stack === "java") {
+        ui.log.raw("  mvn install");
+      } else if (answers.stack === "go") {
+        ui.log.raw("  go mod tidy");
+      } else if (answers.stack === "php") {
+        ui.log.raw("  composer install");
+      } else {
+        ui.log.raw("  npm install");
+      }
     }
 
     ui.log.divider();
     ui.log.success(t("init.success.ready"));
     ui.log.info(`\n${t("init.success.next_steps")}`);
-    ui.log.raw(`  1. cd ${answers.projectName}`);
-    ui.log.raw("  2. Open the project in your favorite editor.");
-    ui.log.raw("  3. Start coding! 🎉");
+    ui.log.raw(`  ${t("init.success.step1", { projectName: answers.projectName })}`);
+    ui.log.raw(`  ${t("init.success.step2")}`);
+    ui.log.raw(`  ${t("init.success.step3")}`);
   },
 });
