@@ -112,9 +112,9 @@ core/
 └── test/                     # Core logic tests
 ```
 
-### 3. **@stackcode/i18n** - Internationalization
+### 3. **@stackcode/i18n** - Internacionalización
 
-**Purpose:** Manages multi-language support across all packages.
+**Propósito:** Gestiona el soporte multiidioma en todos los paquetes.
 
 **Features:**
 
@@ -134,9 +134,9 @@ i18n/
 │       └── pt.json           # Portuguese translations
 ```
 
-### 4. **stackcode-vscode** - VS Code Extension
+### 4. **stackcode-vscode** - Extensión de VS Code
 
-**Purpose:** Integrates StackCode functionality directly into VS Code.
+**Propósito:** Integra la funcionalidad de StackCode directamente en VS Code.
 
 **Key Components:**
 
@@ -315,13 +315,13 @@ Each package follows consistent patterns:
 
 ### Command System
 
-- **Plugin Architecture:** Future support for custom commands
-- **Middleware Support:** Pre/post command hooks
-- **Configuration Extension:** Custom validation and generation rules
+- **Plugin Architecture:** Soporte futuro para comandos personalizados
+- **Middleware Support:** Hooks pre/post comando
+- **Configuration Extension:** Reglas personalizadas de validación y generación
 
-## 📚 Additional Resources
+## 📚 Recursos Adicionales
 
-- **[Contributing Guide](../CONTRIBUTING.md):** Development workflow and standards
-- **[Stacks Documentation](STACKS.md):** Supported technology stacks
-- **[Self-Hosting Guide](SELF_HOSTING_GUIDE.md):** Deployment options
-- **[ADR Directory](adr/):** Architectural decision records
+- **[Guía de Contribución](../CONTRIBUTING.md):** Flujo de trabajo de desarrollo y estándares
+- **[Documentación de Stacks](STACKS.md):** Stacks de tecnología soportados
+- **[Guía de Auto-hospedaje](SELF_HOSTING_GUIDE.md):** Opciones de despliegue
+- **[Directorio ADR](adr/):** Registros de decisión arquitectural

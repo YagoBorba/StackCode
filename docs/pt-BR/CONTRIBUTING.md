@@ -357,9 +357,9 @@ See the comprehensive guide in [main CONTRIBUTING.md](../CONTRIBUTING.md#adding-
 - Test both success and error scenarios
 - Use descriptive test names
 
-## 🌐 Internationalization
+## 🌐 Internacionalização
 
-We welcome contributions to support more languages:
+Aceitamos contribuições para suporte a mais idiomas:
 
 ### Current Structure
 

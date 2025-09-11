@@ -370,9 +370,9 @@ cli/
 └── test/                     # Command tests
 ```
 
-### 2. **@stackcode/core** - Business Logic Engine
+### 2. **@stackcode/core** - Motor de Lógica de Negócio
 
-**Purpose:** Contains all business logic, utilities, and templates.
+**Propósito:** Contém toda a lógica de negócio, utilitários e templates.
 
 **Key Components:**
 
@@ -409,9 +409,9 @@ core/
 └── test/                     # Core logic tests
 ```
 
-### 3. **@stackcode/i18n** - Internationalization
+### 3. **@stackcode/i18n** - Internacionalização
 
-**Purpose:** Manages multi-language support across all packages.
+**Propósito:** Gerencia suporte multilíngue em todos os pacotes.
 
 **Features:**
 
@@ -433,7 +433,7 @@ i18n/
 
 ### 4. **stackcode-vscode** - VS Code Extension
 
-**Purpose:** Integrates StackCode functionality directly into VS Code.
+**Propósito:** Integra a funcionalidade do StackCode diretamente no VS Code.
 
 **Key Components:**
 
@@ -612,13 +612,13 @@ Each package follows consistent patterns:
 
 ### Command System
 
-- **Plugin Architecture:** Future support for custom commands
-- **Middleware Support:** Pre/post command hooks
-- **Configuration Extension:** Custom validation and generation rules
+- **Plugin Architecture:** Suporte futuro para comandos personalizados
+- **Middleware Support:** Hooks pré/pós comando
+- **Configuration Extension:** Regras personalizadas de validação e geração
 
-## 📚 Additional Resources
+## 📚 Recursos Adicionais
 
-- **[Contributing Guide](../CONTRIBUTING.md):** Development workflow and standards
-- **[Stacks Documentation](STACKS.md):** Supported technology stacks
-- **[Self-Hosting Guide](SELF_HOSTING_GUIDE.md):** Deployment options
-- **[ADR Directory](adr/):** Architectural decision records
+- **[Guia de Contribuição](../CONTRIBUTING.md):** Fluxo de trabalho de desenvolvimento e padrões
+- **[Documentação de Stacks](STACKS.md):** Stacks de tecnologia suportados
+- **[Guia de Auto-hospedagem](SELF_HOSTING_GUIDE.md):** Opções de implantação
+- **[Diretório ADR](adr/):** Registros de decisão arquitetural
