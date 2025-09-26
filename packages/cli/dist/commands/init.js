@@ -3,6 +3,7 @@ import path from "path";
 import { scaffoldProject, setupHusky, generateReadmeContent, generateGitignoreContent, runCommand, validateStackDependencies, saveStackCodeConfig, } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
 import * as ui from "./ui.js";
+import { initEducationalMode, showEducationalMessage } from "../educational-mode.js";
 /**
  * Creates and returns the init command configuration for yargs.
  * This command initializes a new project with the selected stack and configurations.
@@ -12,7 +13,9 @@ export const getInitCommand = () => ({
     command: "init",
     describe: t("init.command_description"),
     builder: {},
-    handler: async () => {
+    handler: async (argv) => {
+        // Initialize educational mode based on config and flag
+        initEducationalMode(argv.educate || false);
         ui.log.step(t("init.welcome"));
         ui.log.divider();
         const answers = await ui.promptForInitAnswers();
@@ -42,6 +45,7 @@ export const getInitCommand = () => ({
             replacements,
         };
         ui.log.info(`  ${t("init.step.scaffold")}`);
+        showEducationalMessage("educational.scaffold_explanation");
         await scaffoldProject(projectOptions);
         if (answers.features.includes("husky") &&
             answers.commitValidation !== undefined) {
@@ -53,18 +57,23 @@ export const getInitCommand = () => ({
             await saveStackCodeConfig(projectPath, config);
         }
         ui.log.info(`  ${t("init.step.readme")}`);
+        showEducationalMessage("educational.readme_explanation");
         const readmeContent = await generateReadmeContent();
         await fs.writeFile(path.join(projectPath, "README.md"), readmeContent);
         ui.log.info(`  ${t("init.step.gitignore")}`);
+        showEducationalMessage("educational.gitignore_explanation");
         const gitignoreContent = await generateGitignoreContent([answers.stack]);
         await fs.writeFile(path.join(projectPath, ".gitignore"), gitignoreContent);
         if (answers.features.includes("husky")) {
             ui.log.info(`  ${t("init.step.husky")}`);
+            showEducationalMessage("educational.husky_explanation");
             await setupHusky(projectPath);
         }
         ui.log.info(`  ${t("init.step.git")}`);
+        showEducationalMessage("educational.git_init_explanation");
         await runCommand("git", ["init"], { cwd: projectPath });
         ui.log.info(`  ${t("init.step.validate_deps")}`);
+        showEducationalMessage("educational.dependency_validation_explanation");
         const dependencyValidation = await validateStackDependencies(answers.stack);
         if (!dependencyValidation.isValid) {
             ui.log.warning(t("init.dependencies.missing", { stack: answers.stack }));

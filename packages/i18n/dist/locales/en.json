@@ -4,7 +4,8 @@
     "error_generic": "✖ An error occurred.",
     "yes": "Yes",
     "no": "No",
-    "error_demand_command": "You need to specify at least one command."
+    "error_demand_command": "You need to specify at least one command.",
+    "educate_flag_description": "Enable educational mode with detailed explanations"
   },
   "github": {
     "description": "GitHub integration commands",
@@ -103,11 +104,14 @@
     "prompt": {
       "main": "What do you want to configure?",
       "select_lang": "Select your preferred language (global setting):",
-      "toggle_validation": "Enable mandatory conventional commit validation for this project?"
+      "toggle_validation": "Enable mandatory conventional commit validation for this project?",
+      "toggle_educate": "Configure educational mode (global)",
+      "enable_educate": "Enable educational mode? (Shows explanations in all commands)"
     },
     "success": {
       "set": "✔ Success! Configuration '{key}' set to '{value}'.",
-      "set_validation": "✔ Success! Commit validation for this project is now {status}."
+      "set_validation": "✔ Success! Commit validation for this project is now {status}.",
+      "set_educate": "✔ Success! Educational mode is now {status}."
     },
     "status": {
       "enabled": "ENABLED",
@@ -403,6 +407,18 @@
       "opening_pr": "Opening pull request...",
       "are_you_sure_finish_branch": "Are you sure you want to finish {currentBranch}? This will merge it back to the base branch.",
       "finish_branch": "Finish Branch"
+    },
+    "educational": {
+      "gitignore_explanation": "A .gitignore file is being created to prevent secrets and unnecessary files (like node_modules) from being saved in the repository. This keeps your repository clean and secure.",
+      "readme_explanation": "A README.md file is being created to document your project. It's the first thing visitors see on GitHub and should explain what your project does and how to use it.",
+      "husky_explanation": "Husky is being configured to automate checks before commits. This ensures that problematic code doesn't get pushed to the repository, maintaining code quality.",
+      "git_init_explanation": "Initializing a Git repository for version control. Git allows you to track changes, collaborate with others, and maintain project history.",
+      "dependency_validation_explanation": "Checking if all necessary tools are installed. This prevents errors during development and ensures your environment is properly configured.",
+      "scaffold_explanation": "Creating initial project structure based on the selected stack. This saves time and ensures you start with best practices.",
+      "commit_validation_explanation": "Conventional commits help maintain a clean history and enable release automation. The standard format makes it easy to understand what each change does.",
+      "stack_dependencies_explanation": "Each stack has its own dependencies and tools. We validate this to ensure you have everything needed for efficient development.",
+      "license_explanation": "A license defines how others can use your code. MIT is permissive and popular for open source projects.",
+      "conventional_commits_explanation": "Conventional commits follow a standard that enables automation and understanding. Format: type(scope): description"
     },
     "dashboard": {
       "received_command_from_webview": "[StackCode] Received command from webview:",

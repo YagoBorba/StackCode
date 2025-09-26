@@ -2,12 +2,16 @@ import type { CommandModule } from "yargs";
 import { runCommand, getCommandOutput, getErrorMessage } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
 import * as ui from "./ui.js";
+import { initEducationalMode, showBestPractice } from "../educational-mode.js";
 
 export const getCommitCommand = (): CommandModule => ({
   command: "commit",
   describe: t("commit.command_description"),
   builder: {},
-  handler: async () => {
+  handler: async (argv: any) => {
+    // Initialize educational mode based on config and flag
+    initEducationalMode(argv.educate || false);
+    showBestPractice("educational.conventional_commits_explanation");
     try {
       const statusOutput = await getCommandOutput(
         "git",

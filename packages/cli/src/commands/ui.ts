@@ -100,6 +100,10 @@ export async function promptForConfigChoice(): Promise<string> {
           name: t("config.prompt.toggle_validation"),
           value: "commitValidation",
         },
+        {
+          name: t("config.prompt.toggle_educate"),
+          value: "educate",
+        },
       ],
     },
   ]);
@@ -128,6 +132,18 @@ export async function promptToEnableValidation(): Promise<boolean> {
       name: "enable",
       message: t("config.prompt.toggle_validation"),
       default: true,
+    },
+  ]);
+  return enable;
+}
+
+export async function promptToEnableEducate(): Promise<boolean> {
+  const { enable } = await inquirer.prompt<{ enable: boolean }>([
+    {
+      type: "confirm",
+      name: "enable",
+      message: t("config.prompt.enable_educate"),
+      default: false,
     },
   ]);
   return enable;

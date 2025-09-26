@@ -155,7 +155,6 @@ export async function loadStackCodeConfig(projectPath) {
         return JSON.parse(configContent);
     }
     catch {
-        // Return default configuration if file doesn't exist or is invalid
         return {
             features: {
                 commitValidation: false,

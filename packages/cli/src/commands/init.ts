@@ -14,6 +14,7 @@ import {
 } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
 import * as ui from "./ui.js";
+import { initEducationalMode, showEducationalMessage, showBestPractice } from "../educational-mode.js";
 
 /**
  * Creates and returns the init command configuration for yargs.
@@ -24,7 +25,9 @@ export const getInitCommand = (): CommandModule => ({
   command: "init",
   describe: t("init.command_description"),
   builder: {},
-  handler: async () => {
+  handler: async (argv: any) => {
+    // Initialize educational mode based on config and flag
+    initEducationalMode(argv.educate || false);
     ui.log.step(t("init.welcome"));
     ui.log.divider();
 
@@ -59,6 +62,7 @@ export const getInitCommand = (): CommandModule => ({
     };
 
     ui.log.info(`  ${t("init.step.scaffold")}`);
+    showEducationalMessage("educational.scaffold_explanation");
     await scaffoldProject(projectOptions);
 
     if (
@@ -74,22 +78,27 @@ export const getInitCommand = (): CommandModule => ({
     }
 
     ui.log.info(`  ${t("init.step.readme")}`);
+    showEducationalMessage("educational.readme_explanation");
     const readmeContent = await generateReadmeContent();
     await fs.writeFile(path.join(projectPath, "README.md"), readmeContent);
 
     ui.log.info(`  ${t("init.step.gitignore")}`);
+    showEducationalMessage("educational.gitignore_explanation");
     const gitignoreContent = await generateGitignoreContent([answers.stack]);
     await fs.writeFile(path.join(projectPath, ".gitignore"), gitignoreContent);
 
     if (answers.features.includes("husky")) {
       ui.log.info(`  ${t("init.step.husky")}`);
+      showEducationalMessage("educational.husky_explanation");
       await setupHusky(projectPath);
     }
 
     ui.log.info(`  ${t("init.step.git")}`);
+    showEducationalMessage("educational.git_init_explanation");
     await runCommand("git", ["init"], { cwd: projectPath });
 
     ui.log.info(`  ${t("init.step.validate_deps")}`);
+    showEducationalMessage("educational.dependency_validation_explanation");
     const dependencyValidation = await validateStackDependencies(answers.stack);
 
     if (!dependencyValidation.isValid) {

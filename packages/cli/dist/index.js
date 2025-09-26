@@ -22,6 +22,13 @@ async function main() {
             .alias("v", "version")
             .strict()
             .locale(locale)
+            .option("educate", {
+            alias: "e",
+            type: "boolean",
+            default: false,
+            describe: t("common.educate_flag_description"),
+            global: true,
+        })
             .command(getValidateCommand())
             .command(getGenerateCommand())
             .command(getInitCommand())
