@@ -1,6 +1,6 @@
 {
   "name": "@stackcode/cli",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "The Command-/Line Interface for StackCode",
   "type": "module",
   "main": "dist/index.js",
@@ -34,8 +34,8 @@
     "url": "https://github.com/YagoBorba/StackCode/issues"
   },
   "dependencies": {
-    "@stackcode/core": "^1.0.4",
-    "@stackcode/i18n": "^1.0.4",
+    "@stackcode/core": "^2.0.1",
+    "@stackcode/i18n": "^2.0.1",
     "chalk": "^5.3.0",
     "configstore": "^7.0.0",
     "inquirer": "^8.2.6",
