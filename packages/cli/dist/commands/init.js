@@ -3,7 +3,7 @@ import path from "path";
 import { scaffoldProject, setupHusky, generateReadmeContent, generateGitignoreContent, runCommand, validateStackDependencies, saveStackCodeConfig, } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
 import * as ui from "./ui.js";
-import { initEducationalMode, showEducationalMessage } from "../educational-mode.js";
+import { initEducationalMode, showEducationalMessage, } from "../educational-mode.js";
 /**
  * Creates and returns the init command configuration for yargs.
  * This command initializes a new project with the selected stack and configurations.

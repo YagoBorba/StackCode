@@ -13,7 +13,6 @@ export const getValidateCommand = () => ({
         });
     },
     handler: (argv) => {
-        // Initialize educational mode based on config and flag
         initEducationalMode(argv.educate || false);
         const message = argv.message;
         if (validateCommitMessage(message)) {

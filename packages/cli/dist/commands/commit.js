@@ -7,7 +7,6 @@ export const getCommitCommand = () => ({
     describe: t("commit.command_description"),
     builder: {},
     handler: async (argv) => {
-        // Initialize educational mode based on config and flag
         initEducationalMode(argv.educate || false);
         showBestPractice("educational.conventional_commits_explanation");
         try {
