@@ -5,6 +5,7 @@
     "yes": "Sim",
     "no": "Não",
     "error_demand_command": "Você precisa especificar pelo menos um comando.",
+    "educate_flag_description": "Ativar modo educacional com explicações detalhadas",
     "back": "Voltar",
     "cancel": "Cancelar",
     "previous_page": "Página anterior",
@@ -125,11 +126,14 @@
     "prompt": {
       "main": "O que você deseja configurar?",
       "select_lang": "Selecione seu idioma de preferência (configuração global):",
-      "toggle_validation": "Habilitar validação de commits obrigatória para este projeto?"
+      "toggle_validation": "Habilitar validação de commits obrigatória para este projeto?",
+      "toggle_educate": "Configurar modo educacional (global)",
+      "enable_educate": "Habilitar modo educacional? (Mostra explicações em todos os comandos)"
     },
     "success": {
       "set": "✔ Sucesso! A configuração '{key}' foi definida como '{value}'.",
-      "set_validation": "✔ Sucesso! A validação de commit para este projeto está agora {status}."
+      "set_validation": "✔ Sucesso! A validação de commit para este projeto está agora {status}.",
+      "set_educate": "✔ Sucesso! O modo educacional está agora {status}."
     },
     "status": {
       "enabled": "HABILITADA",
@@ -425,6 +429,18 @@
       "opening_pr": "Abrindo pull request...",
       "are_you_sure_finish_branch": "Tem certeza de que deseja finalizar {currentBranch}? Isso irá mesclá-la de volta para a branch base.",
       "finish_branch": "Finalizar Branch"
+    },
+    "educational": {
+      "gitignore_explanation": "Um arquivo .gitignore está sendo criado para impedir que segredos e arquivos desnecessários (como node_modules) sejam salvos no repositório. Isso mantém seu repositório limpo e seguro.",
+      "readme_explanation": "Um arquivo README.md está sendo criado para documentar seu projeto. É a primeira coisa que visitantes veem no GitHub e deve explicar o que seu projeto faz e como usá-lo.",
+      "husky_explanation": "Husky está sendo configurado para automatizar verificações antes dos commits. Isso garante que código com problemas não seja enviado para o repositório, mantendo a qualidade do código.",
+      "git_init_explanation": "Inicializando um repositório Git para controle de versão. O Git permite rastrear mudanças, colaborar com outros e manter histórico do projeto.",
+      "dependency_validation_explanation": "Verificando se todas as ferramentas necessárias estão instaladas. Isso evita erros durante o desenvolvimento e garante que o ambiente está configurado corretamente.",
+      "scaffold_explanation": "Criando estrutura inicial do projeto baseada no stack selecionado. Isso economiza tempo e garante que você comece com as melhores práticas.",
+      "commit_validation_explanation": "Commits convencionais ajudam a manter um histórico limpo e permitem automação de releases. O formato padrão facilita entender o que cada mudança faz.",
+      "stack_dependencies_explanation": "Cada stack tem suas próprias dependências e ferramentas. Validamos isso para garantir que você tenha tudo necessário para desenvolver eficientemente.",
+      "license_explanation": "Uma licença define como outros podem usar seu código. MIT é permissiva e popular para projetos open source.",
+      "conventional_commits_explanation": "Commits convencionais seguem um padrão que facilita automação e compreensão. Formato: tipo(escopo): descrição"
     },
     "dashboard": {
       "received_command_from_webview": "[StackCode] Comando recebido do webview:",

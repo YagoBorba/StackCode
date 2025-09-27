@@ -43,6 +43,14 @@ export async function runInteractiveMode() {
         globalConfig.set("lang", lang);
         ui.log.success(t("config.success.set", { key: "lang", value: lang }));
     }
+    else if (choice === "educate") {
+        const enable = await ui.promptToEnableEducate();
+        globalConfig.set("educate", enable.toString());
+        const status = enable
+            ? t("config.status.enabled")
+            : t("config.status.disabled");
+        ui.log.success(t("config.success.set_educate", { status }));
+    }
     else if (choice === "commitValidation") {
         const projectRoot = await findProjectRoot(process.cwd());
         if (!projectRoot) {

@@ -61,7 +61,10 @@ StackCode is a suite of tools designed to work together seamlessly:
   Integrates seamlessly with Husky git hooks. The `stc validate` command ensures that no non-conventional commit ever makes it into your repository.
 
 - ⚙️ **Flexible Configuration (`config`):**
-  Manage global preferences (like language) and project-specific settings (like enabling commit validation) with a simple, interactive command.
+  Manage global preferences (like language and educational mode) and project-specific settings (like enabling commit validation) with a simple, interactive command.
+
+- 🎓 **Educational Mode (`--educate`):**
+  **NEW!** Learn while you work. Enable educational mode to receive helpful explanations about best practices behind every action. Configure globally with `stc config set educate true` or use the `--educate` flag on any command for on-demand learning.
 
 ## 🛠️ Under the Hood (Main Technologies)
 
@@ -101,6 +104,22 @@ This is the best approach for ensuring everyone on a project uses the exact same
     ```bash
     npx stc commit
     ```
+
+### 🎓 Enable Educational Mode (Recommended for Beginners)
+
+StackCode can teach you best practices as you work. To enable educational explanations:
+
+```bash
+# Enable educational mode globally (shows explanations on all commands)
+stc config set educate true
+
+# Or use on-demand with any command
+stc validate "feat: new feature" --educate
+stc commit --educate
+stc init --educate
+```
+
+Educational mode explains the "why" behind each action, making it perfect for learning DevOps best practices!
 
 ## 📚 Documentation
 

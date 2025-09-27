@@ -52,12 +52,14 @@ O StackCode segue uma **arquitetura de monorepo modular** com clara separação 
 
 - **Comandos**: Implementações dos comandos CLI (`init`, `generate`, `commit`, etc.)
 - **Manipuladores de Argumentos**: Parsing e validação de argumentos usando Yargs
+- **Modo Educacional**: Sistema de aprendizado contextual com explicações de melhores práticas
 - **Utilitários**: Funções auxiliares específicas da CLI
 
 **Responsabilidades:**
 
 - Parsing de argumentos de linha de comando
 - Interação com o usuário via terminal
+- Fornecimento de explicações educacionais contextuais
 - Orquestração de chamadas para o pacote core
 - Tratamento de erros e apresentação de resultados
 
@@ -589,6 +591,49 @@ Each package follows consistent patterns:
 - **Template Generation:** Verify output correctness
 - **GitHub Integration:** API interaction testing
 
+## 🎓 Arquitetura do Modo Educacional
+
+### Visão Geral
+
+O Modo Educacional é uma funcionalidade transversal que melhora a experiência do usuário fornecendo explicações contextuais e orientações sobre melhores práticas em todo o kit de ferramentas StackCode.
+
+### Implementação
+
+```typescript
+// Fluxo do Modo Educacional
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│ Comando Usuário │ -> │ Detecção Modo   │ -> │ Mostrar Mensag. │
+│  --educate ou   │    │ Config Global + │    │ Melhores Prátic.│
+│ config global   │    │ Flag Comando    │    │ & Explicações   │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+### Componentes Principais
+
+- **`educational-mode.ts`:** Lógica central do modo educacional
+  - `initEducationalMode()`: Detecta configuração e flags de comando
+  - `showEducationalMessage()`: Exibe dicas contextuais
+  - `showBestPractice()`: Mostra explicações de melhores práticas
+  - `showSecurityTip()`: Destaca considerações de segurança
+
+- **Integração de Configuração:**
+  - Configuração global: `stackcode config set educate true/false`
+  - Flag por comando: `--educate` em qualquer comando
+  - Configuração interativa via `stackcode config`
+
+- **Sistema de Mensagens:**
+  - Explicações internacionalizadas (PT/EN/ES)
+  - Mensagens de fallback para confiabilidade
+  - Conteúdo contextual baseado no comando
+
+### Cobertura do Conteúdo Educacional
+
+- **Inicialização de Projetos:** Explica decisões de scaffolding e dependências
+- **Geração de Arquivos:** Descreve propósito do .gitignore, README, etc.
+- **Fluxos Git:** Explica commits convencionais e benefícios do controle de versão
+- **Práticas de Segurança:** Destaca importância do .gitignore para segredos
+- **Benefícios da Automação:** Mostra valor do Husky, CI/CD e automação de releases
+
 ## 🚀 Deployment and Distribution
 
 ### NPM Packages
@@ -601,6 +646,49 @@ Each package follows consistent patterns:
 
 - **Marketplace:** Published to VS Code Marketplace
 - **VSIX:** Direct installation package available
+
+## 🎓 Arquitetura do Modo Educacional
+
+### Visão Geral
+
+O Modo Educacional é um recurso transversal que aprimora a experiência do usuário fornecendo explicações contextuais e orientação sobre melhores práticas em todo o kit de ferramentas StackCode.
+
+### Implementação
+
+```typescript
+// Fluxo do Modo Educacional
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│ Comando Usuário │ -> │ Detecção Modo   │ -> │ Exibir Mensagens│
+│  --educate ou   │    │ Config Global + │    │ Melhores Práticas│
+│ config global   │    │ Flag Comando    │    │ & Explicações   │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+### Componentes Principais
+
+- **`educational-mode.ts`:** Lógica principal do modo educacional
+  - `initEducationalMode()`: Detecta configuração e flags de comando
+  - `showEducationalMessage()`: Exibe dicas contextuais
+  - `showBestPractice()`: Mostra explicações de melhores práticas
+  - `showSecurityTip()`: Destaca considerações de segurança
+
+- **Integração de Configuração:**
+  - Configuração global: `stackcode config set educate true/false`
+  - Flag por comando: `--educate` em qualquer comando
+  - Configuração interativa via `stackcode config`
+
+- **Sistema de Mensagens:**
+  - Explicações internacionalizadas (PT/EN)
+  - Mensagens de fallback para confiabilidade
+  - Conteúdo contextual baseado no comando
+
+### Cobertura de Conteúdo Educacional
+
+- **Inicialização de Projetos:** Explica decisões de scaffolding e dependências
+- **Geração de Arquivos:** Descreve propósito de .gitignore, README, etc.
+- **Fluxos Git:** Explica commits convencionais e benefícios do controle de versão
+- **Práticas de Segurança:** Destaca importância do .gitignore para segredos
+- **Benefícios da Automação:** Mostra valor do Husky, CI/CD e automação de releases
 
 ## 🔮 Extensibility Points
 
