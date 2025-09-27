@@ -48,6 +48,11 @@ async function handleGitHubReleaseCreation(
       throw new Error("Could not parse GitHub owner/repo from remote URL.");
 
     const [owner, repo] = match[1].replace(".git", "").split("/");
+
+    if (typeof token !== "string" || !token) {
+      throw new Error("Invalid GitHub token. Please run 'stackcode config' to set it.");
+    }
+
     await createGitHubRelease({ owner, repo, tagName, releaseNotes, token });
   } catch (error: unknown) {
     ui.log.error(`\n${t("common.error_generic")}`);
