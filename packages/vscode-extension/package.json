@@ -270,8 +270,8 @@
     "vite": "^7.1.1"
   },
   "dependencies": {
-    "@stackcode/core": "^1.0.0",
-    "@stackcode/i18n": "^1.0.0"
+    "@stackcode/core": "^1.0.4",
+    "@stackcode/i18n": "^1.0.4"
   },
   "keywords": [
     "git",
