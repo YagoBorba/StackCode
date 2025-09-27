@@ -36,6 +36,9 @@ describe("Release Command Handler", () => {
       createRelease: true,
     });
     vi.mocked(core.getRecommendedBump).mockResolvedValue("patch");
+    vi.mocked(core.getErrorMessage).mockImplementation((error: any) =>
+      error instanceof Error ? error.message : String(error),
+    );
     vi.mocked(core.getCommandOutput).mockResolvedValue(
       "git@github.com:owner/repo.git",
     );
