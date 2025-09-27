@@ -10,11 +10,6 @@
 
 ---
 
-**Ever felt the tedious grind of setting up new projects, enforcing conventions, and managing releases?** <br/>
-We believe developers should focus on creating, not on repetitive boilerplate and configuration. That's why we built **StackCode**: the developer's automated Ops Assistant. <br/>
-With intelligent scaffolding, guided commits, a simplified Gitflow, and automated releases, your workflow is about to get a major upgrade. <br/>
-**Your only frustration will be not having this from the start.** 😉
-
 <div align="center">
 
 [![CI Status][ci-shield]][ci-link]
@@ -29,6 +24,7 @@ With intelligent scaffolding, guided commits, a simplified Gitflow, and automate
 [npm-link]: https://www.npmjs.com/package/@stackcode/cli
 [license-shield]: https://img.shields.io/github/license/YagoBorba/StackCode?style=flat-square&logo=github&labelColor=black&color=508CF9
 [license-link]: https://github.com/YagoBorba/StackCode/blob/develop/LICENSE
+
 </br>
 
 </div>
@@ -46,35 +42,38 @@ Our goal is to make best practices the easiest path.
 
 StackCode is a suite of tools designed to work together seamlessly:
 
-* 🚀 **Effortless Project Scaffolding (`init`):**
-  Generate a complete, production-ready project structure in seconds. Starts with a professional Node.js + TypeScript stack, with more to come.
+- 🚀 **Effortless Project Scaffolding (`init`):**
+  Generate a complete, production-ready project structure in seconds. Choose from multiple technology stacks including Node.js, React, Vue.js, Python, Java, Go, and PHP—each with best practices and optimal folder structures. **Now with intelligent dependency validation** that checks if required tools are installed before proceeding, providing helpful installation instructions when needed.
 
-* 📝 **Intelligent File Generation (`generate`):**
+- 📝 **Intelligent File Generation (`generate`):**
   Need a `.gitignore`? Don't just get one—get a perfect one. Our composable template engine combines rules for your stack, IDE, and tools (like Docker) into a single, organized file.
 
-* 💬 **Guided Conventional Commits (`commit`):**
+- 💬 **Guided Conventional Commits (`commit`):**
   Never write a non-compliant commit message again. Our interactive wizard guides you through the Conventional Commits specification, ensuring a clean and readable Git history.
 
-* 🔗 **Simplified Gitflow (`git`):**
+- 🔗 **Simplified Gitflow (`git`):**
   Forget memorizing branch names. Use `stc git start` and `stc git finish` to manage feature branches with ease. Our interactive menu makes the process foolproof.
 
-* 🔖 **Automated Versioning & Releases (`release`):**
+- 🔖 **Automated Versioning & Releases (`release`):**
   This is where the magic happens. The `release` command analyzes your commits, automatically determines the next semantic version (`patch`, `minor`, `major`), updates all `package.json` files, generates a `CHANGELOG.md`, and creates the corresponding commit and Git tag.
 
-* ✅ **Guaranteed Commit Quality (`validate`):**
+- ✅ **Guaranteed Commit Quality (`validate`):**
   Integrates seamlessly with Husky git hooks. The `stc validate` command ensures that no non-conventional commit ever makes it into your repository.
 
-* ⚙️ **Flexible Configuration (`config`):**
-  Manage global preferences (like language) and project-specific settings (like enabling commit validation) with a simple, interactive command.
+- ⚙️ **Flexible Configuration (`config`):**
+  Manage global preferences (like language and educational mode) and project-specific settings (like enabling commit validation) with a simple, interactive command.
+
+- 🎓 **Educational Mode (`--educate`):**
+  **NEW!** Learn while you work. Enable educational mode to receive helpful explanations about best practices behind every action. Configure globally with `stc config set educate true` or use the `--educate` flag on any command for on-demand learning.
 
 ## 🛠️ Under the Hood (Main Technologies)
 
-* **[TypeScript](https://www.typescriptlang.org/)**: For a robust, type-safe, and maintainable codebase.
-* **[Node.js](https://nodejs.org/)**: The runtime environment for our powerful backend logic.
-* **[Yargs](https://yargs.js.org/)**: For building a clean, professional, and extensible command-line interface.
-* **[Inquirer](https://github.com/SBoudrias/Inquirer.js/)**: To create the intuitive and interactive prompts that guide the user.
-* **[Vitest](https://vitest.dev/)**: For a fast, modern, and reliable testing suite that guarantees our core logic is solid.
-* **[GitHub Actions](https://github.com/features/actions)**: For our CI pipeline that automatically builds and tests every Pull Request.
+- **[TypeScript](https://www.typescriptlang.org/)**: For a robust, type-safe, and maintainable codebase.
+- **[Node.js](https://nodejs.org/)**: The runtime environment for our powerful backend logic.
+- **[Yargs](https://yargs.js.org/)**: For building a clean, professional, and extensible command-line interface.
+- **[Inquirer](https://github.com/SBoudrias/Inquirer.js/)**: To create the intuitive and interactive prompts that guide the user.
+- **[Vitest](https://vitest.dev/)**: For a fast, modern, and reliable testing suite that guarantees our core logic is solid.
+- **[GitHub Actions](https://github.com/features/actions)**: For our CI pipeline that automatically builds and tests every Pull Request.
 
 ## 🚀 Getting Started
 
@@ -86,7 +85,7 @@ This is the recommended approach for everyday use, especially for commands like 
 
 1.  Install the CLI globally using npm:
     ```bash
-    npm install -g @stackcode/cli  
+    npm install -g @stackcode/cli
     ```
 2.  You can now run `stc` from any directory on your system!
     ```bash
@@ -106,11 +105,44 @@ This is the best approach for ensuring everyone on a project uses the exact same
     npx stc commit
     ```
 
+### 🎓 Enable Educational Mode (Recommended for Beginners)
+
+StackCode can teach you best practices as you work. To enable educational explanations:
+
+```bash
+# Enable educational mode globally (shows explanations on all commands)
+stc config set educate true
+
+# Or use on-demand with any command
+stc validate "feat: new feature" --educate
+stc commit --educate
+stc init --educate
+```
+
+Educational mode explains the "why" behind each action, making it perfect for learning DevOps best practices!
+
+## 📚 Documentation
+
+For detailed information about the project:
+
+- **[📐 Architecture Guide](docs/ARCHITECTURE.md)** - Understand the project structure, design principles, and component interactions
+- **[🤝 Contributing Guide](docs/CONTRIBUTING.md)** - Development workflow, coding standards, and how to contribute
+- **[🛠️ Technology Stacks](docs/STACKS.md)** - Complete list of supported frameworks and project templates
+- **[🚀 Self-Hosting Guide](docs/SELF_HOSTING_GUIDE.md)** - Deploy and customize StackCode for your organization
+- **[🏛️ ADRs](docs/adr/)** - Architectural decision records documenting key design choices
+
+### 🌐 Documentation in Other Languages
+
+- **[🇧🇷 Português (Brasil)](docs/pt-BR/)** - Documentação em português
+- **[🇪🇸 Español](docs/es/)** - Documentación en español
+
+_Want to help translate the documentation? Check our [contribution guide](docs/CONTRIBUTING.md#internationalization)!_
+
 ## 🤝 Want to Contribute?
 
 Awesome! StackCode is an open-source project, and we welcome contributions.
 
-To get started, please read our **[Contribution Guide](CONTRIBUTING.md)**. It has everything you need to know about our workflow, code standards, and how to submit your pull requests.
+To get started, please read our **[Contribution Guide](docs/CONTRIBUTING.md)**. It has everything you need to know about our workflow, code standards, and how to submit your pull requests.
 
 ## 📝 License
 
@@ -121,10 +153,3 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 <div align="right">
     <a href="#readme-top">Back to Top</a>
 </div>
-
-[ci-shield]: https://github.com/YagoBorba/StackCode/actions/workflows/ci.yml/badge.svg
-[ci-link]: https://github.com/YagoBorba/StackCode/actions/workflows/ci.yml
-[npm-shield]: https://img.shields.io/npm/v/@stackcode/cli?style=flat-square&logo=npm&labelColor=black&color=CB3837
-[npm-link]: https://www.npmjs.com/package/@stackcode/cli
-[license-shield]: https://img.shields.io/github/license/YagoBorba/StackCode?style=flat-square&logo=github&labelColor=black&color=508CF9
-[license-link]: https://github.com/YagoBorba/StackCode/blob/develop/LICENSE

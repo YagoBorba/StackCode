@@ -1,0 +1,18 @@
+// ARQUIVO DE REFERÊNCIA: packages/vscode-extension/src/webview-ui/tsconfig.json
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "bundler", // Também é bom usar bundler aqui
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "strict": true,
+    "allowSyntheticDefaultImports": true
+    // ...outras regras de strictness que você queira
+  },
+  "include": ["src"], // Ele só precisa "olhar" para a pasta src da UI
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

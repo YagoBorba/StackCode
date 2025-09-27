@@ -1,46 +1,26 @@
-import inquirer from 'inquirer';
-import { getStartCommand, createBranch } from './git_sub/start.js';
-import { getFinishCommand, finishHandler } from './git_sub/finish.js';
-import { t } from '@stackcode/i18n';
+import { getStartCommand, createBranch } from "./git_sub/start.js";
+import { getFinishCommand, finishHandler } from "./git_sub/finish.js";
+import { t } from "@stackcode/i18n";
+import * as ui from "./ui.js";
 export const getGitCommand = () => ({
-    command: 'git',
-    describe: t('git.command_description'),
+    command: "git",
+    describe: t("git.command_description"),
     builder: (yargs) => {
-        return yargs
-            .command(getStartCommand())
-            .command(getFinishCommand())
-            .help();
+        return yargs.command(getStartCommand()).command(getFinishCommand()).help();
     },
     handler: async (argv) => {
-        if (argv.subcommand) {
+        if (argv._[1]) {
             return;
         }
-        const { action } = await inquirer.prompt([{
-                type: 'list',
-                name: 'action',
-                message: t('git.prompt_interactive_action'),
-                choices: [
-                    { name: t('git.action_start'), value: 'start' },
-                    { name: t('git.action_finish'), value: 'finish' },
-                ]
-            }]);
-        if (action === 'start') {
-            const { branchName } = await inquirer.prompt([{
-                    type: 'input',
-                    name: 'branchName',
-                    message: t('git.prompt_branch_name'),
-                    validate: (input) => !!input || 'O nome da branch não pode ser vazio.',
-                }]);
-            const { branchType } = await inquirer.prompt([{
-                    type: 'list',
-                    name: 'branchType',
-                    message: t('git.prompt_branch_type'),
-                    choices: ['feature', 'fix', 'hotfix', 'chore'],
-                }]);
+        const action = await ui.promptForGitAction();
+        if (action === "start") {
+            const branchName = await ui.promptForBranchName();
+            const branchType = await ui.promptForBranchType();
             await createBranch(branchName, branchType);
         }
-        else if (action === 'finish') {
+        else if (action === "finish") {
             await finishHandler();
         }
-    }
+    },
 });
+//# sourceMappingURL=git.js.map

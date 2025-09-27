@@ -3,7 +3,8 @@
  * @module core/validator
  */
 
-const CONVENTIONAL_COMMIT_REGEX = /^(feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert)(\(.+\))?!?: .{1,}/;
+const CONVENTIONAL_COMMIT_REGEX =
+  /^(feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert)(\(.+\))?!?: .{1,}/;
 
 /**
  * Validates a commit message string against the Conventional Commits specification.

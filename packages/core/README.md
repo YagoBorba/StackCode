@@ -1,4 +1,3 @@
-
 # @stackcode/core
 
 This package is the core engine of the StackCode toolkit. It contains all the business logic for project scaffolding, file generation, Git operations, and the release process, completely decoupled from the command-line interface.
@@ -16,15 +15,17 @@ Here are the main functions exported by this package:
 ### Scaffolding
 
 #### `scaffoldProject(options: ProjectOptions): Promise<void>`
+
 Creates a complete project directory structure from predefined templates.
 
 - **`options`**: An object containing:
-    - `projectPath: string`: The absolute path where the project will be created.
-    - `stack: 'node-ts'`: The technology stack to use.
-    - `features: ('docker' | 'husky')[]`: An array of additional features.
-    - `replacements: Record<string, string>`: Placeholders to replace in `.tpl` files.
+  - `projectPath: string`: The absolute path where the project will be created.
+  - `stack: 'node-js' | 'node-ts' | 'react' | 'vue' | 'python' | 'java' | 'go' | 'php'`: The technology stack to use.
+  - `features: ('docker' | 'husky')[]`: An array of additional features.
+  - `replacements: Record<string, string>`: Placeholders to replace in `.tpl` files.
 
 #### `setupHusky(projectPath: string): Promise<void>`
+
 Configures Husky git hooks in the specified project directory.
 
 ---
@@ -32,30 +33,37 @@ Configures Husky git hooks in the specified project directory.
 ### Generators
 
 #### `generateGitignoreContent(technologies: string[]): Promise<string>`
+
 Intelligently combines multiple `.tpl` files to generate a comprehensive `.gitignore` file.
 
 - **`technologies`**: An array of technologies (e.g., `['node-ts', 'ides']`). The function will find corresponding `.tpl` files and concatenate them.
 
 **Example:**
-```typescript
-import { generateGitignoreContent } from '@stackcode/core';
 
-const content = await generateGitignoreContent(['node-ts', 'ides', 'docker']);
+```typescript
+import { generateGitignoreContent } from "@stackcode/core";
+
+const content = await generateGitignoreContent(["node-ts", "ides", "docker"]);
 ```
+
 ---
 
 ### Release Automation
 
 #### `detectVersioningStrategy(startPath: string): Promise<MonorepoInfo>`
+
 Analyzes a monorepo to determine if it uses a "locked" or "independent" versioning strategy.
 
 #### `findChangedPackages(packages: PackageInfo[], projectRoot: string): Promise<PackageInfo[]>`
+
 Compares packages against their last Git tag to find which ones have changed.
 
 #### `getRecommendedBump(projectRoot: string): Promise<string>`
+
 Reads Git history since the last tag and recommends the next semantic version (`patch`, `minor`, or `major`) based on Conventional Commits.
 
 #### `performReleaseCommit(pkgInfo: PackageBumpInfo, projectRoot: string): Promise<void>`
+
 Automates the release process by running `git add`, `git commit`, and `git tag` for a given package release.
 
 ---
@@ -63,10 +71,53 @@ Automates the release process by running `git add`, `git commit`, and `git tag` 
 ### Validation
 
 #### `validateCommitMessage(message: string): boolean`
+
 Checks if a string conforms to the Conventional Commits specification.
 
 - **`message`**: The commit message string to validate.
 - **Returns**: `true` if valid, `false` otherwise.
+
+#### `isCommandAvailable(command: string): Promise<boolean>`
+
+Checks if a command is available in the system PATH.
+
+- **`command`**: The command to check (e.g., 'go', 'composer', 'mvn').
+- **Returns**: A promise that resolves to `true` if the command is available, `false` otherwise.
+
+#### `getStackDependencies(stack: string): string[]`
+
+Gets the required dependencies for a given stack.
+
+- **`stack`**: The stack name (e.g., 'go', 'php', 'java', 'python').
+- **Returns**: An array of required commands for the stack.
+
+**Example:**
+
+```typescript
+import { getStackDependencies } from "@stackcode/core";
+
+const deps = getStackDependencies("go"); // Returns: ["go"]
+const phpDeps = getStackDependencies("php"); // Returns: ["composer", "php"]
+```
+
+#### `validateStackDependencies(stack: string): Promise<{isValid: boolean; missingDependencies: string[]; availableDependencies: string[]}>`
+
+Validates if all required dependencies for a stack are available.
+
+- **`stack`**: The stack name to validate.
+- **Returns**: A promise that resolves to an object with validation results.
+
+**Example:**
+
+```typescript
+import { validateStackDependencies } from "@stackcode/core";
+
+const result = await validateStackDependencies("go");
+if (!result.isValid) {
+  console.log("Missing dependencies:", result.missingDependencies);
+  // Output: ["go"] if Go is not installed
+}
+```
 
 ---
 
