@@ -60,8 +60,8 @@ export async function runInteractiveMode() {
   } else if (choice === "educate") {
     const enable = await ui.promptToEnableEducate();
     globalConfig.set("educate", enable.toString());
-    const status = enable 
-      ? t("config.status.enabled") 
+    const status = enable
+      ? t("config.status.enabled")
       : t("config.status.disabled");
     ui.log.success(t("config.success.set_educate", { status }));
   } else if (choice === "commitValidation") {

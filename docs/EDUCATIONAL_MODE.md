@@ -80,12 +80,12 @@ stackcode generate --educate
 
 The system intelligently combines global settings with command flags:
 
-| Global Setting | Command Flag | Result |
-|---------------|--------------|---------|
-| `true` | Not used | Shows explanations |
-| `true` | `--educate` | Shows explanations |
-| `false` | Not used | No explanations |
-| `false` | `--educate` | Shows explanations |
+| Global Setting | Command Flag | Result             |
+| -------------- | ------------ | ------------------ |
+| `true`         | Not used     | Shows explanations |
+| `true`         | `--educate`  | Shows explanations |
+| `false`        | Not used     | No explanations    |
+| `false`        | `--educate`  | Shows explanations |
 
 ## 📚 Educational Content
 
@@ -94,26 +94,31 @@ The system intelligently combines global settings with command flags:
 Educational mode provides context for all major StackCode operations:
 
 #### Project Initialization (`init`)
+
 - **Scaffolding Decisions**: Why specific file structures are recommended
 - **Dependency Validation**: Importance of having correct tools installed
 - **Configuration Files**: Purpose of each generated file
 
 #### File Generation (`generate`)
+
 - **`.gitignore`**: Security benefits and best practices
 - **`README.md`**: Documentation importance for project success
 - **Template Choices**: Why specific templates fit certain use cases
 
 #### Git Workflow (`git`, `commit`)
+
 - **Conventional Commits**: Benefits for automation and collaboration
 - **Branch Management**: GitFlow principles and team coordination
 - **Version Control**: Best practices for commit history
 
 #### Release Management (`release`)
+
 - **Semantic Versioning**: How and why versions are calculated
 - **Automation Benefits**: Reducing manual release overhead
 - **Changelog Generation**: Keeping stakeholders informed
 
 #### Validation (`validate`)
+
 - **Quality Gates**: Importance of automated validation
 - **Commit Standards**: How consistency improves team productivity
 - **Integration Benefits**: CI/CD pipeline optimization
@@ -122,17 +127,17 @@ Educational mode provides context for all major StackCode operations:
 
 ```bash
 # .gitignore creation
-💡 A .gitignore file is being created to prevent secrets and unnecessary 
-   files (like node_modules) from being saved in the repository. This 
+💡 A .gitignore file is being created to prevent secrets and unnecessary
+   files (like node_modules) from being saved in the repository. This
    keeps your repository clean and secure.
 
 # Conventional commit validation
-📚 Conventional commits follow a standard that enables automation and 
+📚 Conventional commits follow a standard that enables automation and
    understanding. Format: type(scope): description
 
 # Husky setup
-💡 Husky is being configured to automate checks before commits. This 
-   ensures that problematic code doesn't get pushed to the repository, 
+💡 Husky is being configured to automate checks before commits. This
+   ensures that problematic code doesn't get pushed to the repository,
    maintaining code quality.
 ```
 
@@ -200,6 +205,7 @@ showSecurityTip("educational.secrets_warning");
 ### Performance
 
 Educational mode adds minimal overhead:
+
 - Message lookup: ~1ms per message
 - Translation processing: Cached after first load
 - No network requests or external dependencies
@@ -240,12 +246,14 @@ stackcode validate "feat: nova funcionalidade" --educate
 ### When to Enable Globally
 
 ✅ **Good for:**
+
 - Learning environments and training
 - New team members getting familiar with practices
 - Teams establishing new standards
 - Personal projects where you want to learn
 
 ❌ **Consider disabling for:**
+
 - Experienced teams with established workflows
 - Automated scripts and CI/CD pipelines
 - High-frequency operations where output noise matters
@@ -340,4 +348,4 @@ stackcode config set lang pt  # if Portuguese audience
 
 ---
 
-*Educational Mode makes StackCode more than just a tool—it becomes your DevOps mentor, teaching best practices as you build amazing software.*
+_Educational Mode makes StackCode more than just a tool—it becomes your DevOps mentor, teaching best practices as you build amazing software._

@@ -183,7 +183,7 @@ Além dos templates de projeto principais, o StackCode fornece suporte abrangent
 ### Frameworks Backend
 
 - **Node.js** (`node.tpl`) - node_modules, logs, variáveis de ambiente
-- **Python** (`python.tpl`) - __pycache__, .env, .venv
+- **Python** (`python.tpl`) - **pycache**, .env, .venv
 - **Java** (`java.tpl`) - .class, target/, .jar
 - **Go** (`go.tpl`) - Binários Go, arquivos vendor
 - **PHP** (`php.tpl`) - vendor/, .env, cache

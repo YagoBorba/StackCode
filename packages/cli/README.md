@@ -66,6 +66,7 @@ showEducationalMessage("educational.gitignore_explanation");
 ### Educational Messages
 
 The system provides explanations for:
+
 - `.gitignore` creation and security benefits
 - `README.md` importance for documentation
 - Husky setup for automated quality checks

@@ -64,18 +64,19 @@ stackcode config get educate
 
 ### Comportamiento Inteligente
 
-| Estado Global | Flag `--educate` | Resultado |
-|---------------|------------------|-----------|
-| ✅ Habilitado | ➖ No usado | 📚 **Siempre muestra explicaciones** |
-| ✅ Habilitado | ✅ Usado | 📚 **Siempre muestra explicaciones** |
-| ❌ Deshabilitado | ➖ No usado | ➖ **Modo normal (sin explicaciones)** |
-| ❌ Deshabilitado | ✅ Usado | 📚 **Muestra explicaciones solo en este comando** |
+| Estado Global    | Flag `--educate` | Resultado                                         |
+| ---------------- | ---------------- | ------------------------------------------------- |
+| ✅ Habilitado    | ➖ No usado      | 📚 **Siempre muestra explicaciones**              |
+| ✅ Habilitado    | ✅ Usado         | 📚 **Siempre muestra explicaciones**              |
+| ❌ Deshabilitado | ➖ No usado      | ➖ **Modo normal (sin explicaciones)**            |
+| ❌ Deshabilitado | ✅ Usado         | 📚 **Muestra explicaciones solo en este comando** |
 
 ## 📚 Contenido Educativo
 
 ### Comandos Soportados
 
 #### `stackcode init --educate`
+
 - **Scaffolding**: Por qué usar plantillas preconfiguradas
 - **Dependencias**: Importancia de la validación de herramientas
 - **.gitignore**: Prevención de filtraciones de seguridad
@@ -84,11 +85,13 @@ stackcode config get educate
 - **Git Init**: Beneficios del control de versiones
 
 #### `stackcode commit --educate`
+
 - **Commits Convencionales**: Estandarización y automatización
 - **Historial Limpio**: Facilita reviews y debugging
 - **Versionado Semántico**: Cómo los commits impactan versiones
 
 #### `stackcode validate --educate`
+
 - **Validación Preventiva**: Evitar commits problemáticos
 - **Integración CI/CD**: Cómo la validación mejora pipelines
 - **Estandarización de Equipo**: Consistencia entre desarrolladores
@@ -112,7 +115,7 @@ $ stackcode validate "commit sin patrón" --educate
 El modo educativo está completamente localizado:
 
 - **🇪🇸 Español**: Explicaciones en español
-- **🇧🇷 Português**: Explicações em português brasileiro  
+- **🇧🇷 Português**: Explicações em português brasileiro
 - **🇺🇸 English**: English explanations
 
 El idioma de las explicaciones sigue la configuración de idioma de StackCode:
@@ -183,9 +186,9 @@ stackcode config unset educate
 
 ```typescript
 // Flujo básico del modo educativo
-initEducationalMode(commandFlag: boolean) → 
-  checkGlobalConfig() → 
-    determineIfEnabled() → 
+initEducationalMode(commandFlag: boolean) →
+  checkGlobalConfig() →
+    determineIfEnabled() →
       showContextualMessages()
 ```
 
@@ -240,4 +243,4 @@ Si encuentras problemas con el modo educativo:
 
 ---
 
-*El Modo Educativo transforma StackCode de una herramienta de automatización en un mentor de DevOps.*
+_El Modo Educativo transforma StackCode de una herramienta de automatización en un mentor de DevOps._

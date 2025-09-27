@@ -1,4 +1,4 @@
-import type { CommandModule } from "yargs";
+import type { CommandModule, ArgumentsCamelCase } from "yargs";
 import fs from "fs/promises";
 import path from "path";
 import {
@@ -14,18 +14,25 @@ import {
 } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
 import * as ui from "./ui.js";
-import { initEducationalMode, showEducationalMessage, showBestPractice } from "../educational-mode.js";
+import {
+  initEducationalMode,
+  showEducationalMessage,
+} from "../educational-mode.js";
+
+interface InitArgs {
+  educate?: boolean;
+}
 
 /**
  * Creates and returns the init command configuration for yargs.
  * This command initializes a new project with the selected stack and configurations.
  * @returns The yargs command module for the init command.
  */
-export const getInitCommand = (): CommandModule => ({
+export const getInitCommand = (): CommandModule<object, InitArgs> => ({
   command: "init",
   describe: t("init.command_description"),
   builder: {},
-  handler: async (argv: any) => {
+  handler: async (argv: ArgumentsCamelCase<InitArgs>) => {
     // Initialize educational mode based on config and flag
     initEducationalMode(argv.educate || false);
     ui.log.step(t("init.welcome"));

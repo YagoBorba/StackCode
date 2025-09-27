@@ -23,9 +23,12 @@ export function setEducationalMode(enabled: boolean): void {
  */
 export function initEducationalMode(commandFlag: boolean = false): void {
   const globalEducateConfig = globalConfig.get("educate");
-  
+
   // If global config is enabled OR command flag is used, enable educational mode
-  isEducationalModeEnabled = globalEducateConfig === "true" || globalEducateConfig === true || commandFlag;
+  isEducationalModeEnabled =
+    globalEducateConfig === "true" ||
+    globalEducateConfig === true ||
+    commandFlag;
 }
 
 /**
@@ -43,20 +46,27 @@ export function isEducationalMode(): boolean {
  */
 export function showEducationalMessage(
   messageKey: string,
-  params?: Record<string, string | number>
+  params?: Record<string, string | number>,
 ): void {
   if (isEducationalModeEnabled) {
     const message = t(messageKey, params);
     // Fallback if translation not found
     if (message === messageKey) {
       const fallbackMessages: Record<string, string> = {
-        "educational.gitignore_explanation": "Um arquivo .gitignore está sendo criado para impedir que segredos e arquivos desnecessários sejam salvos no repositório.",
-        "educational.readme_explanation": "Um arquivo README.md está sendo criado para documentar seu projeto.",
-        "educational.husky_explanation": "Husky está sendo configurado para automatizar verificações antes dos commits.",
-        "educational.git_init_explanation": "Inicializando um repositório Git para controle de versão.",
-        "educational.scaffold_explanation": "Criando estrutura inicial do projeto baseada no stack selecionado.",
-        "educational.commit_validation_explanation": "Commits convencionais ajudam a manter um histórico limpo e permitem automação de releases.",
-        "educational.conventional_commits_explanation": "Commits convencionais seguem um padrão que facilita automação. Formato: tipo(escopo): descrição"
+        "educational.gitignore_explanation":
+          "Um arquivo .gitignore está sendo criado para impedir que segredos e arquivos desnecessários sejam salvos no repositório.",
+        "educational.readme_explanation":
+          "Um arquivo README.md está sendo criado para documentar seu projeto.",
+        "educational.husky_explanation":
+          "Husky está sendo configurado para automatizar verificações antes dos commits.",
+        "educational.git_init_explanation":
+          "Inicializando um repositório Git para controle de versão.",
+        "educational.scaffold_explanation":
+          "Criando estrutura inicial do projeto baseada no stack selecionado.",
+        "educational.commit_validation_explanation":
+          "Commits convencionais ajudam a manter um histórico limpo e permitem automação de releases.",
+        "educational.conventional_commits_explanation":
+          "Commits convencionais seguem um padrão que facilita automação. Formato: tipo(escopo): descrição",
       };
       ui.log.info(`💡 ${fallbackMessages[messageKey] || messageKey}`);
     } else {
@@ -72,15 +82,17 @@ export function showEducationalMessage(
  */
 export function showBestPractice(
   messageKey: string,
-  params?: Record<string, string | number>
+  params?: Record<string, string | number>,
 ): void {
   if (isEducationalModeEnabled) {
     const message = t(messageKey, params);
     // Fallback if translation not found
     if (message === messageKey) {
       const fallbackMessages: Record<string, string> = {
-        "educational.commit_validation_explanation": "Commits convencionais ajudam a manter um histórico limpo e permitem automação de releases.",
-        "educational.conventional_commits_explanation": "Commits convencionais seguem um padrão que facilita automação. Formato: tipo(escopo): descrição"
+        "educational.commit_validation_explanation":
+          "Commits convencionais ajudam a manter um histórico limpo e permitem automação de releases.",
+        "educational.conventional_commits_explanation":
+          "Commits convencionais seguem um padrão que facilita automação. Formato: tipo(escopo): descrição",
       };
       ui.log.step(`📚 ${fallbackMessages[messageKey] || messageKey}`);
     } else {
@@ -96,7 +108,7 @@ export function showBestPractice(
  */
 export function showSecurityTip(
   messageKey: string,
-  params?: Record<string, string | number>
+  params?: Record<string, string | number>,
 ): void {
   if (isEducationalModeEnabled) {
     ui.log.warning(`🔒 ${t(messageKey, params)}`);

@@ -80,12 +80,12 @@ stackcode generate --educate
 
 O sistema combina inteligentemente configurações globais com flags de comando:
 
-| Configuração Global | Flag do Comando | Resultado |
-|-------------------|-----------------|-----------|
-| `true` | Não usada | Mostra explicações |
-| `true` | `--educate` | Mostra explicações |
-| `false` | Não usada | Sem explicações |
-| `false` | `--educate` | Mostra explicações |
+| Configuração Global | Flag do Comando | Resultado          |
+| ------------------- | --------------- | ------------------ |
+| `true`              | Não usada       | Mostra explicações |
+| `true`              | `--educate`     | Mostra explicações |
+| `false`             | Não usada       | Sem explicações    |
+| `false`             | `--educate`     | Mostra explicações |
 
 ## 📚 Conteúdo Educacional
 
@@ -94,26 +94,31 @@ O sistema combina inteligentemente configurações globais com flags de comando:
 O modo educacional fornece contexto para todas as operações principais do StackCode:
 
 #### Inicialização de Projeto (`init`)
+
 - **Decisões de Scaffolding**: Por que estruturas de arquivos específicas são recomendadas
 - **Validação de Dependências**: Importância de ter as ferramentas corretas instaladas
 - **Arquivos de Configuração**: Propósito de cada arquivo gerado
 
 #### Geração de Arquivos (`generate`)
+
 - **`.gitignore`**: Benefícios de segurança e melhores práticas
 - **`README.md`**: Importância da documentação para o sucesso do projeto
 - **Escolhas de Template**: Por que templates específicos se adequam a certos casos de uso
 
 #### Fluxo Git (`git`, `commit`)
+
 - **Commits Convencionais**: Benefícios para automação e colaboração
 - **Gerenciamento de Branches**: Princípios do GitFlow e coordenação de equipe
 - **Controle de Versão**: Melhores práticas para histórico de commits
 
 #### Gerenciamento de Release (`release`)
+
 - **Versionamento Semântico**: Como e por que versões são calculadas
 - **Benefícios da Automação**: Reduzindo sobrecarga manual de releases
 - **Geração de Changelog**: Mantendo stakeholders informados
 
 #### Validação (`validate`)
+
 - **Quality Gates**: Importância da validação automatizada
 - **Padrões de Commit**: Como consistência melhora produtividade da equipe
 - **Benefícios de Integração**: Otimização de pipeline CI/CD
@@ -122,17 +127,17 @@ O modo educacional fornece contexto para todas as operações principais do Stac
 
 ```bash
 # Criação de .gitignore
-💡 Um arquivo .gitignore está sendo criado para impedir que segredos e 
-   arquivos desnecessários (como node_modules) sejam salvos no repositório. 
+💡 Um arquivo .gitignore está sendo criado para impedir que segredos e
+   arquivos desnecessários (como node_modules) sejam salvos no repositório.
    Isso mantém seu repositório limpo e seguro.
 
 # Validação de commit convencional
-📚 Commits convencionais seguem um padrão que facilita automação e 
+📚 Commits convencionais seguem um padrão que facilita automação e
    compreensão. Formato: tipo(escopo): descrição
 
 # Configuração do Husky
-💡 Husky está sendo configurado para automatizar verificações antes dos 
-   commits. Isso garante que código com problemas não seja enviado para 
+💡 Husky está sendo configurado para automatizar verificações antes dos
+   commits. Isso garante que código com problemas não seja enviado para
    o repositório, mantendo a qualidade do código.
 ```
 
@@ -200,6 +205,7 @@ showSecurityTip("educational.secrets_warning");
 ### Performance
 
 O modo educacional adiciona sobrecarga mínima:
+
 - Busca de mensagem: ~1ms por mensagem
 - Processamento de tradução: Armazenado em cache após primeiro carregamento
 - Sem requisições de rede ou dependências externas
@@ -240,12 +246,14 @@ stackcode validate "feat: nova funcionalidade" --educate
 ### Quando Habilitar Globalmente
 
 ✅ **Bom para:**
+
 - Ambientes de aprendizado e treinamento
 - Novos membros da equipe se familiarizando com práticas
 - Equipes estabelecendo novos padrões
 - Projetos pessoais onde você quer aprender
 
 ❌ **Considere desabilitar para:**
+
 - Equipes experientes com fluxos estabelecidos
 - Scripts automatizados e pipelines CI/CD
 - Operações de alta frequência onde ruído na saída importa
@@ -340,4 +348,4 @@ stackcode config set lang pt  # se audiência portuguesa
 
 ---
 
-*O Modo Educacional faz do StackCode mais que apenas uma ferramenta—torna-se seu mentor DevOps, ensinando melhores práticas enquanto você constrói software incrível.*
+_O Modo Educacional faz do StackCode mais que apenas uma ferramenta—torna-se seu mentor DevOps, ensinando melhores práticas enquanto você constrói software incrível._
