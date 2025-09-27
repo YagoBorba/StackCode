@@ -105,6 +105,39 @@ docs/
 
 Ve nuestra [Guía de Contribución](CONTRIBUTING.md) para instrucciones detalladas.
 
+## 🎓 **Modo Educativo**
+
+StackCode incluye un **Modo Educativo** único que transforma la herramienta en un sistema de aprendizaje interactivo. Esta característica es perfecta para desarrolladores que quieren aprender mejores prácticas de DevOps mientras trabajan.
+
+### Cómo Funciona
+
+- **Explicaciones Contextuales**: Cada acción viene con una explicación del "por qué" detrás de la decisión
+- **Configurable**: Puede ser habilitado globalmente o usado bajo demanda
+- **Completamente Traducido**: Disponible en español, português e inglés
+
+### Configuración
+
+```bash
+# Habilitar globalmente (siempre muestra explicaciones)
+stackcode config set educate true
+
+# Usar bajo demanda con cualquier comando
+stackcode validate "feat: nueva funcionalidad" --educate
+stackcode commit --educate
+stackcode init --educate
+
+# Configurar interactivamente
+stackcode config
+```
+
+### Beneficios
+
+- **Aprendizaje Práctico**: Aprende mejores prácticas mientras usas la herramienta
+- **Incorporación de Equipos**: Perfecto para nuevos miembros del equipo
+- **Documentación Viva**: Explicaciones siempre actualizadas y contextuales
+
+Para más detalles, consulta la **[Guía del Modo Educativo](EDUCATIONAL_MODE.md)**.
+
 ## 🔗 **Recursos Externos**
 
 - **[Repositorio GitHub](https://github.com/YagoBorba/StackCode)** - Código fuente e issues

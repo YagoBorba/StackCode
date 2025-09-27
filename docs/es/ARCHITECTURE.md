@@ -53,6 +53,7 @@ StackCode sigue una **arquitectura de monorepo modular** con clara separación d
 - **Capa de Comandos:** Puntos de entrada para todas las operaciones CLI
 - **Manejadores de Comandos:** Implementaciones de comandos individuales
 - **Prompts Interactivos:** Orientación al usuario y recolección de entrada
+- **Modo Educativo:** Sistema de aprendizaje contextual con explicaciones de mejores prácticas
 - **Manejo de Errores:** Reporte de errores consistente y recuperación
 
 **Arquitectura:**
@@ -61,6 +62,7 @@ StackCode sigue una **arquitectura de monorepo modular** con clara separación d
 cli/
 ├── src/
 │   ├── index.ts              # Punto de entrada principal CLI
+│   ├── educational-mode.ts   # Gestión del modo educativo
 │   ├── commands/             # Implementaciones de comandos
 │   │   ├── init.ts           # Scaffolding de proyecto
 │   │   ├── generate.ts       # Generación de archivos
@@ -68,7 +70,8 @@ cli/
 │   │   ├── git.ts            # Gestión de flujo Git
 │   │   ├── release.ts        # Gestión de versiones
 │   │   ├── validate.ts       # Validación de commits
-│   │   └── config.ts         # Gestión de configuración
+│   │   ├── config.ts         # Gestión de configuración
+│   │   └── ui.ts             # Prompts interactivos y feedback
 │   └── types/                # Definiciones de tipos específicos CLI
 └── test/                     # Tests de comandos
 ```
@@ -299,6 +302,49 @@ Each package follows consistent patterns:
 - **@stackcode/cli:** Published to NPM for global installation
 - **@stackcode/core:** Internal package, not published separately
 - **@stackcode/i18n:** Internal package, not published separately
+
+## 🎓 Arquitectura del Modo Educativo
+
+### Resumen General
+
+El Modo Educativo es una característica transversal que mejora la experiencia del usuario proporcionando explicaciones contextuales y orientación sobre mejores prácticas a través de todo el kit de herramientas StackCode.
+
+### Implementación
+
+```typescript
+// Flujo del Modo Educativo
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│ Comando Usuario │ -> │ Detección Modo  │ -> │ Mostrar Mensaj. │
+│  --educate o    │    │ Config Global + │    │ Mejores Práctic.│
+│ config global   │    │ Flag Comando    │    │ & Explicaciones │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+### Componentes Principales
+
+- **`educational-mode.ts`:** Lógica central del modo educativo
+  - `initEducationalMode()`: Detecta configuración y flags de comando
+  - `showEducationalMessage()`: Muestra consejos contextuales
+  - `showBestPractice()`: Muestra explicaciones de mejores prácticas
+  - `showSecurityTip()`: Resalta consideraciones de seguridad
+
+- **Integración de Configuración:**
+  - Configuración global: `stackcode config set educate true/false`
+  - Flag por comando: `--educate` en cualquier comando
+  - Configuración interactiva vía `stackcode config`
+
+- **Sistema de Mensajes:**
+  - Explicaciones internacionalizadas (ES/PT/EN)
+  - Mensajes de respaldo para confiabilidad
+  - Contenido contextual basado en el comando
+
+### Cobertura del Contenido Educativo
+
+- **Inicialización de Proyectos:** Explica decisiones de scaffolding y dependencias
+- **Generación de Archivos:** Describe propósito de .gitignore, README, etc.
+- **Flujos Git:** Explica commits convencionales y beneficios del control de versiones
+- **Prácticas de Seguridad:** Resalta importancia de .gitignore para secretos
+- **Beneficios de Automatización:** Muestra valor de Husky, CI/CD y automatización de releases
 
 ### VS Code Extension
 

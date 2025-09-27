@@ -53,6 +53,7 @@ StackCode follows a **modular monorepo architecture** with clear separation of c
 - **Command Layer:** Entry points for all CLI operations
 - **Command Handlers:** Individual command implementations
 - **Interactive Prompts:** User guidance and input collection
+- **Educational Mode:** Contextual learning system with best practice explanations
 - **Error Handling:** Consistent error reporting and recovery
 
 **Architecture:**
@@ -61,6 +62,7 @@ StackCode follows a **modular monorepo architecture** with clear separation of c
 cli/
 ├── src/
 │   ├── index.ts              # Main CLI entry point
+│   ├── educational-mode.ts   # Educational mode management
 │   ├── commands/             # Command implementations
 │   │   ├── init.ts           # Project scaffolding
 │   │   ├── generate.ts       # File generation
@@ -68,7 +70,8 @@ cli/
 │   │   ├── git.ts            # Git workflow management
 │   │   ├── release.ts        # Version management
 │   │   ├── validate.ts       # Commit validation
-│   │   └── config.ts         # Configuration management
+│   │   ├── config.ts         # Configuration management
+│   │   └── ui.ts             # Interactive prompts and feedback
 │   └── types/                # CLI-specific type definitions
 └── test/                     # Command tests
 ```
@@ -401,6 +404,49 @@ const result = await validateStackDependencies("go");
 | `java`                               | `mvn`, `java`     | ✅                |
 | `python`                             | `pip`, `python`   | ✅                |
 | `node-js`, `node-ts`, `react`, `vue` | `npm`             | ✅                |
+
+## 🎓 Educational Mode Architecture
+
+### Overview
+
+The Educational Mode is a cross-cutting feature that enhances the user experience by providing contextual explanations and best practice guidance throughout the StackCode toolkit.
+
+### Implementation
+
+```typescript
+// Educational Mode Flow
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   User Command  │ -> │ Mode Detection  │ -> │  Show Messages  │
+│  --educate or   │    │ Global Config + │    │  Best Practices │
+│  global config  │    │ Command Flag    │    │  & Explanations │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+### Key Components
+
+- **`educational-mode.ts`:** Core educational mode logic
+  - `initEducationalMode()`: Detects configuration and command flags
+  - `showEducationalMessage()`: Displays contextual tips
+  - `showBestPractice()`: Shows best practice explanations
+  - `showSecurityTip()`: Highlights security considerations
+
+- **Configuration Integration:**
+  - Global setting: `stackcode config set educate true/false`
+  - Per-command flag: `--educate` on any command
+  - Interactive setup via `stackcode config`
+
+- **Message System:**
+  - Internationalized explanations (PT/EN)
+  - Fallback messages for reliability
+  - Context-aware content based on command
+
+### Educational Content Coverage
+
+- **Project Initialization:** Explains scaffolding decisions and dependencies
+- **File Generation:** Describes purpose of .gitignore, README, etc.
+- **Git Workflows:** Explains conventional commits and version control benefits
+- **Security Practices:** Highlights importance of .gitignore for secrets
+- **Automation Benefits:** Shows value of Husky, CI/CD, and release automation
 
 ## 🚀 Deployment and Distribution
 

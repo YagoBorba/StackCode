@@ -119,6 +119,7 @@ export async function promptForLanguage(): Promise<string> {
       choices: [
         { name: "English", value: "en" },
         { name: "Português", value: "pt" },
+        { name: "Español", value: "es" },
       ],
     },
   ]);
