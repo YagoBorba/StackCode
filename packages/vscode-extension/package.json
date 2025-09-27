@@ -2,7 +2,7 @@
   "name": "stackcode-vscode",
   "displayName": "StackCode",
   "description": "Complete development assistant with project scaffolding, Git workflow, and real-time best practices enforcement",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "publisher": "YagoBorba",
   "engines": {
     "vscode": "^1.85.0"
