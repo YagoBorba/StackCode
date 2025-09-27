@@ -18,8 +18,10 @@ vi.mock("configstore", () => ({
 vi.mock("@stackcode/i18n", () => ({
   t: vi.fn((key: string) => {
     const translations: Record<string, string> = {
-      "educational.conventional_commits_explanation": "Conventional commits follow a standard that enables automation",
-      "educational.gitignore_explanation": "A .gitignore file is being created to prevent secrets",
+      "educational.conventional_commits_explanation":
+        "Conventional commits follow a standard that enables automation",
+      "educational.gitignore_explanation":
+        "A .gitignore file is being created to prevent secrets",
     };
     return translations[key] || key;
   }),
@@ -41,11 +43,9 @@ describe("Educational Mode", () => {
     it("should enable educational mode when flag is true", () => {
       // Act
       initEducationalMode(true);
-      // Assert 
+      // Assert
       showEducationalMessage("educational.gitignore_explanation");
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("💡")
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("💡"));
     });
 
     it("should enable educational mode when global config is true", () => {
@@ -53,7 +53,7 @@ describe("Educational Mode", () => {
       mockGet.mockReturnValue(true);
       // Act
       initEducationalMode(false);
-      // Assert 
+      // Assert
       expect(mockGet).toHaveBeenCalledWith("educate");
     });
     it("should disable educational mode when flag is false and config is false", () => {
@@ -62,9 +62,9 @@ describe("Educational Mode", () => {
       // Act
       initEducationalMode(false);
       consoleSpy.mockClear();
-      // Act 
+      // Act
       showEducationalMessage("educational.gitignore_explanation");
-      // Assert 
+      // Assert
       expect(consoleSpy).not.toHaveBeenCalled();
     });
     it("should enable educational mode when flag is true even if config is false", () => {
@@ -72,36 +72,30 @@ describe("Educational Mode", () => {
       mockGet.mockReturnValue(false);
       // Act
       initEducationalMode(true);
-      // Assert 
+      // Assert
       showEducationalMessage("educational.gitignore_explanation");
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("💡")
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("💡"));
     });
   });
   describe("showEducationalMessage", () => {
     beforeEach(() => {
-      initEducationalMode(true); 
+      initEducationalMode(true);
     });
 
     it("should display educational message with correct icon when enabled", () => {
       // Act
       showEducationalMessage("educational.gitignore_explanation");
       // Assert
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("💡"));
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("💡")
-      );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("A .gitignore file is being created")
+        expect.stringContaining("A .gitignore file is being created"),
       );
     });
     it("should show fallback message when translation is not found", () => {
-      // Act 
+      // Act
       showEducationalMessage("educational.nonexistent_key");
-      // Assert 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("💡")
-      );
+      // Assert
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("💡"));
     });
     it("should not display message when educational mode is disabled", () => {
       // Arrange
@@ -115,17 +109,15 @@ describe("Educational Mode", () => {
   });
   describe("showBestPractice", () => {
     beforeEach(() => {
-      initEducationalMode(true); 
+      initEducationalMode(true);
     });
     it("should display best practice message with correct icon when enabled", () => {
       // Act
       showBestPractice("educational.conventional_commits_explanation");
       // Assert
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("📚"));
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("📚")
-      );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Conventional commits follow")
+        expect.stringContaining("Conventional commits follow"),
       );
     });
 
@@ -133,9 +125,7 @@ describe("Educational Mode", () => {
       // Act
       showBestPractice("educational.unknown_practice");
       // Assert
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("📚")
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("📚"));
     });
     it("should not display best practice when educational mode is disabled", () => {
       // Arrange
@@ -151,42 +141,47 @@ describe("Educational Mode", () => {
     it("should work with optional parameters in messages", () => {
       // Arrange
       initEducationalMode(true);
-      // Act 
+      // Act
       showEducationalMessage("educational.scaffold_explanation");
       // Assert
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("💡")
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("💡"));
     });
   });
   describe("Educational Mode State Management", () => {
     it("should maintain state across multiple calls", () => {
       // Arrange
       initEducationalMode(true);
-      // Act 
+      // Act
       showEducationalMessage("educational.gitignore_explanation");
       showBestPractice("educational.conventional_commits_explanation");
       showEducationalMessage("educational.readme_explanation");
-      // Assert 
+      // Assert
       expect(consoleSpy).toHaveBeenCalledTimes(3);
-      expect(consoleSpy).toHaveBeenNthCalledWith(1, expect.stringContaining("💡"));
-      expect(consoleSpy).toHaveBeenNthCalledWith(2, expect.stringContaining("📚"));
-      expect(consoleSpy).toHaveBeenNthCalledWith(3, expect.stringContaining("💡"));
+      expect(consoleSpy).toHaveBeenNthCalledWith(
+        1,
+        expect.stringContaining("💡"),
+      );
+      expect(consoleSpy).toHaveBeenNthCalledWith(
+        2,
+        expect.stringContaining("📚"),
+      );
+      expect(consoleSpy).toHaveBeenNthCalledWith(
+        3,
+        expect.stringContaining("💡"),
+      );
     });
     it("should update behavior when mode is changed", () => {
-      // Arrange 
+      // Arrange
       mockGet.mockReturnValue(false);
       initEducationalMode(false);
-      // Act & Assert 
+      // Act & Assert
       showEducationalMessage("educational.gitignore_explanation");
       expect(consoleSpy).not.toHaveBeenCalled();
-      // Arrange 
+      // Arrange
       initEducationalMode(true);
-      // Act & Assert 
+      // Act & Assert
       showEducationalMessage("educational.gitignore_explanation");
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("💡")
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("💡"));
     });
   });
 });
