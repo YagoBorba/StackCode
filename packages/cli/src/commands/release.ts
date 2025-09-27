@@ -50,7 +50,9 @@ async function handleGitHubReleaseCreation(
     const [owner, repo] = match[1].replace(".git", "").split("/");
 
     if (typeof token !== "string" || !token) {
-      throw new Error("Invalid GitHub token. Please run 'stackcode config' to set it.");
+      throw new Error(
+        "Invalid GitHub token. Please run 'stackcode config' to set it.",
+      );
     }
 
     await createGitHubRelease({ owner, repo, tagName, releaseNotes, token });

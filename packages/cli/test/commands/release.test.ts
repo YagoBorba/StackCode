@@ -3,10 +3,12 @@ import { getReleaseCommand } from "../../src/commands/release";
 import * as core from "@stackcode/core";
 import inquirer from "inquirer";
 import fs from "fs/promises";
+import Configstore from "configstore";
 
 vi.mock("@stackcode/core");
 vi.mock("inquirer");
 vi.mock("fs/promises");
+vi.mock("configstore");
 
 describe("Release Command Handler", () => {
   const { handler } = getReleaseCommand();
@@ -39,6 +41,8 @@ describe("Release Command Handler", () => {
     );
     vi.mocked(fs.readFile).mockResolvedValue("");
     vi.mocked(fs.writeFile).mockResolvedValue();
+    const config = new Configstore("stackcode");
+    vi.mocked(config.get).mockReturnValue("gh_token");
 
     // Act
     // @ts-expect-error - Testing with empty options object
