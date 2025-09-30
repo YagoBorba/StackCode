@@ -1,7 +1,7 @@
 import { t } from "@stackcode/i18n";
 import * as ui from "./ui.js";
 import { runReleaseWorkflow, createGitHubRelease, getCommandOutput, getErrorMessage, } from "@stackcode/core";
-import { CLIAuthManager, getCurrentRepository } from "../services/githubAuth.js";
+import { createCLIAuthFacade, getCurrentRepository, } from "../services/githubAuth.js";
 async function handleGitHubReleaseCreation(params, authManager) {
     const shouldCreateRelease = await ui.promptToCreateGitHubRelease();
     if (!shouldCreateRelease)
@@ -32,19 +32,19 @@ async function handleGitHubReleaseCreation(params, authManager) {
         const errorMessage = getErrorMessage(error);
         ui.log.gray(errorMessage);
         if (errorMessage.toLowerCase().includes("bad credentials")) {
-            authManager.removeToken();
+            await authManager.removeToken();
             ui.log.warning("Your saved GitHub token was invalid and has been cleared.");
         }
     }
 }
 async function resolveGitHubToken(authManager) {
-    const storedToken = authManager.getToken();
+    const storedToken = await authManager.getToken();
     if (storedToken) {
         const isValid = await authManager.validateToken(storedToken);
         if (isValid) {
             return storedToken;
         }
-        authManager.removeToken();
+        await authManager.removeToken();
         ui.log.warning(t("github.auth.token_invalid"));
     }
     const token = (await ui.promptForToken()).trim();
@@ -58,7 +58,7 @@ async function resolveGitHubToken(authManager) {
     }
     const shouldPersist = await ui.promptToSaveToken();
     if (shouldPersist) {
-        authManager.saveToken(token);
+        await authManager.saveToken(token);
     }
     return token;
 }
@@ -84,7 +84,7 @@ export const getReleaseCommand = () => ({
     handler: async () => {
         try {
             const cwd = process.cwd();
-            const authManager = new CLIAuthManager();
+            const authManager = createCLIAuthFacade();
             ui.log.step(t("release.start"));
             const releaseHooks = {
                 onProgress: async (progress) => {

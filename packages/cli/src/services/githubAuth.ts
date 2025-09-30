@@ -1,7 +1,12 @@
-import fs from "fs";
-import os from "os";
-import path from "path";
-import { Octokit } from "@octokit/rest";
+import fs from "node:fs";
+import path from "node:path";
+import {
+  createCLIAuthProvider,
+  createFileTokenStorage,
+  createGitHubAuth,
+  DEFAULT_GITHUB_TOKEN_FILE,
+  DEFAULT_STACKCODE_DIRECTORY,
+} from "@stackcode/github-auth";
 
 export interface RepositoryInfo {
   owner: string;
@@ -13,67 +18,65 @@ interface RepositoryDetectionOptions {
   verbose?: boolean;
 }
 
+const tokenFilePath = path.join(
+  DEFAULT_STACKCODE_DIRECTORY,
+  DEFAULT_GITHUB_TOKEN_FILE,
+);
+
+const tokenStorage = createFileTokenStorage({ filePath: tokenFilePath });
+
+export const githubAuth = createGitHubAuth({
+  provider: createCLIAuthProvider({ storage: tokenStorage }),
+});
+
+export type AuthenticatedOctokit = Awaited<
+  ReturnType<typeof githubAuth.getAuthenticatedClient>
+>;
+
 /**
- * Manages GitHub authentication for the CLI by storing and validating tokens
- * in the user's `~/.stackcode` directory.
+ * Retrieves a persisted GitHub token when available.
  */
-export class CLIAuthManager {
-  private readonly tokenPath: string;
+export async function getStoredToken(): Promise<string | null> {
+  return githubAuth.getStoredToken();
+}
 
-  constructor() {
-    const configDir = path.join(os.homedir(), ".stackcode");
-    if (!fs.existsSync(configDir)) {
-      fs.mkdirSync(configDir, { recursive: true });
-    }
-    this.tokenPath = path.join(configDir, "github_token");
-  }
+/**
+ * Saves a GitHub personal access token securely.
+ */
+export async function saveToken(token: string): Promise<void> {
+  await githubAuth.saveToken(token);
+}
 
-  /**
-   * Persists a personal access token to the local filesystem with restricted permissions.
-   */
-  public saveToken(token: string): void {
-    fs.writeFileSync(this.tokenPath, token, { mode: 0o600 });
-  }
+/**
+ * Removes any stored GitHub token.
+ */
+export async function removeToken(): Promise<void> {
+  await githubAuth.removeToken();
+}
 
-  /**
-   * Retrieves a previously saved token, if it exists.
-   */
-  public getToken(): string | null {
-    try {
-      if (fs.existsSync(this.tokenPath)) {
-        return fs.readFileSync(this.tokenPath, "utf-8").trim();
-      }
-    } catch (error) {
-      console.error("Failed to read GitHub token", error);
-    }
-    return null;
-  }
+/**
+ * Validates a candidate token by performing a lightweight authenticated request.
+ */
+export async function validateToken(token: string): Promise<boolean> {
+  return githubAuth.validateToken(token);
+}
 
-  /**
-   * Deletes the stored GitHub token from the filesystem.
-   */
-  public removeToken(): void {
-    try {
-      if (fs.existsSync(this.tokenPath)) {
-        fs.unlinkSync(this.tokenPath);
-      }
-    } catch (error) {
-      console.error("Failed to remove GitHub token", error);
-    }
-  }
+export interface CLIAuthFacade {
+  getToken(): Promise<string | null>;
+  saveToken(token: string): Promise<void>;
+  removeToken(): Promise<void>;
+  validateToken(token: string): Promise<boolean>;
+  getClient(): Promise<AuthenticatedOctokit>;
+}
 
-  /**
-   * Validates the provided token by performing a lightweight request against the GitHub API.
-   */
-  public async validateToken(token: string): Promise<boolean> {
-    try {
-      const octokit = new Octokit({ auth: token });
-      await octokit.users.getAuthenticated();
-      return true;
-    } catch {
-      return false;
-    }
-  }
+export function createCLIAuthFacade(): CLIAuthFacade {
+  return {
+    getToken: () => githubAuth.getStoredToken(),
+    saveToken: (token: string) => githubAuth.saveToken(token),
+    removeToken: () => githubAuth.removeToken(),
+    validateToken: (token: string) => githubAuth.validateToken(token),
+    getClient: () => githubAuth.getAuthenticatedClient(),
+  };
 }
 
 /**

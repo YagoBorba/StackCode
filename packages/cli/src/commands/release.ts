@@ -12,7 +12,11 @@ import {
   getCommandOutput,
   getErrorMessage,
 } from "@stackcode/core";
-import { CLIAuthManager, getCurrentRepository } from "../services/githubAuth.js";
+import {
+  createCLIAuthFacade,
+  getCurrentRepository,
+  type CLIAuthFacade,
+} from "../services/githubAuth.js";
 
 async function handleGitHubReleaseCreation(
   params: {
@@ -21,7 +25,7 @@ async function handleGitHubReleaseCreation(
     cwd: string;
     githubInfo?: ReleaseWorkflowGitHubInfo;
   },
-  authManager: CLIAuthManager,
+  authManager: CLIAuthFacade,
 ) {
   const shouldCreateRelease = await ui.promptToCreateGitHubRelease();
   if (!shouldCreateRelease) return;
@@ -57,7 +61,7 @@ async function handleGitHubReleaseCreation(
     ui.log.gray(errorMessage);
 
     if (errorMessage.toLowerCase().includes("bad credentials")) {
-      authManager.removeToken();
+      await authManager.removeToken();
       ui.log.warning(
         "Your saved GitHub token was invalid and has been cleared.",
       );
@@ -66,15 +70,15 @@ async function handleGitHubReleaseCreation(
 }
 
 async function resolveGitHubToken(
-  authManager: CLIAuthManager,
+  authManager: CLIAuthFacade,
 ): Promise<string | null> {
-  const storedToken = authManager.getToken();
+  const storedToken = await authManager.getToken();
   if (storedToken) {
     const isValid = await authManager.validateToken(storedToken);
     if (isValid) {
       return storedToken;
     }
-    authManager.removeToken();
+    await authManager.removeToken();
     ui.log.warning(t("github.auth.token_invalid"));
   }
 
@@ -91,7 +95,7 @@ async function resolveGitHubToken(
 
   const shouldPersist = await ui.promptToSaveToken();
   if (shouldPersist) {
-    authManager.saveToken(token);
+    await authManager.saveToken(token);
   }
 
   return token;
@@ -125,7 +129,7 @@ export const getReleaseCommand = (): CommandModule => ({
   handler: async () => {
     try {
       const cwd = process.cwd();
-      const authManager = new CLIAuthManager();
+  const authManager = createCLIAuthFacade();
       ui.log.step(t("release.start"));
 
       const releaseHooks: ReleaseWorkflowHooks = {

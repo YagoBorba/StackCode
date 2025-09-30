@@ -41,7 +41,7 @@ vi.mock("@stackcode/core", () => {
 });
 
 vi.mock("../../src/services/githubAuth.js", () => ({
-  CLIAuthManager: vi.fn(() => authManagerInstance),
+  createCLIAuthFacade: vi.fn(() => authManagerInstance),
   getCurrentRepository: vi.fn(),
 }));
 
@@ -78,9 +78,13 @@ describe("Release Command Handler", () => {
     vi.spyOn(console, "table").mockImplementation(() => {});
 
     authManagerInstance.getToken.mockReset();
+    authManagerInstance.getToken.mockResolvedValue(null);
     authManagerInstance.saveToken.mockReset();
+    authManagerInstance.saveToken.mockResolvedValue(undefined);
     authManagerInstance.removeToken.mockReset();
+    authManagerInstance.removeToken.mockResolvedValue(undefined);
     authManagerInstance.validateToken.mockReset();
+    authManagerInstance.validateToken.mockResolvedValue(false);
     runReleaseWorkflowMock.mockReset();
     createGitHubReleaseMock.mockReset();
     getErrorMessageMock.mockReset();
@@ -136,7 +140,7 @@ describe("Release Command Handler", () => {
     } as MockReleaseResult);
 
     vi.mocked(ui.promptToCreateGitHubRelease).mockResolvedValue(true);
-    authManagerInstance.getToken.mockReturnValue("gh_token");
+  authManagerInstance.getToken.mockResolvedValue("gh_token");
     authManagerInstance.validateToken.mockResolvedValue(true);
 
     // @ts-expect-error - Testing with empty options object
