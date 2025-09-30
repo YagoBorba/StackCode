@@ -1,41 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import path from "path";
 import inquirer from "inquirer";
 import fs from "fs/promises";
-import {
-  scaffoldProject,
-  setupHusky,
-  generateReadmeContent,
-  generateGitignoreContent,
-  runCommand,
-  validateStackDependencies,
-  saveStackCodeConfig,
-} from "@stackcode/core";
+import { runInitWorkflow, type InitWorkflowResult } from "@stackcode/core";
 import { getInitCommand } from "../../src/commands/init";
 
 vi.mock("@stackcode/core", () => ({
-  scaffoldProject: vi.fn(),
-  setupHusky: vi.fn(),
-  generateReadmeContent: vi.fn(),
-  generateGitignoreContent: vi.fn(),
-  runCommand: vi.fn(),
-  validateStackDependencies: vi.fn(),
-  saveStackCodeConfig: vi.fn(),
+  runInitWorkflow: vi.fn(),
 }));
 
 vi.mock("inquirer");
 vi.mock("fs/promises");
 vi.mock("@stackcode/i18n", () => ({ t: (key: string) => key }));
+vi.mock("../../src/educational-mode.js", () => ({
+  initEducationalMode: vi.fn(),
+  showEducationalMessage: vi.fn(),
+}));
 
 const mockedInquirer = vi.mocked(inquirer);
 const mockedFs = vi.mocked(fs);
 const mockedCore = {
-  scaffoldProject: vi.mocked(scaffoldProject),
-  setupHusky: vi.mocked(setupHusky),
-  generateReadmeContent: vi.mocked(generateReadmeContent),
-  generateGitignoreContent: vi.mocked(generateGitignoreContent),
-  runCommand: vi.mocked(runCommand),
-  validateStackDependencies: vi.mocked(validateStackDependencies),
-  saveStackCodeConfig: vi.mocked(saveStackCodeConfig),
+  runInitWorkflow: vi.mocked(runInitWorkflow),
 };
 
 describe("Init Command", () => {
@@ -57,58 +42,46 @@ describe("Init Command", () => {
     };
     mockedInquirer.prompt.mockResolvedValue(mockAnswers);
     mockedFs.access.mockRejectedValue(new Error("not found"));
-    mockedCore.generateReadmeContent.mockResolvedValue("# Test Project");
-    mockedCore.generateGitignoreContent.mockResolvedValue("node_modules");
-    mockedCore.validateStackDependencies.mockResolvedValue({
-      isValid: true,
-      missingDependencies: [],
-      availableDependencies: ["npm"],
-    });
+    const workflowResult: InitWorkflowResult = {
+      status: "completed",
+      projectPath: path.join(process.cwd(), mockAnswers.projectName),
+      dependencyValidation: {
+        isValid: true,
+        missingDependencies: [],
+        availableDependencies: ["npm"],
+      },
+      dependenciesInstalled: true,
+      installCommand: { command: "npm", args: ["install"] },
+      warnings: [],
+    };
+    mockedCore.runInitWorkflow.mockResolvedValue(workflowResult);
 
     // Act
     await handler({ _: [], $0: "stc" });
     // Assert
     const projectPath = expect.stringContaining(mockAnswers.projectName);
 
-    expect(mockedCore.scaffoldProject).toHaveBeenCalledWith({
-      projectPath: projectPath,
-      stack: mockAnswers.stack,
-      features: mockAnswers.features,
-      replacements: {
+    expect(mockedCore.runInitWorkflow).toHaveBeenCalledWith(
+      {
+        projectPath,
         projectName: mockAnswers.projectName,
         description: mockAnswers.description,
         authorName: mockAnswers.authorName,
+        stack: mockAnswers.stack,
+        features: mockAnswers.features,
+        commitValidation: mockAnswers.commitValidation,
       },
-    });
-
-    expect(mockedCore.saveStackCodeConfig).toHaveBeenCalledWith(
-      projectPath,
       expect.objectContaining({
-        defaultAuthor: mockAnswers.authorName,
-        defaultLicense: "MIT",
-        features: { commitValidation: true },
+        onProgress: expect.any(Function),
+        onEducationalMessage: expect.any(Function),
+        onMissingDependencies: expect.any(Function),
+        confirmContinueAfterMissingDependencies: expect.any(Function),
       }),
     );
 
-    expect(mockedFs.writeFile).toHaveBeenCalledWith(
-      expect.stringContaining("README.md"),
-      "# Test Project",
+    expect(console.log).toHaveBeenCalledWith(
+      expect.stringContaining("init.success.ready"),
     );
-    expect(mockedFs.writeFile).toHaveBeenCalledWith(
-      expect.stringContaining(".gitignore"),
-      "node_modules",
-    );
-
-    expect(mockedCore.setupHusky).toHaveBeenCalledWith(projectPath);
-
-    expect(mockedCore.runCommand).toHaveBeenCalledWith("git", ["init"], {
-      cwd: projectPath,
-    });
-    expect(mockedCore.runCommand).toHaveBeenCalledWith("npm", ["install"], {
-      cwd: projectPath,
-    });
-
-    expect(console.log).toHaveBeenCalledWith("init.success.ready");
   });
 
   it("should cancel the operation if user denies overwrite", async () => {
@@ -124,7 +97,9 @@ describe("Init Command", () => {
 
     // Assert
     expect(mockedInquirer.prompt).toHaveBeenCalledTimes(2);
-    expect(mockedCore.scaffoldProject).not.toHaveBeenCalled();
-    expect(console.log).toHaveBeenCalledWith("common.operation_cancelled");
+    expect(mockedCore.runInitWorkflow).not.toHaveBeenCalled();
+    expect(console.log).toHaveBeenCalledWith(
+      expect.stringContaining("common.operation_cancelled"),
+    );
   });
 });

@@ -196,6 +196,7 @@ export async function loadStackCodeConfig(
     return JSON.parse(configContent) as StackCodeConfig;
   } catch {
     return {
+      stack: undefined,
       features: {
         commitValidation: false,
         husky: false,

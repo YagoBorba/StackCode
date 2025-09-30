@@ -156,6 +156,7 @@ export async function loadStackCodeConfig(projectPath) {
     }
     catch {
         return {
+            stack: undefined,
             features: {
                 commitValidation: false,
                 husky: false,

@@ -1,23 +1,362 @@
-import { BaseCommand } from "./BaseCommand";
+import * as vscode from "vscode";
+import {
+  runCommitWorkflow,
+  type CommitWorkflowStep,
+} from "@stackcode/core";
 import { t } from "@stackcode/i18n";
+import { BaseCommand } from "./BaseCommand";
+import { GitHubIssuesService } from "../services/GitHubIssuesService";
+import { GitHubAuthService } from "../services/GitHubAuthService";
+import type { GitHubIssue } from "@stackcode/core";
 
+interface CommitTypeQuickPickItem extends vscode.QuickPickItem {
+  value: string;
+}
+
+/**
+ * CommitCommand orchestrates the commit workflow within VS Code.
+ * It prompts the user for Conventional Commit details, optionally links
+ * GitHub issues, and delegates the git operations to the shared workflow.
+ */
 export class CommitCommand extends BaseCommand {
-  async execute(): Promise<void> {
+  private readonly issuesService: GitHubIssuesService;
+  private readonly authService: GitHubAuthService;
+  private outputChannel?: vscode.OutputChannel;
+
+  constructor(
+    issuesService: GitHubIssuesService,
+    authService: GitHubAuthService,
+  ) {
+    super();
+    this.issuesService = issuesService;
+    this.authService = authService;
+  }
+
+  /**
+   * Executes the commit workflow by collecting user input and delegating to the core workflow.
+   */
+  public async execute(): Promise<void> {
     try {
       const workspaceFolder = this.getCurrentWorkspaceFolder();
       if (!workspaceFolder) {
-        this.showError(t("vscode.common.no_workspace_folder"));
+        await this.showError(t("vscode.common.no_workspace_folder"));
         return;
       }
 
-      const command = `npx @stackcode/cli commit`;
+      const commitType = await this.selectCommitType();
+      if (!commitType) {
+        return;
+      }
 
-      await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
+      const scope = await vscode.window.showInputBox({
+        prompt: this.translate("commit.prompt.scope", "Scope (optional)"),
+        placeHolder: this.translate(
+          "commit.prompt.scope",
+          "Scope (optional)",
+        ),
+      });
 
-      this.showSuccess(t("vscode.commit.commit_dialog_opened"));
+      const shortDescription = await this.promptRequiredText(
+        this.translate(
+          "commit.prompt.short_description",
+          "Write a short, imperative description of the change",
+        ),
+        this.translate(
+          "commit.prompt.short_description",
+          "Write a short, imperative description of the change",
+        ),
+      );
+      if (!shortDescription) {
+        return;
+      }
+
+      const longDescription = await vscode.window.showInputBox({
+        prompt: this.translate(
+          "commit.prompt.long_description",
+          "Provide a longer description (optional)",
+        ),
+        placeHolder: this.translate(
+          "commit.prompt.long_description",
+          "Provide a longer description (optional)",
+        ),
+        value: "",
+      });
+
+      const breakingChanges = await vscode.window.showInputBox({
+        prompt: this.translate(
+          "commit.prompt.breaking_changes",
+          "Describe BREAKING CHANGES (optional)",
+        ),
+        placeHolder: this.translate(
+          "commit.prompt.breaking_changes",
+          "Describe BREAKING CHANGES (optional)",
+        ),
+      });
+
+      const issueReferences = await this.resolveIssueReferences();
+
+      const result = await vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: this.translate(
+            "commit.command_description",
+            "Prepare a conventional commit",
+          ),
+          cancellable: false,
+        },
+        async (progress) =>
+          runCommitWorkflow(
+            {
+              cwd: workspaceFolder.uri.fsPath,
+              type: commitType,
+              scope: scope || undefined,
+              shortDescription,
+              longDescription: longDescription || undefined,
+              breakingChanges: breakingChanges || undefined,
+              affectedIssues: issueReferences || undefined,
+            },
+            {
+              onProgress: (workflowProgress) =>
+                this.reportCommitProgress(workflowProgress.step, progress),
+            },
+          ),
+      );
+
+      if (result.status === "committed") {
+        this.appendCommitMessage(result.message ?? shortDescription);
+        await this.showSuccess(t("commit.success"));
+        return;
+      }
+
+      if (result.reason === "no-staged-changes") {
+        await this.showWarning(t("commit.error_no_changes_staged"));
+        return;
+      }
+
+      const errorMessage =
+        result.error ?? this.translate("common.error_generic", "An error occurred.");
+      await this.showError(errorMessage);
     } catch (error) {
-      this.showError(
-        t("vscode.commit.failed_open_commit_dialog", { error: String(error) }),
+      await this.showError(
+        `${this.translate("common.error_generic", "An error occurred.")} ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
+  }
+
+  /**
+   * Displays commit message output for user reference.
+   * @param message - The final commit message created by the workflow.
+   */
+  private appendCommitMessage(message: string): void {
+    const channel = this.ensureOutputChannel();
+    channel.appendLine("―".repeat(60));
+    channel.appendLine(
+      `${new Date().toISOString()} - ${this.translate(
+        "commit.output_channel_title",
+        "Commit message",
+      )}`,
+    );
+    channel.appendLine(message);
+    channel.show(true);
+  }
+
+  /**
+   * Prompts the user to select the Conventional Commit type.
+   */
+  private async selectCommitType(): Promise<string | undefined> {
+    const items: CommitTypeQuickPickItem[] = [
+      { label: this.translate("commit.types.feat", "feat"), value: "feat" },
+      { label: this.translate("commit.types.fix", "fix"), value: "fix" },
+      { label: this.translate("commit.types.docs", "docs"), value: "docs" },
+      {
+        label: this.translate("commit.types.style", "style"),
+        value: "style",
+      },
+      {
+        label: this.translate("commit.types.refactor", "refactor"),
+        value: "refactor",
+      },
+      { label: this.translate("commit.types.perf", "perf"), value: "perf" },
+      { label: this.translate("commit.types.test", "test"), value: "test" },
+      {
+        label: this.translate("commit.types.chore", "chore"),
+        value: "chore",
+      },
+      {
+        label: this.translate("commit.types.revert", "revert"),
+        value: "revert",
+      },
+    ];
+
+    const selection = await vscode.window.showQuickPick(items, {
+      placeHolder: this.translate(
+        "commit.prompt.select_type",
+        "Select the type of change",
+      ),
+    });
+
+    return selection?.value;
+  }
+
+  /**
+   * Prompts the user for required text input, handling validation.
+   * @param prompt - Prompt message to display.
+   * @param placeHolder - Placeholder text for the input box.
+   */
+  private async promptRequiredText(
+    prompt: string,
+    placeHolder: string,
+  ): Promise<string | undefined> {
+    return vscode.window.showInputBox({
+      prompt,
+      placeHolder,
+      validateInput: (value) =>
+        value && value.trim().length > 0
+          ? undefined
+          : this.translate("common.error_generic", "This field is required."),
+    });
+  }
+
+  /**
+   * Resolves GitHub issues references, asking the user if they wish to link issues.
+   */
+  private async resolveIssueReferences(): Promise<string | undefined> {
+    try {
+      if (!this.authService.isAuthenticated) {
+        return this.promptManualIssueReference();
+      }
+
+      const issues = await this.issuesService.fetchCurrentRepositoryIssues();
+      if (!issues.length) {
+        return this.promptManualIssueReference();
+      }
+
+      const selections = await vscode.window.showQuickPick(
+        issues.map((issue) => this.mapIssueToQuickPick(issue)),
+        {
+          canPickMany: true,
+          placeHolder: this.translate(
+            "commit.prompt.affected_issues",
+            "Select issues to reference",
+          ),
+        },
+      );
+
+      if (!selections || selections.length === 0) {
+        return this.promptManualIssueReference();
+      }
+
+      return selections
+        .map((item) =>
+          this.translate("commit.issues.reference_entry", "closes #{issueNumber}", {
+            issueNumber: item.issue.number,
+          }),
+        )
+        .join(", ");
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      await this.showWarning(
+        `${this.translate(
+          "github.issues.error_fetching",
+          "Failed to fetch issues:",
+        )} ${reason}`,
+      );
+      return this.promptManualIssueReference();
+    }
+  }
+
+  /**
+   * Prompts the user for manual issue references when GitHub integration is unavailable.
+   */
+  private async promptManualIssueReference(): Promise<string | undefined> {
+    const manualValue = await vscode.window.showInputBox({
+      prompt: this.translate(
+        "commit.prompt.affected_issues",
+        "Does this change affect any open issues?",
+      ),
+      placeHolder: this.translate(
+        "commit.placeholder.issue_reference",
+        "closes #123",
+      ),
+    });
+    return manualValue?.trim() ? manualValue.trim() : undefined;
+  }
+
+  /**
+   * Maps a GitHub issue to a VS Code quick pick item.
+   */
+  private mapIssueToQuickPick(issue: GitHubIssue): {
+    label: string;
+    description: string;
+    issue: GitHubIssue;
+  } {
+    return {
+      label: `#${issue.number} ${issue.title}`,
+      description: issue.user?.login ?? "",
+      issue,
+    };
+  }
+
+  /**
+   * Updates progress reporting messages according to the workflow step.
+   */
+  private reportCommitProgress(
+    step: CommitWorkflowStep,
+    progress: vscode.Progress<{ message?: string }>,
+  ): void {
+    const messages: Partial<Record<CommitWorkflowStep, string>> = {
+      checkingStaged: this.translate(
+        "commit.progress.checking_staged",
+        "Checking staged changes...",
+      ),
+      buildingMessage: this.translate(
+        "commit.progress.building_message",
+        "Building commit message...",
+      ),
+      committing: this.translate(
+        "commit.progress.committing",
+        "Running git commit...",
+      ),
+      completed: this.translate(
+        "commit.progress.completed",
+        "Commit completed successfully.",
+      ),
+    };
+
+    const message = messages[step];
+    if (message) {
+      progress.report({ message });
+      this.ensureOutputChannel().appendLine(message);
+    }
+  }
+
+  /**
+   * Lazily creates and returns the output channel used for commit logs.
+   */
+  private ensureOutputChannel(): vscode.OutputChannel {
+    if (!this.outputChannel) {
+      this.outputChannel = vscode.window.createOutputChannel("StackCode Commit");
+    }
+    return this.outputChannel;
+  }
+
+  /**
+   * Safely translates a key using i18n with a fallback string.
+   */
+  private translate(
+    key: string,
+    fallback: string,
+    variables?: Record<string, string | number>,
+  ): string {
+    try {
+      return variables ? t(key, variables) : t(key);
+    } catch {
+      if (!variables) return fallback;
+      return Object.entries(variables).reduce(
+        (acc, [varKey, value]) => acc.replace(`{${varKey}}`, String(value)),
+        fallback,
       );
     }
   }

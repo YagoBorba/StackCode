@@ -2,8 +2,8 @@ import chalk from "chalk";
 import inquirer from "inquirer";
 import { t } from "@stackcode/i18n";
 import { type PackageBumpInfo } from "@stackcode/core";
-import { CLIAuthManager } from "./github.js";
-import { getCurrentRepository, fetchRepositoryIssues } from "./github.js";
+import { CLIAuthManager, getCurrentRepository } from "../services/githubAuth.js";
+import { fetchRepositoryIssues } from "@stackcode/core";
 import { Octokit } from "@octokit/rest";
 
 export const log = {

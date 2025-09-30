@@ -1,8 +1,15 @@
 import * as vscode from "vscode";
 import { BaseCommand } from "./BaseCommand";
-import { ProgressCallback } from "../types";
 import { t } from "@stackcode/i18n";
 import * as path from "path";
+import {
+  runGenerateWorkflow,
+  type GenerateFileType,
+  type GenerateWorkflowHooks,
+  type GenerateWorkflowOptions,
+  type GenerateWorkflowResult,
+  type GenerateWorkflowStep,
+} from "@stackcode/core";
 
 /**
  * Command to generate project files like README.md and .gitignore.
@@ -47,171 +54,214 @@ export class GenerateCommand extends BaseCommand {
     }
   }
 
-  async generateReadme(): Promise<void> {
-    try {
-      const workspaceFolder = this.getCurrentWorkspaceFolder();
-      if (!workspaceFolder) {
-        this.showError(t("vscode.common.no_workspace_folder"));
-        return;
+  private async ensureWorkspaceFolder(): Promise<vscode.WorkspaceFolder | undefined> {
+    const workspaceFolder = this.getCurrentWorkspaceFolder();
+    if (!workspaceFolder) {
+      await this.showError(t("vscode.common.no_workspace_folder"));
+      return undefined;
+    }
+    return workspaceFolder;
+  }
+
+  private async promptGitignoreTechnologies(): Promise<string[] | undefined> {
+    const selections = await vscode.window.showQuickPick(
+      [
+        { label: "node-ts", description: t("vscode.init.stacks.node_ts") },
+        { label: "react", description: t("vscode.init.stacks.react") },
+        { label: "vue", description: t("vscode.init.stacks.vue") },
+        { label: "angular", description: t("vscode.init.stacks.angular") },
+        { label: "python", description: t("vscode.init.stacks.python") },
+        { label: "java", description: t("vscode.init.stacks.java") },
+        { label: "go", description: t("vscode.init.stacks.go") },
+        { label: "php", description: t("vscode.init.stacks.php") },
+      ],
+      {
+        placeHolder: t("vscode.generate.select_project_type_gitignore"),
+        canPickMany: true,
+      },
+    );
+    if (!selections || selections.length === 0) return undefined;
+    return selections.map((s) => s.label);
+  }
+
+  private stepMessage(step: GenerateWorkflowStep): string | undefined {
+    switch (step) {
+      case "checkingFile":
+        return t("vscode.generate.setting_up_readme");
+      case "generatingContent":
+        return t("vscode.generate.running_generator");
+      case "writingFile":
+        return t("vscode.generate.readme_created");
+      default:
+        return undefined;
+    }
+  }
+
+  private createWorkflowHooks(progress: vscode.Progress<{ message?: string }>): GenerateWorkflowHooks {
+    return {
+      onProgress: async ({ step }: { step: GenerateWorkflowStep }) => {
+        const message = this.stepMessage(step);
+        if (message) progress.report({ message });
+      },
+      onEducationalMessage: async (messageKey: string) => {
+        progress.report({ message: t(messageKey) });
+      },
+      shouldOverwriteFile: async ({
+        fileType,
+        filePath,
+      }: {
+        fileType: GenerateFileType;
+        filePath: string;
+      }) => {
+        const confirmLabel = t("vscode.generate.overwrite");
+        const message = fileType === "readme"
+          ? t("vscode.generate.readme_exists_overwrite")
+          : t("vscode.generate.gitignore_exists_overwrite");
+        const choice = await vscode.window.showWarningMessage(message, { modal: true }, confirmLabel);
+        return choice === confirmLabel;
+      },
+    };
+  }
+
+  private async runWorkflowWithProgress(
+    workspaceFolder: vscode.WorkspaceFolder,
+    options: GenerateWorkflowOptions,
+  ): Promise<GenerateWorkflowResult> {
+    return vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: t("vscode.generate.running_generator"),
+        cancellable: false,
+      },
+      async (progress) => {
+        const hooks = this.createWorkflowHooks(progress);
+        return runGenerateWorkflow(options, hooks);
+      },
+    );
+  }
+
+  private async handleWorkflowOutcome(
+    workspaceFolder: vscode.WorkspaceFolder,
+    result: GenerateWorkflowResult,
+    fileTypes: GenerateFileType[],
+  ): Promise<void> {
+    const created = result.files.filter(
+      (f: GenerateWorkflowResult["files"][number]) =>
+        f.status === "created" || f.status === "overwritten",
+    );
+    for (const f of created) {
+      if (f.fileType === "readme") {
+        await this.showSuccess(t("vscode.generate.readme_has_been_generated"));
+      } else if (f.fileType === "gitignore") {
+        await this.showSuccess(t("vscode.generate.gitignore_has_been_generated"));
       }
+    }
 
-      const readmePath = path.join(workspaceFolder.uri.fsPath, "README.md");
-
-      try {
-        await vscode.workspace.fs.stat(vscode.Uri.file(readmePath));
-        const overwrite = await this.confirmAction(
-          t("vscode.generate.readme_exists_overwrite"),
-          t("vscode.generate.overwrite"),
-        );
-        if (!overwrite) {
-          return;
-        }
-      } catch {
-        // File doesn't exist - proceed with generation
-      }
-
-      vscode.window.withProgress(
-        {
-          location: vscode.ProgressLocation.Notification,
-          title: t("vscode.generate.generating_readme"),
-          cancellable: false,
-        },
-        async (progress: ProgressCallback) => {
-          progress.report({
-            increment: 0,
-            message: t("vscode.generate.setting_up_readme"),
-          });
-
-          const command = `npx @stackcode/cli generate readme`;
-
-          progress.report({
-            increment: 50,
-            message: t("vscode.generate.running_generator"),
-          });
-
-          await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
-
-          progress.report({
-            increment: 100,
-            message: t("vscode.generate.readme_created"),
-          });
-        },
+    // Offer to open files
+    for (const ft of fileTypes) {
+      const filePath = path.join(
+        workspaceFolder.uri.fsPath,
+        ft === "readme" ? "README.md" : ".gitignore",
       );
-
-      this.showSuccess(t("vscode.generate.readme_has_been_generated"));
-
-      const openFile = await vscode.window.showInformationMessage(
-        t("vscode.generate.would_you_like_open_readme"),
-        t("vscode.generate.open_file"),
+      const openPromptKey =
+        ft === "readme"
+          ? "vscode.generate.would_you_like_open_readme"
+          : "vscode.generate.would_you_like_open_gitignore";
+      const openLabel = t("vscode.generate.open_file");
+      const choice = await vscode.window.showInformationMessage(
+        t(openPromptKey),
+        openLabel,
       );
-
-      if (openFile === t("vscode.generate.open_file")) {
-        const document = await vscode.workspace.openTextDocument(readmePath);
+      if (choice === openLabel) {
+        const document = await vscode.workspace.openTextDocument(filePath);
         await vscode.window.showTextDocument(document);
       }
+    }
+
+    // Show translated warnings if any
+    if (result.warnings.length > 0) {
+      for (const w of result.warnings) {
+        await this.showWarning(t(w));
+      }
+    }
+  }
+  async generateReadme(): Promise<void> {
+    const workspaceFolder = await this.ensureWorkspaceFolder();
+    if (!workspaceFolder) {
+      return;
+    }
+
+    try {
+      const result = await this.runWorkflowWithProgress(
+        workspaceFolder,
+        {
+          projectPath: workspaceFolder.uri.fsPath,
+          files: ["readme"],
+        },
+      );
+
+      await this.handleWorkflowOutcome(workspaceFolder, result, ["readme"]);
     } catch (error) {
-      this.showError(
+      await this.showError(
         t("vscode.generate.failed_generate_readme", { error: String(error) }),
       );
     }
   }
 
   async generateGitignore(): Promise<void> {
+    const workspaceFolder = await this.ensureWorkspaceFolder();
+    if (!workspaceFolder) {
+      return;
+    }
+
+    const technologies = await this.promptGitignoreTechnologies();
+    if (!technologies) {
+      return;
+    }
+
     try {
-      const workspaceFolder = this.getCurrentWorkspaceFolder();
-      if (!workspaceFolder) {
-        this.showError(t("vscode.common.no_workspace_folder"));
-        return;
-      }
-
-      const gitignorePath = path.join(workspaceFolder.uri.fsPath, ".gitignore");
-
-      try {
-        await vscode.workspace.fs.stat(vscode.Uri.file(gitignorePath));
-        const overwrite = await this.confirmAction(
-          t("vscode.generate.gitignore_exists_overwrite"),
-          t("vscode.generate.overwrite"),
-        );
-        if (!overwrite) {
-          return;
-        }
-      } catch {
-        // File doesn't exist - proceed with generation
-      }
-
-      const projectType = await vscode.window.showQuickPick(
-        [
-          { label: "node-ts", description: t("vscode.init.stacks.node_ts") },
-          { label: "react", description: t("vscode.init.stacks.react") },
-          { label: "vue", description: t("vscode.init.stacks.vue") },
-          { label: "angular", description: t("vscode.init.stacks.angular") },
-          { label: "python", description: t("vscode.init.stacks.python") },
-          { label: "java", description: t("vscode.init.stacks.java") },
-          { label: "go", description: t("vscode.init.stacks.go") },
-          { label: "php", description: t("vscode.init.stacks.php") },
-          {
-            label: "flutter",
-            description: t("vscode.generate.stacks.flutter"),
-          },
-          { label: "swift", description: t("vscode.generate.stacks.swift") },
-          {
-            label: "android",
-            description: t("vscode.generate.stacks.android"),
-          },
-        ],
+      const result = await this.runWorkflowWithProgress(
+        workspaceFolder,
         {
-          placeHolder: t("vscode.generate.select_project_type_gitignore"),
+          projectPath: workspaceFolder.uri.fsPath,
+          files: ["gitignore"],
+          gitignoreTechnologies: technologies,
         },
       );
 
-      if (!projectType) {
-        return;
-      }
-
-      vscode.window.withProgress(
-        {
-          location: vscode.ProgressLocation.Notification,
-          title: t("vscode.generate.generating_gitignore"),
-          cancellable: false,
-        },
-        async (progress: ProgressCallback) => {
-          progress.report({
-            increment: 0,
-            message: t("vscode.generate.setting_up_gitignore"),
-          });
-
-          const command = `npx @stackcode/cli generate gitignore --type="${projectType.label}"`;
-
-          progress.report({
-            increment: 50,
-            message: t("vscode.generate.running_generator"),
-          });
-
-          await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
-
-          progress.report({
-            increment: 100,
-            message: t("vscode.generate.gitignore_created"),
-          });
-        },
-      );
-
-      this.showSuccess(t("vscode.generate.gitignore_has_been_generated"));
-
-      const openFile = await vscode.window.showInformationMessage(
-        t("vscode.generate.would_you_like_open_gitignore"),
-        t("vscode.generate.open_file"),
-      );
-
-      if (openFile === t("vscode.generate.open_file")) {
-        const document = await vscode.workspace.openTextDocument(gitignorePath);
-        await vscode.window.showTextDocument(document);
-      }
+      await this.handleWorkflowOutcome(workspaceFolder, result, ["gitignore"]);
     } catch (error) {
-      this.showError(
+      await this.showError(
         t("vscode.generate.failed_generate_gitignore", {
           error: String(error),
         }),
+      );
+    }
+  }
+
+  private async generateFiles(
+    fileTypes: GenerateFileType[],
+    gitignoreTechnologies?: string[],
+  ): Promise<void> {
+    const workspaceFolder = await this.ensureWorkspaceFolder();
+    if (!workspaceFolder) {
+      return;
+    }
+
+    try {
+      const result = await this.runWorkflowWithProgress(
+        workspaceFolder,
+        {
+          projectPath: workspaceFolder.uri.fsPath,
+          files: fileTypes,
+          gitignoreTechnologies,
+        },
+      );
+
+      await this.handleWorkflowOutcome(workspaceFolder, result, fileTypes);
+    } catch (error) {
+      await this.showError(
+        t("vscode.generate.failed_generate_readme", { error: String(error) }),
       );
     }
   }

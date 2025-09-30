@@ -73,6 +73,12 @@
         "icon": "$(check)"
       },
       {
+        "command": "stackcode.validate.commit",
+        "title": "Validate Commit Message",
+        "category": "StackCode",
+        "icon": "$(check)"
+      },
+      {
         "command": "stackcode.release",
         "title": "Create Release",
         "category": "StackCode",

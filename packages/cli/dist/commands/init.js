@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import { scaffoldProject, setupHusky, generateReadmeContent, generateGitignoreContent, runCommand, validateStackDependencies, saveStackCodeConfig, } from "@stackcode/core";
+import { runInitWorkflow, } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
 import * as ui from "./ui.js";
 import { initEducationalMode, showEducationalMessage, } from "../educational-mode.js";
@@ -14,7 +14,6 @@ export const getInitCommand = () => ({
     describe: t("init.command_description"),
     builder: {},
     handler: async (argv) => {
-        // Initialize educational mode based on config and flag
         initEducationalMode(argv.educate || false);
         ui.log.step(t("init.welcome"));
         ui.log.divider();
@@ -33,112 +32,81 @@ export const getInitCommand = () => ({
         }
         ui.log.divider();
         ui.log.success(t("init.setup_start"));
-        const replacements = {
+        const workflowOptions = {
+            projectPath,
             projectName: answers.projectName,
             description: answers.description,
             authorName: answers.authorName,
-        };
-        const projectOptions = {
-            projectPath,
             stack: answers.stack,
             features: answers.features,
-            replacements,
+            commitValidation: answers.commitValidation,
         };
-        ui.log.info(`  ${t("init.step.scaffold")}`);
-        showEducationalMessage("educational.scaffold_explanation");
-        await scaffoldProject(projectOptions);
-        if (answers.features.includes("husky") &&
-            answers.commitValidation !== undefined) {
-            const config = {
-                defaultAuthor: answers.authorName,
-                defaultLicense: "MIT", // Default license, could be prompted in future
-                features: { commitValidation: answers.commitValidation },
-            };
-            await saveStackCodeConfig(projectPath, config);
-        }
-        ui.log.info(`  ${t("init.step.readme")}`);
-        showEducationalMessage("educational.readme_explanation");
-        const readmeContent = await generateReadmeContent();
-        await fs.writeFile(path.join(projectPath, "README.md"), readmeContent);
-        ui.log.info(`  ${t("init.step.gitignore")}`);
-        showEducationalMessage("educational.gitignore_explanation");
-        const gitignoreContent = await generateGitignoreContent([answers.stack]);
-        await fs.writeFile(path.join(projectPath, ".gitignore"), gitignoreContent);
-        if (answers.features.includes("husky")) {
-            ui.log.info(`  ${t("init.step.husky")}`);
-            showEducationalMessage("educational.husky_explanation");
-            await setupHusky(projectPath);
-        }
-        ui.log.info(`  ${t("init.step.git")}`);
-        showEducationalMessage("educational.git_init_explanation");
-        await runCommand("git", ["init"], { cwd: projectPath });
-        ui.log.info(`  ${t("init.step.validate_deps")}`);
-        showEducationalMessage("educational.dependency_validation_explanation");
-        const dependencyValidation = await validateStackDependencies(answers.stack);
-        if (!dependencyValidation.isValid) {
-            ui.log.warning(t("init.dependencies.missing", { stack: answers.stack }));
-            dependencyValidation.missingDependencies.forEach((dep) => {
-                ui.log.raw(t("init.dependencies.missing_detail", { command: dep }));
-            });
-            ui.log.raw("\n" + t("init.dependencies.install_instructions"));
-            dependencyValidation.missingDependencies.forEach((dep) => {
-                const installKey = `init.dependencies.install_${dep}`;
-                try {
-                    ui.log.raw(t(installKey));
+        const workflowHooks = {
+            onProgress: async ({ step }) => {
+                switch (step) {
+                    case "scaffold":
+                        ui.log.info(`  ${t("init.step.scaffold")}`);
+                        break;
+                    case "generateReadme":
+                        ui.log.info(`  ${t("init.step.readme")}`);
+                        break;
+                    case "generateGitignore":
+                        ui.log.info(`  ${t("init.step.gitignore")}`);
+                        break;
+                    case "setupHusky":
+                        ui.log.info(`  ${t("init.step.husky")}`);
+                        break;
+                    case "initializeGit":
+                        ui.log.info(`  ${t("init.step.git")}`);
+                        break;
+                    case "validateDependencies":
+                        ui.log.info(`  ${t("init.step.validate_deps")}`);
+                        break;
+                    case "installDependencies":
+                        ui.log.info(`  ${t("init.step.deps")}`);
+                        break;
+                    case "saveConfig":
+                    case "completed":
+                        break;
                 }
-                catch {
-                    ui.log.raw(`  - ${dep}: Check the official documentation for installation instructions`);
-                }
-            });
-            ui.log.warning("\n" + t("init.dependencies.optional_skip"));
-            const shouldContinue = await ui.promptForConfirmation(t("init.dependencies.prompt_continue"), false);
-            if (!shouldContinue) {
-                ui.log.info(t("common.operation_cancelled"));
-                return;
-            }
+            },
+            onEducationalMessage: async (messageKey) => {
+                showEducationalMessage(messageKey);
+            },
+            onMissingDependencies: async ({ stack, missingDependencies, }) => {
+                ui.log.warning(t("init.dependencies.missing", { stack }));
+                missingDependencies.forEach((dependency) => {
+                    ui.log.raw(t("init.dependencies.missing_detail", { command: dependency }));
+                });
+                ui.log.raw(`\n${t("init.dependencies.install_instructions")}`);
+                missingDependencies.forEach((dependency) => {
+                    const installKey = `init.dependencies.install_${dependency}`;
+                    try {
+                        ui.log.raw(t(installKey));
+                    }
+                    catch {
+                        ui.log.raw(`  - ${dependency}: Check the official documentation for installation instructions`);
+                    }
+                });
+                ui.log.warning(`\n${t("init.dependencies.optional_skip")}`);
+            },
+            confirmContinueAfterMissingDependencies: async () => ui.promptForConfirmation(t("init.dependencies.prompt_continue"), false),
+        };
+        const result = await runInitWorkflow(workflowOptions, workflowHooks);
+        if (result.status === "cancelled") {
+            ui.log.info(t("common.operation_cancelled"));
+            return;
         }
-        else {
+        if (result.dependencyValidation.isValid) {
             ui.log.success(`  ${t("init.dependencies.all_available")}`);
         }
-        ui.log.info(`  ${t("init.step.deps")}`);
-        try {
-            if (answers.stack === "python") {
-                await runCommand("pip", ["install", "-e", "."], { cwd: projectPath });
-            }
-            else if (answers.stack === "java") {
-                await runCommand("mvn", ["install"], { cwd: projectPath });
-            }
-            else if (answers.stack === "go") {
-                await runCommand("go", ["mod", "tidy"], { cwd: projectPath });
-            }
-            else if (answers.stack === "php") {
-                await runCommand("composer", ["install"], { cwd: projectPath });
-            }
-            else {
-                await runCommand("npm", ["install"], { cwd: projectPath });
-            }
-        }
-        catch (error) {
-            ui.log.error(`\n${t("init.error.deps_install_failed", {
-                error: error instanceof Error ? error.message : String(error),
-            })}`);
+        if (!result.dependenciesInstalled && result.installCommand) {
+            const installCommandString = `${result.installCommand.command} ${result.installCommand.args.join(" ")}`.trim();
+            const warningMessage = result.warnings.at(-1) ?? "Unknown error";
+            ui.log.error(`\n${t("init.error.deps_install_failed", { error: warningMessage })}`);
             ui.log.warning(t("init.error.deps_install_manual"));
             ui.log.info(t("init.error.suggested_command"));
-            if (answers.stack === "python") {
-                ui.log.raw("  pip install -e .");
-            }
-            else if (answers.stack === "java") {
-                ui.log.raw("  mvn install");
-            }
-            else if (answers.stack === "go") {
-                ui.log.raw("  go mod tidy");
-            }
-            else if (answers.stack === "php") {
-                ui.log.raw("  composer install");
-            }
-            else {
-                ui.log.raw("  npm install");
-            }
+            ui.log.raw(`  ${installCommandString}`);
         }
         ui.log.divider();
         ui.log.success(t("init.success.ready"));

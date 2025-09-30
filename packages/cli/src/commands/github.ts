@@ -3,9 +3,10 @@ import { getErrorMessage } from "@stackcode/core";
 import { fetchRepositoryIssues } from "@stackcode/core";
 import { Octokit } from "@octokit/rest";
 import { t, initI18n } from "@stackcode/i18n";
-import fs from "fs";
-import os from "os";
-import path from "path";
+import {
+  CLIAuthManager,
+  getCurrentRepository,
+} from "../services/githubAuth.js";
 
 interface AuthArgs {
   token?: string;
@@ -20,103 +21,6 @@ interface IssuesArgs {
   assignee?: string;
   labels?: string;
   limit?: number;
-}
-
-/**
- * Gerenciamento de token de autenticação GitHub no CLI
- */
-class CLIAuthManager {
-  private tokenPath: string;
-
-  constructor() {
-    const configDir = path.join(os.homedir(), ".stackcode");
-    if (!fs.existsSync(configDir)) {
-      fs.mkdirSync(configDir, { recursive: true });
-    }
-    this.tokenPath = path.join(configDir, "github_token");
-  }
-
-  saveToken(token: string): void {
-    fs.writeFileSync(this.tokenPath, token, { mode: 0o600 });
-  }
-
-  getToken(): string | null {
-    try {
-      if (fs.existsSync(this.tokenPath)) {
-        return fs.readFileSync(this.tokenPath, "utf-8").trim();
-      }
-    } catch (error) {
-      console.error(t("github.auth.error_reading_token"), error);
-    }
-    return null;
-  }
-
-  removeToken(): void {
-    try {
-      if (fs.existsSync(this.tokenPath)) {
-        fs.unlinkSync(this.tokenPath);
-      }
-    } catch (error) {
-      console.error(t("github.auth.error_removing_token"), error);
-    }
-  }
-
-  async validateToken(token: string): Promise<boolean> {
-    try {
-      const octokit = new Octokit({ auth: token });
-      await octokit.users.getAuthenticated();
-      return true;
-    } catch {
-      return false;
-    }
-  }
-}
-
-/**
- * Detecta repositório GitHub atual baseado no git remote
- */
-function getCurrentRepository(): { owner: string; repo: string } | null {
-  try {
-    const cwd = process.cwd();
-    console.log(`🔍 Detectando repositório em: ${cwd}`);
-
-    const remoteUrl = fs
-      .readFileSync(".git/config", "utf8")
-      .split("\n")
-      .find((line: string) => line.includes("url = "))
-      ?.split("url = ")[1]
-      ?.trim();
-
-    if (!remoteUrl) {
-      console.log(`❌ Não foi possível encontrar URL remota no .git/config`);
-      return null;
-    }
-
-    console.log(`🔗 URL remota encontrada: ${remoteUrl}`);
-
-    const patterns = [
-      /^https:\/\/github\.com\/([^/]+)\/([^/]+)(?:\.git)?$/,
-      /^git@github\.com:([^/]+)\/([^/]+)(?:\.git)?$/,
-      /^ssh:\/\/git@github\.com\/([^/]+)\/([^/]+)(?:\.git)?$/,
-    ];
-
-    for (const pattern of patterns) {
-      const match = remoteUrl.match(pattern);
-      if (match) {
-        const result = { owner: match[1], repo: match[2] };
-        console.log(`✅ Repositório detectado: ${result.owner}/${result.repo}`);
-        return result;
-      }
-    }
-
-    console.log(`❌ URL não corresponde aos padrões GitHub conhecidos`);
-    return null;
-  } catch (error) {
-    console.log(
-      `❌ Erro ao detectar repositório: ${error instanceof Error ? error.message : String(error)}`,
-    );
-    return null;
-  }
 }
 
 /**
@@ -303,7 +207,7 @@ function getIssuesCommand(): CommandModule<
           }
           [owner, repo] = parts;
         } else {
-          const currentRepo = getCurrentRepository();
+          const currentRepo = getCurrentRepository({ verbose: true });
           if (!currentRepo) {
             console.error(`❌ ${t("github.issues.no_repository_detected")}`);
             console.error(t("github.issues.run_from_git_repo"));
@@ -396,7 +300,7 @@ async function showInteractiveIssuesMenu(
     process.exit(1);
   }
 
-  const currentRepo = getCurrentRepository();
+  const currentRepo = getCurrentRepository({ verbose: true });
 
   const choices = [
     {

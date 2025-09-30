@@ -1,29 +1,38 @@
 import chalk from "chalk";
-import { runCommand, getCommandOutput, getErrorMessage } from "@stackcode/core";
+import { getErrorMessage, runGitFinishWorkflow, } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
 import open from "open";
-function getRepoPathFromUrl(url) {
-    const match = url.match(/github\.com[/:]([\w-]+\/[\w-.]+)/);
-    return match ? match[1].replace(".git", "") : null;
-}
 export const finishHandler = async () => {
     try {
-        const currentBranch = await getCommandOutput("git", ["branch", "--show-current"], { cwd: process.cwd() });
-        if (!currentBranch) {
-            console.error(chalk.red(t("git.error_not_git_repo")));
+        const result = await runGitFinishWorkflow({ cwd: process.cwd() }, {
+            onProgress: (progress) => {
+                if (progress.step === "pushing" && progress.message) {
+                    console.log(chalk.blue(t("git.info_pushing_branch", {
+                        branchName: progress.message,
+                    })));
+                }
+                if (progress.step === "computingPrUrl") {
+                    console.log(chalk.blue(t("git.info_opening_browser")));
+                }
+            },
+        });
+        if (result.status !== "pushed" || !result.branch) {
+            if (result.error === "not-on-branch") {
+                console.error(chalk.red(t("git.error_not_git_repo")));
+            }
+            else {
+                console.error(chalk.red(t("common.unexpected_error")));
+                if (result.error) {
+                    console.error(chalk.gray(result.error));
+                }
+            }
             return;
         }
-        console.log(chalk.blue(t("git.info_pushing_branch", { branchName: currentBranch })));
-        await runCommand("git", ["push", "--set-upstream", "origin", currentBranch], { cwd: process.cwd() });
-        console.log(chalk.blue(t("git.info_opening_browser")));
-        const remoteUrl = await getCommandOutput("git", ["remote", "get-url", "origin"], { cwd: process.cwd() });
-        const repoPath = getRepoPathFromUrl(remoteUrl);
-        if (!repoPath) {
+        if (!result.prUrl) {
             console.error(chalk.red(t("git.error_parsing_remote")));
             return;
         }
-        const prUrl = `https://github.com/${repoPath}/pull/new/${currentBranch}`;
-        await open(prUrl);
+        await open(result.prUrl);
         console.log(chalk.green(t("git.success_pr_ready")));
     }
     catch (error) {

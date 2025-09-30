@@ -74,9 +74,9 @@ export async function activate(context: vscode.ExtensionContext) {
   initCommand = new InitCommand();
   generateCommand = new GenerateCommand();
   gitCommand = new GitCommand();
-  commitCommand = new CommitCommand();
+  commitCommand = new CommitCommand(gitHubIssuesService, gitHubAuthService);
   validateCommand = new ValidateCommand();
-  releaseCommand = new ReleaseCommand();
+  releaseCommand = new ReleaseCommand(gitHubAuthService);
   configCommand = new ConfigCommand();
   authCommand = new AuthCommand(gitHubAuthService);
 
@@ -97,6 +97,9 @@ export async function activate(context: vscode.ExtensionContext) {
     // Core functionality commands
     vscode.commands.registerCommand("stackcode.init", () =>
       initCommand.execute(),
+    ),
+    vscode.commands.registerCommand("stackcode.validate.commit", () =>
+      validateCommand.validateCommitMessage(),
     ),
     vscode.commands.registerCommand("stackcode.generate.readme", () =>
       generateCommand.generateReadme(),
