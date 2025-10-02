@@ -70,6 +70,8 @@
       "login_github": "Login to GitHub",
       "error_loading_issues": "Error loading issues",
       "loading_issues": "Loading issues...",
+      "fetching_issues": "Fetching issues from GitHub...",
+      "please_wait": "Please wait while we load the issues",
       "view_on_github": "View on GitHub",
       "created_by": "Created by",
       "updated": "Updated",

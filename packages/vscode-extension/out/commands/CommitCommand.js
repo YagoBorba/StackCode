@@ -29,21 +29,16 @@ const core_1 = require("@stackcode/core");
 const i18n_1 = require("@stackcode/i18n");
 const BaseCommand_1 = require("./BaseCommand");
 /**
- * CommitCommand orchestrates the commit workflow within VS Code.
- * It prompts the user for Conventional Commit details, optionally links
- * GitHub issues, and delegates the git operations to the shared workflow.
- *
- * Now uses runIssuesWorkflow directly from @stackcode/core for centralized logic.
+ * Handles Conventional Commit workflow in VS Code.
+ * Prompts for commit details, links GitHub issues, and integrates progress feedback.
  */
 class CommitCommand extends BaseCommand_1.BaseCommand {
-    constructor(authService, gitMonitor) {
+    constructor(authService, gitMonitor, progressManager) {
         super();
         this.authService = authService;
         this.gitMonitor = gitMonitor;
+        this.progressManager = progressManager;
     }
-    /**
-     * Executes the commit workflow by collecting user input and delegating to the core workflow.
-     */
     async execute() {
         try {
             const workspaceFolder = this.getCurrentWorkspaceFolder();
@@ -73,26 +68,39 @@ class CommitCommand extends BaseCommand_1.BaseCommand {
                 placeHolder: this.translate("commit.prompt.breaking_changes", "Describe BREAKING CHANGES (optional)"),
             });
             const issueReferences = await this.resolveIssueReferences();
+            // Start progress tracking
+            this.progressManager.startWorkflow("commit");
             const result = await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
                 title: this.translate("commit.command_description", "Prepare a conventional commit"),
                 cancellable: false,
-            }, async (progress) => (0, core_1.runCommitWorkflow)({
-                cwd: workspaceFolder.uri.fsPath,
-                type: commitType,
-                scope: scope || undefined,
-                shortDescription,
-                longDescription: longDescription || undefined,
-                breakingChanges: breakingChanges || undefined,
-                affectedIssues: issueReferences || undefined,
-            }, {
-                onProgress: (workflowProgress) => this.reportCommitProgress(workflowProgress.step, progress),
-            }));
+            }, async (progress) => {
+                this.progressManager.setVSCodeProgressReporter(progress);
+                return (0, core_1.runCommitWorkflow)({
+                    cwd: workspaceFolder.uri.fsPath,
+                    type: commitType,
+                    scope: scope || undefined,
+                    shortDescription,
+                    longDescription: longDescription || undefined,
+                    breakingChanges: breakingChanges || undefined,
+                    affectedIssues: issueReferences || undefined,
+                }, {
+                    onProgress: (workflowProgress) => {
+                        this.reportCommitProgress(workflowProgress.step, progress);
+                        // Also report to ProgressManager for webview updates
+                        this.progressManager.reportProgress("commit", workflowProgress.step, workflowProgress.message);
+                    },
+                });
+            });
+            this.progressManager.clearVSCodeProgressReporter();
             if (result.status === "committed") {
+                this.progressManager.completeWorkflow("commit", "Commit created successfully");
                 this.appendCommitMessage(result.message ?? shortDescription);
                 await this.showSuccess((0, i18n_1.t)("commit.success"));
                 return;
             }
+            // Workflow was cancelled or failed
+            this.progressManager.failWorkflow("commit", result.error || "Commit workflow cancelled");
             if (result.reason === "no-staged-changes") {
                 await this.showWarning((0, i18n_1.t)("commit.error_no_changes_staged"));
                 return;

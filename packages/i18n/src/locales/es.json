@@ -70,6 +70,8 @@
       "login_github": "Iniciar sesión en GitHub",
       "error_loading_issues": "Error cargando issues",
       "loading_issues": "Cargando issues...",
+      "fetching_issues": "Obteniendo issues de GitHub...",
+      "please_wait": "Por favor espere mientras cargamos los issues",
       "view_on_github": "Ver en GitHub",
       "created_by": "Creado por",
       "updated": "Actualizado",

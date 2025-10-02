@@ -17,6 +17,8 @@ import {
   Code,
 } from "lucide-react";
 import IssuesPanel from "./IssuesPanel";
+import ProgressIndicator from "./ProgressIndicator";
+import { useProgress } from "../hooks/useProgress";
 
 // Interfaces para Issues do GitHub
 interface GitHubIssue {
@@ -213,6 +215,9 @@ const Dashboard: React.FC<DashboardProps> = ({
     },
   ];
 
+  // Use progress hook
+  const progressState = useProgress();
+
   useEffect(() => {
     // Animate numbers on load
     const animateNumbers = () => {
@@ -238,6 +243,9 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+      {/* Progress Indicator */}
+      <ProgressIndicator {...progressState} />
+
       {/* Header */}
       <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 p-8">
         <div className="absolute inset-0 bg-black/20"></div>

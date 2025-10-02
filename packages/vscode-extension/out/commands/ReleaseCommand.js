@@ -29,18 +29,15 @@ const core_1 = require("@stackcode/core");
 const i18n_1 = require("@stackcode/i18n");
 const BaseCommand_1 = require("./BaseCommand");
 /**
- * ReleaseCommand executes the monorepo release workflow directly within VS Code.
- * It mirrors the CLI behaviour, including strategy detection, independent release plans,
- * and optional GitHub release creation when authentication is available.
+ * Handles monorepo release workflow in VS Code.
+ * Supports strategy detection, version management, and GitHub release creation.
  */
 class ReleaseCommand extends BaseCommand_1.BaseCommand {
-    constructor(authService) {
+    constructor(authService, progressManager) {
         super();
         this.authService = authService;
+        this.progressManager = progressManager;
     }
-    /**
-     * Runs the release workflow, confirming strategy-specific prompts and handling outcomes.
-     */
     async execute() {
         try {
             const workspaceFolder = this.getCurrentWorkspaceFolder();
@@ -53,14 +50,25 @@ class ReleaseCommand extends BaseCommand_1.BaseCommand {
                 return;
             }
             const cwd = workspaceFolder.uri.fsPath;
+            // Start progress tracking
+            this.progressManager.startWorkflow("release");
             const result = await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
                 title: (0, i18n_1.t)("vscode.release.creating_release"),
                 cancellable: false,
             }, async (progress) => {
+                this.progressManager.setVSCodeProgressReporter(progress);
                 const hooks = this.buildReleaseHooks(progress, cwd);
                 return (0, core_1.runReleaseWorkflow)({ cwd }, hooks);
             });
+            this.progressManager.clearVSCodeProgressReporter();
+            // Complete or fail workflow based on result
+            if (result.status === "prepared") {
+                this.progressManager.completeWorkflow("release", "Release prepared successfully");
+            }
+            else {
+                this.progressManager.failWorkflow("release", result.error || "Release workflow cancelled");
+            }
             await this.handleReleaseResult(result, cwd);
         }
         catch (error) {
@@ -72,7 +80,11 @@ class ReleaseCommand extends BaseCommand_1.BaseCommand {
      */
     buildReleaseHooks(progress, cwd) {
         return {
-            onProgress: (workflowProgress) => this.reportReleaseProgress(workflowProgress, progress),
+            onProgress: (workflowProgress) => {
+                this.reportReleaseProgress(workflowProgress, progress);
+                // Also report to ProgressManager for webview updates
+                this.progressManager.reportProgress("release", workflowProgress.step, workflowProgress.message);
+            },
             confirmLockedRelease: ({ currentVersion, newVersion }) => this.confirmAction((0, i18n_1.t)("release.prompt_confirm_release", {
                 currentVersion,
                 newVersion,
