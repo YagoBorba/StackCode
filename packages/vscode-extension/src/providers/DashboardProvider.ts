@@ -1,12 +1,15 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
-import { GitHubIssuesService } from "../services/GitHubIssuesService";
+import { runIssuesWorkflow, clearRepositoryCache } from "@stackcode/core";
 import { GitHubAuthService } from "../services/GitHubAuthService";
+import { GitMonitor } from "../monitors/GitMonitor";
 
 /**
  * Provides the StackCode dashboard webview interface.
  * Manages project statistics, GitHub issues, and integration with various services.
+ * 
+ * Now uses runIssuesWorkflow directly from @stackcode/core for centralized logic.
  */
 export class DashboardProvider
   implements vscode.WebviewViewProvider, vscode.Disposable
@@ -15,17 +18,17 @@ export class DashboardProvider
   private _view?: vscode.WebviewView;
   private readonly _extensionUri: vscode.Uri;
   private _disposables: vscode.Disposable[] = [];
-  private _issuesService?: GitHubIssuesService;
   private _authService?: GitHubAuthService;
+  private _gitMonitor?: GitMonitor;
 
   constructor(
     context: vscode.ExtensionContext,
-    issuesService?: GitHubIssuesService,
     authService?: GitHubAuthService,
+    gitMonitor?: GitMonitor,
   ) {
     this._extensionUri = context.extensionUri;
-    this._issuesService = issuesService;
     this._authService = authService;
+    this._gitMonitor = gitMonitor;
   }
 
   public resolveWebviewView(webviewView: vscode.WebviewView) {
@@ -88,7 +91,6 @@ export class DashboardProvider
       this._disposables,
     );
 
-    // WebviewView doesn't have onDidBecomeVisible, so we'll update stats immediately
     this.updateProjectStats();
   }
 
@@ -109,12 +111,11 @@ export class DashboardProvider
 
   private async updateIssues(forceRefresh = false): Promise<void> {
     try {
-      if (!this._issuesService || !this._authService) {
-        console.warn("[DashboardProvider] Issues service not available");
+      if (!this._authService || !this._gitMonitor) {
+        console.warn("[DashboardProvider] Auth service or git monitor not available");
         return;
       }
 
-      // Verificar se está autenticado
       if (!this._authService.isAuthenticated) {
         this.sendMessage({
           type: "updateIssues",
@@ -127,22 +128,56 @@ export class DashboardProvider
         return;
       }
 
+      // Get current repository
+      const repository = await this._gitMonitor.getCurrentGitHubRepository();
+      if (!repository) {
+        this.sendMessage({
+          type: "updateIssues",
+          payload: {
+            issues: [],
+            error: "No GitHub repository detected",
+            needsAuth: false,
+          },
+        });
+        return;
+      }
+
       console.log("[DashboardProvider] Fetching GitHub issues...");
 
-      const issues = forceRefresh
-        ? await this._issuesService.refreshIssues()
-        : await this._issuesService.fetchCurrentRepositoryIssues();
+      if (forceRefresh) {
+        clearRepositoryCache({
+          owner: repository.owner,
+          repo: repository.repo,
+          fullName: repository.fullName,
+        });
+      }
+
+      const client = await this._authService.getAuthenticatedClient();
+
+      const result = await runIssuesWorkflow({
+        client,
+        repository: {
+          owner: repository.owner,
+          repo: repository.repo,
+          fullName: repository.fullName,
+        },
+        enableCache: !forceRefresh,
+      });
+
+      if (result.status === "error") {
+        throw new Error(result.error || "Failed to fetch issues");
+      }
 
       this.sendMessage({
         type: "updateIssues",
         payload: {
-          issues,
-          timestamp: new Date().toISOString(),
+          issues: result.issues,
+          timestamp: result.timestamp,
         },
       });
 
       console.log(
-        `[DashboardProvider] Sent ${issues.length} issues to webview`,
+        `[DashboardProvider] Sent ${result.issues.length} issues to webview`,
       );
     } catch (error) {
       console.error("[DashboardProvider] Failed to fetch issues:", error);
@@ -183,7 +218,6 @@ export class DashboardProvider
         "[StackCode] No workspace folders found, using alternative detection",
       );
 
-      // Fallback: usar informações do contexto da extensão
       const extensionWorkspace = path.dirname(
         path.dirname(path.dirname(this._extensionUri.fsPath)),
       );
@@ -235,7 +269,6 @@ export class DashboardProvider
       "webview-ui",
     );
 
-    // Lê o manifest.json do Vite
     const manifestPath = path.join(buildPath.fsPath, ".vite", "manifest.json");
 
     console.log("[StackCode] Build path:", buildPath.fsPath);
@@ -247,7 +280,6 @@ export class DashboardProvider
       const manifest = JSON.parse(manifestContent);
       console.log("[StackCode] Manifest content:", manifest);
 
-      // Pega os arquivos do manifest do Vite
       const indexEntry = manifest["index.html"];
       const scriptFile = indexEntry.file;
       const cssFiles = indexEntry.css || [];
@@ -285,17 +317,16 @@ export class DashboardProvider
         console.log('[StackCode Webview] Script URI:', '${scriptUri}');
         console.log('[StackCode Webview] CSS loaded:', ${cssUris.length});
         
-        // Debug: verificar se o root está sendo populado
         setTimeout(() => {
             const root = document.getElementById('root');
             const loading = document.getElementById('loading');
             if (root && root.innerHTML.trim() !== '') {
-                console.log('[StackCode Webview] React carregou com sucesso!');
+                console.log('[StackCode Webview] React loaded successfully!');
                 if (loading) loading.style.display = 'none';
             } else {
-                console.error('[StackCode Webview] React não carregou! Root está vazio.');
+                console.error('[StackCode Webview] React did not load! Root is empty.');
                 if (loading) {
-                    loading.innerHTML = '❌ Erro: React não carregou. Verifique o console.';
+                    loading.innerHTML = '❌ Error: React did not load. Check console.';
                     loading.style.background = '#f14c4c20';
                     loading.style.border = '1px solid #f14c4c';
                 }
@@ -363,7 +394,9 @@ export class DashboardProvider
     }
   }
 
-  // CORREÇÃO: Adicionando o método dispose para conformidade.
+  /**
+   * Disposes of resources
+   */
   public dispose() {
     while (this._disposables.length) {
       const x = this._disposables.pop();

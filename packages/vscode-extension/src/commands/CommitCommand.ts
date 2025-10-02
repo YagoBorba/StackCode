@@ -1,13 +1,14 @@
 import * as vscode from "vscode";
 import {
   runCommitWorkflow,
+  runIssuesWorkflow,
   type CommitWorkflowStep,
+  type GitHubIssue,
 } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
 import { BaseCommand } from "./BaseCommand";
-import { GitHubIssuesService } from "../services/GitHubIssuesService";
 import { GitHubAuthService } from "../services/GitHubAuthService";
-import type { GitHubIssue } from "@stackcode/core";
+import { GitMonitor } from "../monitors/GitMonitor";
 
 interface CommitTypeQuickPickItem extends vscode.QuickPickItem {
   value: string;
@@ -17,19 +18,21 @@ interface CommitTypeQuickPickItem extends vscode.QuickPickItem {
  * CommitCommand orchestrates the commit workflow within VS Code.
  * It prompts the user for Conventional Commit details, optionally links
  * GitHub issues, and delegates the git operations to the shared workflow.
+ * 
+ * Now uses runIssuesWorkflow directly from @stackcode/core for centralized logic.
  */
 export class CommitCommand extends BaseCommand {
-  private readonly issuesService: GitHubIssuesService;
   private readonly authService: GitHubAuthService;
+  private readonly gitMonitor: GitMonitor;
   private outputChannel?: vscode.OutputChannel;
 
   constructor(
-    issuesService: GitHubIssuesService,
     authService: GitHubAuthService,
+    gitMonitor: GitMonitor,
   ) {
     super();
-    this.issuesService = issuesService;
     this.authService = authService;
+    this.gitMonitor = gitMonitor;
   }
 
   /**
@@ -221,6 +224,7 @@ export class CommitCommand extends BaseCommand {
 
   /**
    * Resolves GitHub issues references, asking the user if they wish to link issues.
+   * Now uses runIssuesWorkflow from @stackcode/core for centralized logic.
    */
   private async resolveIssueReferences(): Promise<string | undefined> {
     try {
@@ -228,13 +232,32 @@ export class CommitCommand extends BaseCommand {
         return this.promptManualIssueReference();
       }
 
-      const issues = await this.issuesService.fetchCurrentRepositoryIssues();
-      if (!issues.length) {
+      // Get current repository
+      const repository = await this.gitMonitor.getCurrentGitHubRepository();
+      if (!repository) {
+        return this.promptManualIssueReference();
+      }
+
+      // Get authenticated client
+      const client = await this.authService.getAuthenticatedClient();
+
+      // Use centralized issues workflow from core
+      const result = await runIssuesWorkflow({
+        client,
+        repository: {
+          owner: repository.owner,
+          repo: repository.repo,
+          fullName: repository.fullName,
+        },
+        enableCache: true,
+      });
+
+      if (result.status === "error" || !result.issues.length) {
         return this.promptManualIssueReference();
       }
 
       const selections = await vscode.window.showQuickPick(
-        issues.map((issue) => this.mapIssueToQuickPick(issue)),
+        result.issues.map((issue) => this.mapIssueToQuickPick(issue)),
         {
           canPickMany: true,
           placeHolder: this.translate(

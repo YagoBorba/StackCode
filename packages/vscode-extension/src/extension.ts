@@ -15,7 +15,6 @@ import { TestGitHubDetectionCommand } from "./commands/TestGitHubDetectionComman
 import { DashboardProvider } from "./providers/DashboardProvider";
 import { ProjectViewProvider } from "./providers/ProjectViewProvider";
 import { GitHubAuthService } from "./services/GitHubAuthService";
-import { GitHubIssuesService } from "./services/GitHubIssuesService";
 
 let proactiveManager: ProactiveNotificationManager;
 let gitMonitor: GitMonitor;
@@ -24,7 +23,6 @@ let configManager: ConfigurationManager;
 let dashboardProvider: DashboardProvider;
 let projectViewProvider: ProjectViewProvider;
 let gitHubAuthService: GitHubAuthService;
-let gitHubIssuesService: GitHubIssuesService;
 
 // Command instances
 let initCommand: InitCommand;
@@ -59,14 +57,11 @@ export async function activate(context: vscode.ExtensionContext) {
   gitMonitor = new GitMonitor(proactiveManager, configManager);
   fileMonitor = new FileMonitor(proactiveManager, configManager);
 
-  // Initialize GitHub issues service (depends on gitMonitor)
-  gitHubIssuesService = new GitHubIssuesService(gitHubAuthService, gitMonitor);
-
   // Initialize providers (after services are ready)
   dashboardProvider = new DashboardProvider(
     context,
-    gitHubIssuesService,
     gitHubAuthService,
+    gitMonitor,
   );
   projectViewProvider = new ProjectViewProvider(context.workspaceState);
 
@@ -74,7 +69,7 @@ export async function activate(context: vscode.ExtensionContext) {
   initCommand = new InitCommand();
   generateCommand = new GenerateCommand();
   gitCommand = new GitCommand();
-  commitCommand = new CommitCommand(gitHubIssuesService, gitHubAuthService);
+  commitCommand = new CommitCommand(gitHubAuthService, gitMonitor);
   validateCommand = new ValidateCommand();
   releaseCommand = new ReleaseCommand(gitHubAuthService);
   configCommand = new ConfigCommand();
@@ -166,10 +161,8 @@ export async function activate(context: vscode.ExtensionContext) {
       projectViewProvider.refresh(),
     ),
 
-    // Webview commands
     vscode.commands.registerCommand("webviewReady", () => {
       console.log("[StackCode] Webview is ready!");
-      // Pode enviar dados iniciais aqui se necessário
     }),
     vscode.commands.registerCommand("stackcode.webview.init", () =>
       initCommand.execute(),
