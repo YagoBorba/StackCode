@@ -26,7 +26,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.InitCommand = void 0;
 const vscode = __importStar(require("vscode"));
 const BaseCommand_1 = require("./BaseCommand");
-// ProgressCallback removed
 const i18n_1 = require("@stackcode/i18n");
 const core_1 = require("@stackcode/core");
 const path = __importStar(require("path"));
@@ -149,8 +148,8 @@ class InitCommand extends BaseCommand_1.BaseCommand {
                     return;
                 }
             }
-            catch {
-                // Directory doesn't exist - proceed with creation
+            catch (error) {
+                console.warn("Directory check failed:", error);
             }
             const workflowOptions = {
                 projectPath,
@@ -180,7 +179,8 @@ class InitCommand extends BaseCommand_1.BaseCommand {
                 await vscode.window.showWarningMessage(this.safeTranslate("common.operation_cancelled", "Operation cancelled."));
                 return;
             }
-            if (!workflowResult.dependenciesInstalled && workflowResult.installCommand) {
+            if (!workflowResult.dependenciesInstalled &&
+                workflowResult.installCommand) {
                 const installCommandString = `${workflowResult.installCommand.command} ${workflowResult.installCommand.args.join(" ")}`.trim();
                 const lastWarning = workflowResult.warnings.at(-1) ??
                     this.safeTranslate("init.error.deps_install_unknown", "Unknown error");

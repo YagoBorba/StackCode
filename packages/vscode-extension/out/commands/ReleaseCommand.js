@@ -50,7 +50,6 @@ class ReleaseCommand extends BaseCommand_1.BaseCommand {
                 return;
             }
             const cwd = workspaceFolder.uri.fsPath;
-            // Start progress tracking
             this.progressManager.startWorkflow("release");
             const result = await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
@@ -62,7 +61,6 @@ class ReleaseCommand extends BaseCommand_1.BaseCommand {
                 return (0, core_1.runReleaseWorkflow)({ cwd }, hooks);
             });
             this.progressManager.clearVSCodeProgressReporter();
-            // Complete or fail workflow based on result
             if (result.status === "prepared") {
                 this.progressManager.completeWorkflow("release", "Release prepared successfully");
             }
@@ -82,7 +80,6 @@ class ReleaseCommand extends BaseCommand_1.BaseCommand {
         return {
             onProgress: (workflowProgress) => {
                 this.reportReleaseProgress(workflowProgress, progress);
-                // Also report to ProgressManager for webview updates
                 this.progressManager.reportProgress("release", workflowProgress.step, workflowProgress.message);
             },
             confirmLockedRelease: ({ currentVersion, newVersion }) => this.confirmAction((0, i18n_1.t)("release.prompt_confirm_release", {
@@ -249,7 +246,8 @@ class ReleaseCommand extends BaseCommand_1.BaseCommand {
      */
     ensureOutputChannel() {
         if (!this.outputChannel) {
-            this.outputChannel = vscode.window.createOutputChannel("StackCode Release");
+            this.outputChannel =
+                vscode.window.createOutputChannel("StackCode Release");
         }
         return this.outputChannel;
     }

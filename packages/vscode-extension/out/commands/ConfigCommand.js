@@ -86,8 +86,8 @@ class ConfigCommand extends BaseCommand_1.BaseCommand {
                     return;
                 }
             }
-            catch {
-                // File does not exist yet - continue without prompt
+            catch (error) {
+                console.warn("Failed to read existing config:", error);
             }
             const defaultConfig = {
                 stack: undefined,

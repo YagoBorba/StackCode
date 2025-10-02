@@ -39,7 +39,7 @@ class GitHubIssuesService {
         this._gitMonitor = gitMonitor;
     }
     /**
-     * Busca issues do repositório atual usando o workflow centralizado do core
+     * Fetches issues from current repository using centralized core workflow
      */
     async fetchCurrentRepositoryIssues(options) {
         try {
@@ -67,13 +67,11 @@ class GitHubIssuesService {
         }
     }
     /**
-     * Busca issues de um repositório específico usando o workflow centralizado do core
+     * Fetches issues from a specific repository using centralized core workflow
      */
     async fetchRepositoryIssues(repository, options) {
         try {
-            // Get authenticated client
             const client = await this._authService.getAuthenticatedClient();
-            // Run the centralized issues workflow from core
             const result = await (0, core_1.runIssuesWorkflow)({
                 client,
                 repository: {
@@ -95,7 +93,7 @@ class GitHubIssuesService {
         }
     }
     /**
-     * Busca issues atribuídas ao usuário atual
+     * Fetches issues assigned to current user
      */
     async fetchMyIssues(repository) {
         try {
@@ -121,7 +119,6 @@ class GitHubIssuesService {
      * Limpa cache de issues (delega para o core)
      */
     clearCache() {
-        // Import dynamically to avoid circular dependencies
         Promise.resolve().then(() => __importStar(require("@stackcode/core"))).then(({ clearIssuesCache }) => {
             clearIssuesCache();
             console.log("[GitHubIssuesService] Cache cleared via core");
@@ -136,7 +133,7 @@ class GitHubIssuesService {
         });
     }
     /**
-     * Força atualização de issues (ignora cache)
+     * Forces issue refresh (ignores cache)
      */
     async refreshIssues(repository) {
         const targetRepo = repository || (await this._gitMonitor.getCurrentGitHubRepository());

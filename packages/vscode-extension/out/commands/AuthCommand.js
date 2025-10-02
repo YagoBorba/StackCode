@@ -27,11 +27,11 @@ exports.AuthCommand = void 0;
 const vscode = __importStar(require("vscode"));
 const BaseCommand_1 = require("./BaseCommand");
 /**
- * AuthCommand - Gerencia comandos de autenticação GitHub
+ * AuthCommand - Manages GitHub authentication commands
  *
- * Comandos disponíveis:
+ * Available commands:
  * - stackcode.auth.login: Inicia processo de login
- * - stackcode.auth.logout: Remove autenticação
+ * - stackcode.auth.logout: Removes authentication
  */
 class AuthCommand extends BaseCommand_1.BaseCommand {
     constructor(authService) {
@@ -39,7 +39,7 @@ class AuthCommand extends BaseCommand_1.BaseCommand {
         this._authService = authService;
     }
     /**
-     * Implementação do método abstrato - mostra status da autenticação
+     * Abstract method implementation - shows authentication status
      */
     async execute() {
         await this.showStatus();
@@ -90,7 +90,7 @@ class AuthCommand extends BaseCommand_1.BaseCommand {
         }
     }
     /**
-     * Mostra status atual da autenticação
+     * Shows current authentication status
      */
     async showStatus() {
         if (this._authService.isAuthenticated) {

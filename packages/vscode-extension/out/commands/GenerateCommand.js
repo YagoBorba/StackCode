@@ -116,7 +116,7 @@ class GenerateCommand extends BaseCommand_1.BaseCommand {
             onEducationalMessage: async (messageKey) => {
                 progress.report({ message: (0, i18n_1.t)(messageKey) });
             },
-            shouldOverwriteFile: async ({ fileType, filePath, }) => {
+            shouldOverwriteFile: async ({ fileType, }) => {
                 const confirmLabel = (0, i18n_1.t)("vscode.generate.overwrite");
                 const message = fileType === "readme"
                     ? (0, i18n_1.t)("vscode.generate.readme_exists_overwrite")
@@ -146,7 +146,6 @@ class GenerateCommand extends BaseCommand_1.BaseCommand {
                 await this.showSuccess((0, i18n_1.t)("vscode.generate.gitignore_has_been_generated"));
             }
         }
-        // Offer to open files
         for (const ft of fileTypes) {
             const filePath = path.join(workspaceFolder.uri.fsPath, ft === "readme" ? "README.md" : ".gitignore");
             const openPromptKey = ft === "readme"
@@ -159,7 +158,6 @@ class GenerateCommand extends BaseCommand_1.BaseCommand {
                 await vscode.window.showTextDocument(document);
             }
         }
-        // Show translated warnings if any
         if (result.warnings.length > 0) {
             for (const w of result.warnings) {
                 await this.showWarning((0, i18n_1.t)(w));

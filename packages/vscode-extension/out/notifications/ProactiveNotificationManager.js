@@ -93,7 +93,6 @@ class ProactiveNotificationManager {
     }
     async runFullBestPracticesCheck() {
         const issues = [];
-        // Check if working on main branch
         try {
             const gitExtension = vscode.extensions.getExtension("vscode.git")?.exports;
             if (gitExtension) {
@@ -105,10 +104,8 @@ class ProactiveNotificationManager {
             }
         }
         catch (error) {
-            // Git extension not available or error accessing it
             console.log("Git extension error:", error);
         }
-        // Check for missing files
         const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
         if (workspaceFolder) {
             const files = await vscode.workspace.fs.readDirectory(workspaceFolder.uri);
@@ -133,7 +130,6 @@ class ProactiveNotificationManager {
         return conventionalPattern.test(message);
     }
     async handleApplyFix(message) {
-        // Enhanced fix handling with specific actions
         if (message.includes("README")) {
             await vscode.commands.executeCommand("stackcode.generate.readme");
         }
@@ -199,9 +195,7 @@ class ProactiveNotificationManager {
         outputChannel.appendLine("3. Review best practices");
         outputChannel.show();
     }
-    dispose() {
-        // Cleanup if needed
-    }
+    dispose() { }
 }
 exports.ProactiveNotificationManager = ProactiveNotificationManager;
 //# sourceMappingURL=ProactiveNotificationManager.js.map

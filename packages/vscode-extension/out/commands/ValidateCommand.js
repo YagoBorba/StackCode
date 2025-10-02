@@ -66,14 +66,14 @@ class ValidateCommand extends BaseCommand_1.BaseCommand {
                 await this.showSuccess((0, i18n_1.t)("vscode.validate.project_validation_completed"));
                 return;
             }
-            // Show a summary of issues
             const summary = resultIssues
                 .map((i) => `• ${(0, i18n_1.t)(i.messageKey)}`)
                 .join("\n");
-            await this.showWarning((0, i18n_1.t)("vscode.validate.issues_summary", { count: String(resultIssues.length) }) +
+            await this.showWarning((0, i18n_1.t)("vscode.validate.issues_summary", {
+                count: String(resultIssues.length),
+            }) +
                 "\n" +
                 summary);
-            // Offer to generate missing files if applicable
             const missingFiles = [];
             const hasMissingReadme = resultIssues.some((i) => i.id === "missing-readme");
             const hasMissingGitignore = resultIssues.some((i) => i.id === "missing-gitignore");

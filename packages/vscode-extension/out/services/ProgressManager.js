@@ -54,10 +54,8 @@ class ProgressManager {
             message,
             percentage,
         };
-        // Broadcast to webviews
         this._broadcastProgress(event);
         this._broadcastState();
-        // Update VS Code progress reporter if available
         if (this._progressReporter) {
             const increment = percentage - (this._currentState.percentage || 0);
             this._progressReporter.report({
@@ -82,7 +80,6 @@ class ProgressManager {
             message,
         });
         this._broadcastState();
-        // Reset after a short delay
         setTimeout(() => {
             if (!this._currentState.inProgress) {
                 this._currentState = { inProgress: false };

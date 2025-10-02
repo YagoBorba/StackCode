@@ -29,7 +29,7 @@ const GitMonitor_1 = require("../monitors/GitMonitor");
 const ProactiveNotificationManager_1 = require("../notifications/ProactiveNotificationManager");
 const ConfigurationManager_1 = require("../config/ConfigurationManager");
 /**
- * Comando de teste para verificar detecção de repositório GitHub
+ * Test command to verify GitHub repository detection
  */
 class TestGitHubDetectionCommand {
     constructor() {

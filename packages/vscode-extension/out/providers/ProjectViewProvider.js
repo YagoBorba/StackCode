@@ -36,7 +36,6 @@ class ProjectViewProvider {
     }
     getTreeItem(element) {
         const item = new vscode.TreeItem(element.label, element.collapsibleState);
-        // Enhanced icons and styling
         const iconMap = {
             "StackCode Project": "rocket",
             "Quick Actions": "zap",
@@ -55,11 +54,8 @@ class ProjectViewProvider {
             "View Project Stats": "graph",
             "Help & Documentation": "question",
         };
-        // Set icons with theme support
         item.iconPath = new vscode.ThemeIcon(iconMap[element.label] || "circle-filled");
-        // Add commands for interactive items
         if (element.command) {
-            // Handle both string and Command object types
             if (typeof element.command === "string") {
                 item.command = {
                     command: element.command,
@@ -69,7 +65,6 @@ class ProjectViewProvider {
             else {
                 item.command = element.command;
             }
-            // Add hover descriptions
             const tooltips = {
                 "Initialize Project": "Create a new project with StackCode scaffolding",
                 "Generate README": "Generate a comprehensive README.md file",
@@ -86,7 +81,6 @@ class ProjectViewProvider {
             };
             item.tooltip = tooltips[element.label] || element.label;
         }
-        // Style for different types
         if (element.children && element.children.length > 0) {
             item.contextValue = "stackcode-category";
         }
@@ -97,7 +91,6 @@ class ProjectViewProvider {
     }
     getChildren(element) {
         if (!element) {
-            // Root level - show main categories with enhanced structure
             return Promise.resolve([
                 {
                     label: "StackCode Project",
@@ -253,13 +246,11 @@ class ProjectViewProvider {
                 },
             ];
         }
-        // Project name
         items.push({
             label: workspaceFolder.name,
             description: "Project root",
             icon: "folder",
         });
-        // Git status
         try {
             const gitExtension = vscode.extensions.getExtension("vscode.git");
             if (gitExtension && gitExtension.isActive) {
@@ -275,10 +266,9 @@ class ProjectViewProvider {
                 }
             }
         }
-        catch {
-            // Git not available
+        catch (error) {
+            console.warn("Git info unavailable:", error);
         }
-        // Quick actions
         items.push({
             label: "Initialize Project",
             description: "Set up StackCode project",

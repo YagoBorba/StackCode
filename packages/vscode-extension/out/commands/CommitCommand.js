@@ -68,7 +68,6 @@ class CommitCommand extends BaseCommand_1.BaseCommand {
                 placeHolder: this.translate("commit.prompt.breaking_changes", "Describe BREAKING CHANGES (optional)"),
             });
             const issueReferences = await this.resolveIssueReferences();
-            // Start progress tracking
             this.progressManager.startWorkflow("commit");
             const result = await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
@@ -87,7 +86,6 @@ class CommitCommand extends BaseCommand_1.BaseCommand {
                 }, {
                     onProgress: (workflowProgress) => {
                         this.reportCommitProgress(workflowProgress.step, progress);
-                        // Also report to ProgressManager for webview updates
                         this.progressManager.reportProgress("commit", workflowProgress.step, workflowProgress.message);
                     },
                 });
@@ -99,13 +97,13 @@ class CommitCommand extends BaseCommand_1.BaseCommand {
                 await this.showSuccess((0, i18n_1.t)("commit.success"));
                 return;
             }
-            // Workflow was cancelled or failed
             this.progressManager.failWorkflow("commit", result.error || "Commit workflow cancelled");
             if (result.reason === "no-staged-changes") {
                 await this.showWarning((0, i18n_1.t)("commit.error_no_changes_staged"));
                 return;
             }
-            const errorMessage = result.error ?? this.translate("common.error_generic", "An error occurred.");
+            const errorMessage = result.error ??
+                this.translate("common.error_generic", "An error occurred.");
             await this.showError(errorMessage);
         }
         catch (error) {
@@ -178,14 +176,11 @@ class CommitCommand extends BaseCommand_1.BaseCommand {
             if (!this.authService.isAuthenticated) {
                 return this.promptManualIssueReference();
             }
-            // Get current repository
             const repository = await this.gitMonitor.getCurrentGitHubRepository();
             if (!repository) {
                 return this.promptManualIssueReference();
             }
-            // Get authenticated client
             const client = await this.authService.getAuthenticatedClient();
-            // Use centralized issues workflow from core
             const result = await (0, core_1.runIssuesWorkflow)({
                 client,
                 repository: {
@@ -258,7 +253,8 @@ class CommitCommand extends BaseCommand_1.BaseCommand {
      */
     ensureOutputChannel() {
         if (!this.outputChannel) {
-            this.outputChannel = vscode.window.createOutputChannel("StackCode Commit");
+            this.outputChannel =
+                vscode.window.createOutputChannel("StackCode Commit");
         }
         return this.outputChannel;
     }

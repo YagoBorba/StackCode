@@ -212,7 +212,7 @@ class DashboardProvider {
                 },
             });
         }
-        catch (e) {
+        catch {
             this.sendMessage({
                 type: "updateStats",
                 payload: { files: 0, error: "Failed to scan files" },
@@ -292,14 +292,14 @@ class DashboardProvider {
         <div class="status">Development Mode</div>
         <h2>🏗️ StackCode Dashboard</h2>
         <div class="error-message">
-            <strong>Build Required:</strong> O webview-ui precisa ser compilado primeiro.
+            <strong>Build Required:</strong> The webview-ui needs to be compiled first.
             <br><br>
-            Execute: <code>npm run build:ui</code>
+            Run: <code>npm run build:ui</code>
             <br><br>
-            Erro: ${error instanceof Error ? error.message : "Manifest não encontrado"}
+            Error: ${error instanceof Error ? error.message : "Manifest not found"}
         </div>
-        <p>Status da extensão: ✅ Ativa</p>
-        <p>Workspace: ${vscode.workspace.workspaceFolders?.[0]?.name || "Nenhum"}</p>
+        <p>Extension Status: ✅ Active</p>
+        <p>Workspace: ${vscode.workspace.workspaceFolders?.[0]?.name || "None"}</p>
     </div>
 </body>
 </html>`;

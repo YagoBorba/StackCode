@@ -154,8 +154,8 @@ class GitCommand extends BaseCommand_1.BaseCommand {
                         currentBranch = repo.state.HEAD.name || "current branch";
                     }
                 }
-                catch {
-                    // Git API unavailable - use generic message
+                catch (error) {
+                    console.warn("Git API unavailable:", error);
                 }
             }
             const confirm = await this.confirmAction((0, i18n_1.t)("vscode.git.are_you_sure_finish_branch", { currentBranch }), (0, i18n_1.t)("vscode.git.finish_branch"));
@@ -196,7 +196,7 @@ class GitCommand extends BaseCommand_1.BaseCommand {
                 if (result.status !== "pushed" || !result.prUrl || !result.branch) {
                     const errorMessage = result.error === "not-on-branch"
                         ? (0, i18n_1.t)("vscode.git.branch_name_required")
-                        : result.error ?? (0, i18n_1.t)("vscode.common.unknown_error");
+                        : (result.error ?? (0, i18n_1.t)("vscode.common.unknown_error"));
                     throw new Error(errorMessage);
                 }
                 await vscode.env.openExternal(vscode.Uri.parse(result.prUrl));

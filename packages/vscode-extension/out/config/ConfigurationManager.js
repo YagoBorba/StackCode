@@ -28,7 +28,6 @@ const vscode = __importStar(require("vscode"));
 class ConfigurationManager {
     constructor() {
         this.configuration = vscode.workspace.getConfiguration("stackcode");
-        // Listen for configuration changes
         vscode.workspace.onDidChangeConfiguration((event) => {
             if (event.affectsConfiguration("stackcode")) {
                 this.configuration = vscode.workspace.getConfiguration("stackcode");

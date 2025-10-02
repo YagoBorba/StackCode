@@ -187,7 +187,7 @@ class GitMonitor {
         });
     }
     /**
-     * Detecta o repositório GitHub atual usando múltiplas estratégias
+     * Detects current GitHub repository using multiple strategies
      */
     async getCurrentGitHubRepository() {
         try {
@@ -211,7 +211,7 @@ class GitMonitor {
         }
     }
     /**
-     * Estratégia 1: Lê repositório diretamente do .git/config
+     * Strategy 1: Reads repository directly from .git/config
      */
     async getRepositoryFromGitConfig() {
         try {
@@ -249,7 +249,7 @@ class GitMonitor {
             return null;
         }
     } /**
-     * Estratégia 2: Via Git Extension API (método original como fallback)
+     * Strategy 2: Via Git Extension API (original method as fallback)
      */
     async getRepositoryFromGitAPI() {
         try {
