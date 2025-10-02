@@ -129,11 +129,9 @@ async function fallbackResolveRepository(
   cwd: string,
 ): Promise<ReleaseWorkflowGitHubInfo | null> {
   try {
-    const remoteUrl = (await getCommandOutput(
-      "git",
-      ["remote", "get-url", "origin"],
-      { cwd },
-    )).trim();
+    const remoteUrl = (
+      await getCommandOutput("git", ["remote", "get-url", "origin"], { cwd })
+    ).trim();
     const match = remoteUrl.match(/github\.com[/:]([\w-]+\/[\w-.]+)/);
     if (!match) {
       return null;
@@ -153,7 +151,7 @@ export const getReleaseCommand = (): CommandModule => ({
   handler: async () => {
     try {
       const cwd = process.cwd();
-  const authManager = createCLIAuthFacade();
+      const authManager = createCLIAuthFacade();
       ui.log.step(t("release.start"));
 
       const releaseHooks: ReleaseWorkflowHooks = {
@@ -204,7 +202,8 @@ export const getReleaseCommand = (): CommandModule => ({
 
 async function handleProgress(progress: ReleaseWorkflowProgress) {
   const messages: Partial<Record<ReleaseWorkflowStep, () => void>> = {
-    lockedUpdatingVersions: () => ui.log.step(t("release.step_updating_versions")),
+    lockedUpdatingVersions: () =>
+      ui.log.step(t("release.step_updating_versions")),
     lockedGeneratingChangelog: () =>
       ui.log.step(t("release.step_generating_changelog")),
     independentFindingChanges: () =>

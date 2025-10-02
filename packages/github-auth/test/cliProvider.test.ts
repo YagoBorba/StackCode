@@ -27,11 +27,12 @@ describe("CLI auth provider", () => {
     email: "stackcoder@example.com",
   };
 
-  const createStubOctokit = (): Octokit => ({
-    users: {
-      getAuthenticated: vi.fn().mockResolvedValue({ data: userPayload }),
-    },
-  }) as unknown as Octokit;
+  const createStubOctokit = (): Octokit =>
+    ({
+      users: {
+        getAuthenticated: vi.fn().mockResolvedValue({ data: userPayload }),
+      },
+    }) as unknown as Octokit;
 
   let storage: TokenStorage;
 
@@ -56,7 +57,13 @@ describe("CLI auth provider", () => {
     const session = await auth.getSession();
 
     expect(session?.session.account?.username).toBe("stackcoder");
-    expect((session?.client as unknown as { users: { getAuthenticated: () => unknown } }).users.getAuthenticated).toBeDefined();
+    expect(
+      (
+        session?.client as unknown as {
+          users: { getAuthenticated: () => unknown };
+        }
+      ).users.getAuthenticated,
+    ).toBeDefined();
     expect(typeof client).toBe("object");
   });
 
@@ -66,16 +73,14 @@ describe("CLI auth provider", () => {
       octokitFactory: () =>
         ({
           users: {
-            getAuthenticated: vi
-              .fn()
-              .mockRejectedValue(new Error("bad token")),
+            getAuthenticated: vi.fn().mockRejectedValue(new Error("bad token")),
           },
         }) as unknown as Octokit,
     });
 
     const auth = createGitHubAuth({ provider });
 
-  expect(await auth.validateToken("invalid")).toBe(false);
+    expect(await auth.validateToken("invalid")).toBe(false);
     expect(await auth.getStoredToken()).toBeNull();
   });
 

@@ -1,9 +1,6 @@
 import type { CommandModule } from "yargs";
 import chalk from "chalk";
-import {
-  getErrorMessage,
-  runGitFinishWorkflow,
-} from "@stackcode/core";
+import { getErrorMessage, runGitFinishWorkflow } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
 import open from "open";
 

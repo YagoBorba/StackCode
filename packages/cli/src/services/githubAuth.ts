@@ -97,7 +97,9 @@ export function getCurrentRepository(
 
     if (!fs.existsSync(configPath)) {
       if (verbose) {
-        console.log("❌ .git/config not found – are you inside a Git repository?");
+        console.log(
+          "❌ .git/config not found – are you inside a Git repository?",
+        );
       }
       return null;
     }

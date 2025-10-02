@@ -61,25 +61,27 @@ describe("runInitWorkflow", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
-    (scaffoldModule.scaffoldProject as ReturnType<typeof vi.fn>).mockResolvedValue(
-      undefined,
-    );
+    (
+      scaffoldModule.scaffoldProject as ReturnType<typeof vi.fn>
+    ).mockResolvedValue(undefined);
     (scaffoldModule.setupHusky as ReturnType<typeof vi.fn>).mockResolvedValue(
       undefined,
     );
-    (generatorsModule.generateReadmeContent as ReturnType<typeof vi.fn>).mockResolvedValue(
-      "# Demo",
-    );
-    (generatorsModule.generateGitignoreContent as ReturnType<typeof vi.fn>).mockResolvedValue(
-      "node_modules",
-    );
+    (
+      generatorsModule.generateReadmeContent as ReturnType<typeof vi.fn>
+    ).mockResolvedValue("# Demo");
+    (
+      generatorsModule.generateGitignoreContent as ReturnType<typeof vi.fn>
+    ).mockResolvedValue("node_modules");
     (utilsModule.runCommand as ReturnType<typeof vi.fn>).mockResolvedValue(
       undefined,
     );
-    (utilsModule.saveStackCodeConfig as ReturnType<typeof vi.fn>).mockResolvedValue(
-      undefined,
-    );
-    (utilsModule.loadStackCodeConfig as ReturnType<typeof vi.fn>).mockResolvedValue({
+    (
+      utilsModule.saveStackCodeConfig as ReturnType<typeof vi.fn>
+    ).mockResolvedValue(undefined);
+    (
+      utilsModule.loadStackCodeConfig as ReturnType<typeof vi.fn>
+    ).mockResolvedValue({
       stack: "node-ts",
       features: {
         commitValidation: false,
@@ -87,14 +89,19 @@ describe("runInitWorkflow", () => {
         docker: false,
       },
     });
-    (utilsModule.validateStackDependencies as ReturnType<typeof vi.fn>).mockResolvedValue({
+    (
+      utilsModule.validateStackDependencies as ReturnType<typeof vi.fn>
+    ).mockResolvedValue({
       isValid: true,
       missingDependencies: [],
       availableDependencies: ["npm"],
     });
-    (mockedFs.writeFile as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
-    (mockedFs.access as ReturnType<typeof vi.fn>)
-      .mockRejectedValue(new Error("not found"));
+    (mockedFs.writeFile as ReturnType<typeof vi.fn>).mockResolvedValue(
+      undefined,
+    );
+    (mockedFs.access as ReturnType<typeof vi.fn>).mockRejectedValue(
+      new Error("not found"),
+    );
     (mockedFs.readFile as ReturnType<typeof vi.fn>).mockRejectedValue(
       new Error("not found"),
     );
@@ -127,22 +134,28 @@ describe("runInitWorkflow", () => {
   });
 
   it("returns cancellation when user declines after missing dependencies", async () => {
-    (utilsModule.validateStackDependencies as ReturnType<typeof vi.fn>).mockResolvedValue({
+    (
+      utilsModule.validateStackDependencies as ReturnType<typeof vi.fn>
+    ).mockResolvedValue({
       isValid: false,
       missingDependencies: ["npm"],
       availableDependencies: [],
     });
-    (hooks.confirmContinueAfterMissingDependencies as ReturnType<(typeof vi.fn)>).mockResolvedValue(
-      false,
-    );
+    (
+      hooks.confirmContinueAfterMissingDependencies as ReturnType<typeof vi.fn>
+    ).mockResolvedValue(false);
 
     const result = await runInitWorkflow(baseOptions, hooks);
 
     expect(result.status).toBe("cancelled");
     expect(result.dependenciesInstalled).toBe(false);
-    expect(utilsModule.runCommand).not.toHaveBeenCalledWith("npm", ["install"], {
-      cwd: baseOptions.projectPath,
-    });
+    expect(utilsModule.runCommand).not.toHaveBeenCalledWith(
+      "npm",
+      ["install"],
+      {
+        cwd: baseOptions.projectPath,
+      },
+    );
   });
 
   it("collects warnings when dependency installation fails", async () => {
@@ -173,20 +186,24 @@ describe("runGenerateWorkflow", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
-    (mockedFs.writeFile as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
+    (mockedFs.writeFile as ReturnType<typeof vi.fn>).mockResolvedValue(
+      undefined,
+    );
     (mockedFs.access as ReturnType<typeof vi.fn>).mockRejectedValue(
       new Error("not found"),
     );
-    (generatorsModule.generateReadmeContent as ReturnType<typeof vi.fn>).mockResolvedValue(
-      "# Demo README",
+    (
+      generatorsModule.generateReadmeContent as ReturnType<typeof vi.fn>
+    ).mockResolvedValue("# Demo README");
+    (
+      generatorsModule.generateGitignoreContent as ReturnType<typeof vi.fn>
+    ).mockResolvedValue("node_modules");
+    (hooks.shouldOverwriteFile as ReturnType<typeof vi.fn>).mockResolvedValue(
+      true,
     );
-    (generatorsModule.generateGitignoreContent as ReturnType<typeof vi.fn>).mockResolvedValue(
-      "node_modules",
-    );
-    (hooks.shouldOverwriteFile as ReturnType<typeof vi.fn>).mockResolvedValue(true);
-    (hooks.resolveGitignoreTechnologies as ReturnType<typeof vi.fn>).mockResolvedValue([
-      "node-ts",
-    ]);
+    (
+      hooks.resolveGitignoreTechnologies as ReturnType<typeof vi.fn>
+    ).mockResolvedValue(["node-ts"]);
   });
 
   it("generates a README file when not present", async () => {
@@ -207,7 +224,9 @@ describe("runGenerateWorkflow", () => {
 
   it("skips file generation when overwrite is declined", async () => {
     (mockedFs.access as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
-    (hooks.shouldOverwriteFile as ReturnType<typeof vi.fn>).mockResolvedValueOnce(false);
+    (
+      hooks.shouldOverwriteFile as ReturnType<typeof vi.fn>
+    ).mockResolvedValueOnce(false);
 
     const result = await runGenerateWorkflow(baseOptions, hooks);
 
@@ -240,13 +259,15 @@ describe("runGenerateWorkflow", () => {
   });
 
   it("infers gitignore technologies from project configuration when none provided", async () => {
-    (utilsModule.loadStackCodeConfig as ReturnType<typeof vi.fn>).mockResolvedValue({
+    (
+      utilsModule.loadStackCodeConfig as ReturnType<typeof vi.fn>
+    ).mockResolvedValue({
       stack: "vue",
       features: {},
     });
-    (hooks.resolveGitignoreTechnologies as ReturnType<typeof vi.fn>).mockResolvedValue(
-      undefined,
-    );
+    (
+      hooks.resolveGitignoreTechnologies as ReturnType<typeof vi.fn>
+    ).mockResolvedValue(undefined);
 
     const options: GenerateWorkflowOptions = {
       ...baseOptions,
@@ -297,9 +318,9 @@ describe("runCommitWorkflow", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
-    (utilsModule.getCommandOutput as ReturnType<typeof vi.fn>).mockResolvedValue(
-      "M file.ts",
-    );
+    (
+      utilsModule.getCommandOutput as ReturnType<typeof vi.fn>
+    ).mockResolvedValue("M file.ts");
     (utilsModule.runCommand as ReturnType<typeof vi.fn>).mockResolvedValue(
       undefined,
     );
@@ -323,9 +344,9 @@ describe("runCommitWorkflow", () => {
   });
 
   it("returns cancelled when there are no staged changes", async () => {
-    (utilsModule.getCommandOutput as ReturnType<typeof vi.fn>).mockResolvedValue(
-      "",
-    );
+    (
+      utilsModule.getCommandOutput as ReturnType<typeof vi.fn>
+    ).mockResolvedValue("");
 
     const result = await runCommitWorkflow(baseOptions);
 
@@ -428,9 +449,9 @@ describe("runGitFinishWorkflow", () => {
   });
 
   it("returns cancelled when not on a branch", async () => {
-    (utilsModule.getCommandOutput as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-      "",
-    );
+    (
+      utilsModule.getCommandOutput as ReturnType<typeof vi.fn>
+    ).mockResolvedValueOnce("");
 
     const result = await runGitFinishWorkflow(options);
 
@@ -450,9 +471,9 @@ describe("runReleaseWorkflow", () => {
     (mockedFs.readFile as ReturnType<typeof vi.fn>).mockRejectedValue(
       new Error("not found"),
     );
-    (utilsModule.getCommandOutput as ReturnType<typeof vi.fn>).mockResolvedValue(
-      "git@github.com:org/repo.git",
-    );
+    (
+      utilsModule.getCommandOutput as ReturnType<typeof vi.fn>
+    ).mockResolvedValue("git@github.com:org/repo.git");
   });
 
   it("prepares a locked release when confirmed", async () => {

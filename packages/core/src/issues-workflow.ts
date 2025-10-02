@@ -1,5 +1,9 @@
 import type { Octokit } from "@octokit/rest";
-import { fetchRepositoryIssues, type GitHubIssue, type FetchIssuesOptions } from "./github.js";
+import {
+  fetchRepositoryIssues,
+  type GitHubIssue,
+  type FetchIssuesOptions,
+} from "./github.js";
 
 /**
  * Repository information required for issues workflow
@@ -73,14 +77,14 @@ const DEFAULT_CACHE_TTL = 5 * 60 * 1000;
 
 /**
  * Runs the issues workflow to fetch GitHub issues for a repository.
- * 
+ *
  * This is the centralized business logic for fetching issues that can be used
  * by both CLI and VS Code extension, ensuring consistent behavior across interfaces.
- * 
+ *
  * @param options - Workflow options including client, repository, and fetch options
  * @param hooks - Optional callbacks for progress reporting
  * @returns Promise with workflow result containing issues and metadata
- * 
+ *
  * @example
  * ```typescript
  * const result = await runIssuesWorkflow({
@@ -88,7 +92,7 @@ const DEFAULT_CACHE_TTL = 5 * 60 * 1000;
  *   repository: { owner: "user", repo: "project" },
  *   fetchOptions: { state: "open", assignee: "username" }
  * });
- * 
+ *
  * if (result.status === "success") {
  *   console.log(`Found ${result.issues.length} issues`);
  * }
@@ -110,7 +114,10 @@ export async function runIssuesWorkflow(
 
   try {
     // Report fetching progress
-    await hooks?.onProgress?.({ step: "fetching", message: "Fetching issues from GitHub..." });
+    await hooks?.onProgress?.({
+      step: "fetching",
+      message: "Fetching issues from GitHub...",
+    });
 
     // Generate cache key
     const cacheKey = generateCacheKey(repository, fetchOptions);
@@ -119,9 +126,14 @@ export async function runIssuesWorkflow(
     if (enableCache) {
       const cached = issuesCache.get(cacheKey);
       if (cached && Date.now() - cached.timestamp < cacheTTL) {
-        console.log(`[Core] Returning cached issues for ${repository.owner}/${repository.repo}`);
-        await hooks?.onProgress?.({ step: "completed", message: "Returned cached issues" });
-        
+        console.log(
+          `[Core] Returning cached issues for ${repository.owner}/${repository.repo}`,
+        );
+        await hooks?.onProgress?.({
+          step: "completed",
+          message: "Returned cached issues",
+        });
+
         return {
           status: "success",
           issues: cached.issues,
@@ -143,19 +155,27 @@ export async function runIssuesWorkflow(
     };
 
     // Fetch issues from GitHub
-    console.log(`[Core] Fetching issues for ${repository.owner}/${repository.repo}...`);
+    console.log(
+      `[Core] Fetching issues for ${repository.owner}/${repository.repo}...`,
+    );
     const issues = await fetchRepositoryIssues(client, fullFetchOptions);
 
     // Cache the results if enabled
     if (enableCache) {
-      await hooks?.onProgress?.({ step: "caching", message: "Caching results..." });
+      await hooks?.onProgress?.({
+        step: "caching",
+        message: "Caching results...",
+      });
       issuesCache.set(cacheKey, {
         issues,
         timestamp: Date.now(),
       });
     }
 
-    await hooks?.onProgress?.({ step: "completed", message: `Found ${issues.length} issues` });
+    await hooks?.onProgress?.({
+      step: "completed",
+      message: `Found ${issues.length} issues`,
+    });
 
     return {
       status: "success",
@@ -164,9 +184,13 @@ export async function runIssuesWorkflow(
       timestamp,
     };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    console.error(`[Core] Failed to fetch issues for ${repository.owner}/${repository.repo}:`, error);
-    
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    console.error(
+      `[Core] Failed to fetch issues for ${repository.owner}/${repository.repo}:`,
+      error,
+    );
+
     await hooks?.onProgress?.({ step: "error", message: errorMessage });
 
     return {
@@ -189,7 +213,7 @@ export function clearIssuesCache(): void {
 
 /**
  * Clears expired cache entries
- * 
+ *
  * @param cacheTTL - Time to live in milliseconds (default: 5 minutes)
  */
 export function clearExpiredIssuesCache(cacheTTL = DEFAULT_CACHE_TTL): void {
@@ -210,11 +234,14 @@ export function clearExpiredIssuesCache(cacheTTL = DEFAULT_CACHE_TTL): void {
 
 /**
  * Clears cache for a specific repository
- * 
+ *
  * @param repository - Repository to clear cache for
  */
-export function clearRepositoryCache(repository: IssuesWorkflowRepository): void {
-  const fullName = repository.fullName || `${repository.owner}/${repository.repo}`;
+export function clearRepositoryCache(
+  repository: IssuesWorkflowRepository,
+): void {
+  const fullName =
+    repository.fullName || `${repository.owner}/${repository.repo}`;
   let clearedCount = 0;
 
   const keysToDelete = Array.from(issuesCache.keys()).filter((key) =>
@@ -238,7 +265,8 @@ function generateCacheKey(
   repository: IssuesWorkflowRepository,
   fetchOptions?: Partial<FetchIssuesOptions>,
 ): string {
-  const fullName = repository.fullName || `${repository.owner}/${repository.repo}`;
+  const fullName =
+    repository.fullName || `${repository.owner}/${repository.repo}`;
   const optionsStr = JSON.stringify(fetchOptions || {});
   return `${fullName}:${optionsStr}`;
 }

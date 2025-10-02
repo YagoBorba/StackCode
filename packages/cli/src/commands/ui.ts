@@ -362,7 +362,10 @@ export async function promptForCommitAnswers(): Promise<CommitAnswers> {
     ]);
 
     if (useGitHubIntegration) {
-      const selectedIssues = await promptForGitHubIssues(authManager, currentRepo);
+      const selectedIssues = await promptForGitHubIssues(
+        authManager,
+        currentRepo,
+      );
       if (selectedIssues.length > 0) {
         affectedIssues = selectedIssues
           .map((issue) => `closes #${issue.number}`)

@@ -140,7 +140,7 @@ describe("Release Command Handler", () => {
     } as MockReleaseResult);
 
     vi.mocked(ui.promptToCreateGitHubRelease).mockResolvedValue(true);
-  authManagerInstance.getToken.mockResolvedValue("gh_token");
+    authManagerInstance.getToken.mockResolvedValue("gh_token");
     authManagerInstance.validateToken.mockResolvedValue(true);
 
     // @ts-expect-error - Testing with empty options object
@@ -162,11 +162,9 @@ describe("Release Command Handler", () => {
       reason: "invalid-structure",
     } as MockReleaseResult);
 
-    const exitSpy = vi.spyOn(process, "exit").mockImplementation(
-      (() => {
-        throw new Error("exit");
-      }) as unknown as typeof process.exit,
-    );
+    const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => {
+      throw new Error("exit");
+    }) as unknown as typeof process.exit);
 
     await expect(async () => {
       // @ts-expect-error - Testing with empty options object

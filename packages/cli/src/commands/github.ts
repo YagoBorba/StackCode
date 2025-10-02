@@ -66,7 +66,7 @@ function getAuthCommand(): CommandModule<Record<string, unknown>, AuthArgs> {
     async handler(args: AuthArgs) {
       await initI18n();
 
-  const authManager = createCLIAuthFacade();
+      const authManager = createCLIAuthFacade();
 
       try {
         if (args.logout) {
@@ -186,7 +186,7 @@ function getIssuesCommand(): CommandModule<
     async handler(args: IssuesArgs) {
       await initI18n();
 
-  const authManager = createCLIAuthFacade();
+      const authManager = createCLIAuthFacade();
 
       try {
         if (
@@ -227,7 +227,7 @@ function getIssuesCommand(): CommandModule<
 
         console.log(`📋 ${t("github.issues.fetching")} ${owner}/${repo}...`);
 
-  let octokit: AuthenticatedOctokit;
+        let octokit: AuthenticatedOctokit;
         try {
           octokit = await authManager.getClient();
         } catch (error) {
@@ -467,7 +467,7 @@ async function fetchAndDisplayIssues(
       return;
     }
 
-  let octokit: AuthenticatedOctokit;
+    let octokit: AuthenticatedOctokit;
     try {
       octokit = await authManager.getClient();
     } catch (clientError) {

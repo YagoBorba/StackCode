@@ -117,10 +117,7 @@ export const getInitCommand = (): CommandModule<object, InitArgs> => ({
         ui.log.warning(`\n${t("init.dependencies.optional_skip")}`);
       },
       confirmContinueAfterMissingDependencies: async () =>
-        ui.promptForConfirmation(
-          t("init.dependencies.prompt_continue"),
-          false,
-        ),
+        ui.promptForConfirmation(t("init.dependencies.prompt_continue"), false),
     };
 
     const result: InitWorkflowResult = await runInitWorkflow(
@@ -138,7 +135,8 @@ export const getInitCommand = (): CommandModule<object, InitArgs> => ({
     }
 
     if (!result.dependenciesInstalled && result.installCommand) {
-      const installCommandString = `${result.installCommand.command} ${result.installCommand.args.join(" ")}`.trim();
+      const installCommandString =
+        `${result.installCommand.command} ${result.installCommand.args.join(" ")}`.trim();
       const warningMessage = result.warnings.at(-1) ?? "Unknown error";
       ui.log.error(
         `\n${t("init.error.deps_install_failed", { error: warningMessage })}`,

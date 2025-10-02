@@ -53,7 +53,9 @@ export const getGenerateCommand = (): CommandModule => ({
     const filetype = argv.filetype as string | undefined;
     const requestedFiles = new Set<GenerateFileType>();
 
-    const mapFiletype = (value: string | undefined): GenerateFileType | null => {
+    const mapFiletype = (
+      value: string | undefined,
+    ): GenerateFileType | null => {
       if (value === "readme") return "readme";
       if (value === "gitignore") return "gitignore";
       return null;

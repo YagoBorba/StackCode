@@ -13,15 +13,15 @@ Shared GitHub authentication utilities for the StackCode CLI and VS Code extensi
 
 ```ts
 import {
-	createGitHubAuth,
-	createCLIAuthProvider,
-	createFileTokenStorage,
+  createGitHubAuth,
+  createCLIAuthProvider,
+  createFileTokenStorage,
 } from "@stackcode/github-auth";
 
 const auth = createGitHubAuth({
-	provider: createCLIAuthProvider({
-		storage: createFileTokenStorage(),
-	}),
+  provider: createCLIAuthProvider({
+    storage: createFileTokenStorage(),
+  }),
 });
 
 const session = await auth.login({ token: "ghp_xxx", persist: true });

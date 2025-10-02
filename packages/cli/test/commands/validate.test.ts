@@ -32,7 +32,9 @@ describe("Validate Command", () => {
     await handler(argv as any);
 
     // Assert
-    expect(mockedCore.runValidateWorkflow).toHaveBeenCalledWith({ message: argv.message });
+    expect(mockedCore.runValidateWorkflow).toHaveBeenCalledWith({
+      message: argv.message,
+    });
     expect(console.log).toHaveBeenCalledWith(
       expect.stringContaining("validate.success"),
     );
@@ -48,7 +50,9 @@ describe("Validate Command", () => {
     await handler(argv as any);
 
     // Assert
-    expect(mockedCore.runValidateWorkflow).toHaveBeenCalledWith({ message: argv.message });
+    expect(mockedCore.runValidateWorkflow).toHaveBeenCalledWith({
+      message: argv.message,
+    });
     expect(console.error).toHaveBeenCalledWith(
       expect.stringContaining("validate.error_invalid"),
     );
