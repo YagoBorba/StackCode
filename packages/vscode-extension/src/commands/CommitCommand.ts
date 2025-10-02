@@ -117,7 +117,9 @@ export class CommitCommand extends BaseCommand {
               affectedIssues: issueReferences || undefined,
             },
             {
-              onProgress: (workflowProgress) => {
+              onProgress: (
+                workflowProgress: import("@stackcode/core").CommitWorkflowProgress,
+              ) => {
                 this.reportCommitProgress(workflowProgress.step, progress);
                 this.progressManager.reportProgress(
                   "commit",

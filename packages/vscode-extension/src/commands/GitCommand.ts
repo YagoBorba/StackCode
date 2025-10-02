@@ -89,7 +89,9 @@ export class GitCommand extends BaseCommand {
               branchType: branchType.label,
             },
             {
-              onProgress: (step) => {
+              onProgress: (
+                step: import("@stackcode/core").GitStartWorkflowProgress,
+              ) => {
                 switch (step.step) {
                   case "switchingBase":
                     progress.report({
@@ -184,7 +186,9 @@ export class GitCommand extends BaseCommand {
           const result = await runGitFinishWorkflow(
             { cwd: workspaceFolder.uri.fsPath },
             {
-              onProgress: (step) => {
+              onProgress: (
+                step: import("@stackcode/core").GitFinishWorkflowProgress,
+              ) => {
                 switch (step.step) {
                   case "pushing":
                     progress.report({
