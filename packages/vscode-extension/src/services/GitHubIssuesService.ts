@@ -12,7 +12,7 @@ import {
  *
  * This service now delegates all business logic to @stackcode/core,
  * providing only VS Code-specific integration (auth + git detection).
- * 
+ *
  * @deprecated Consider using runIssuesWorkflow directly with authenticated client
  */
 export class GitHubIssuesService {
@@ -25,7 +25,7 @@ export class GitHubIssuesService {
   }
 
   /**
-   * Busca issues do repositório atual usando o workflow centralizado do core
+   * Fetches issues from current repository using centralized core workflow
    */
   public async fetchCurrentRepositoryIssues(
     options?: Partial<FetchIssuesOptions>,
@@ -66,17 +66,15 @@ export class GitHubIssuesService {
   }
 
   /**
-   * Busca issues de um repositório específico usando o workflow centralizado do core
+   * Fetches issues from a specific repository using centralized core workflow
    */
   public async fetchRepositoryIssues(
     repository: GitHubRepository,
     options?: Partial<FetchIssuesOptions>,
   ): Promise<GitHubIssue[]> {
     try {
-      // Get authenticated client
       const client = await this._authService.getAuthenticatedClient();
 
-      // Run the centralized issues workflow from core
       const result = await runIssuesWorkflow({
         client,
         repository: {
@@ -103,7 +101,7 @@ export class GitHubIssuesService {
   }
 
   /**
-   * Busca issues atribuídas ao usuário atual
+   * Fetches issues assigned to current user
    */
   public async fetchMyIssues(
     repository?: GitHubRepository,
@@ -134,7 +132,6 @@ export class GitHubIssuesService {
    * Limpa cache de issues (delega para o core)
    */
   public clearCache(): void {
-    // Import dynamically to avoid circular dependencies
     import("@stackcode/core").then(({ clearIssuesCache }) => {
       clearIssuesCache();
       console.log("[GitHubIssuesService] Cache cleared via core");
@@ -151,7 +148,7 @@ export class GitHubIssuesService {
   }
 
   /**
-   * Força atualização de issues (ignora cache)
+   * Forces issue refresh (ignores cache)
    */
   public async refreshIssues(
     repository?: GitHubRepository,

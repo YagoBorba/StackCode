@@ -214,7 +214,7 @@ export class GitMonitor implements vscode.Disposable {
   }
 
   /**
-   * Detecta o repositório GitHub atual usando múltiplas estratégias
+   * Detects current GitHub repository using multiple strategies
    */
   public async getCurrentGitHubRepository(): Promise<GitHubRepository | null> {
     try {
@@ -250,7 +250,7 @@ export class GitMonitor implements vscode.Disposable {
   }
 
   /**
-   * Estratégia 1: Lê repositório diretamente do .git/config
+   * Strategy 1: Reads repository directly from .git/config
    */
   private async getRepositoryFromGitConfig(): Promise<GitHubRepository | null> {
     try {
@@ -307,7 +307,7 @@ export class GitMonitor implements vscode.Disposable {
       return null;
     }
   } /**
-   * Estratégia 2: Via Git Extension API (método original como fallback)
+   * Strategy 2: Via Git Extension API (original method as fallback)
    */
   private async getRepositoryFromGitAPI(): Promise<GitHubRepository | null> {
     try {

@@ -81,8 +81,8 @@ export class ConfigCommand extends BaseCommand {
         if (!overwrite) {
           return;
         }
-      } catch {
-        // File does not exist yet - continue without prompt
+      } catch (error) {
+        console.warn("Failed to read existing config:", error);
       }
 
       const defaultConfig: StackCodeConfig = {

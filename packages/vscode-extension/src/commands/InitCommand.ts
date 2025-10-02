@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
 import { BaseCommand } from "./BaseCommand";
-// ProgressCallback removed
 import { t } from "@stackcode/i18n";
 import {
   runInitWorkflow,
@@ -103,24 +102,22 @@ export class InitCommand extends BaseCommand {
         },
       ];
 
-      const selectedFeatures = await vscode.window.showQuickPick(
-        featureItems,
-        {
-          canPickMany: true,
-          placeHolder: this.safeTranslate(
-            "init.prompt.features",
-            "Select optional features",
-          ),
-        },
-      );
+      const selectedFeatures = await vscode.window.showQuickPick(featureItems, {
+        canPickMany: true,
+        placeHolder: this.safeTranslate(
+          "init.prompt.features",
+          "Select optional features",
+        ),
+      });
 
       if (typeof selectedFeatures === "undefined") {
         return;
       }
 
-      const features = (selectedFeatures.length > 0
-        ? selectedFeatures
-        : featureItems.filter((item) => item.picked)
+      const features = (
+        selectedFeatures.length > 0
+          ? selectedFeatures
+          : featureItems.filter((item) => item.picked)
       ).map((item) => item.value as InitFeature);
 
       let commitValidation: boolean | undefined;
@@ -181,8 +178,8 @@ export class InitCommand extends BaseCommand {
         if (!overwrite) {
           return;
         }
-      } catch {
-        // Directory doesn't exist - proceed with creation
+      } catch (error) {
+        console.warn("Directory check failed:", error);
       }
 
       const workflowOptions: InitWorkflowOptions = {
@@ -238,8 +235,12 @@ export class InitCommand extends BaseCommand {
         return;
       }
 
-      if (!workflowResult.dependenciesInstalled && workflowResult.installCommand) {
-        const installCommandString = `${workflowResult.installCommand.command} ${workflowResult.installCommand.args.join(" ")}`.trim();
+      if (
+        !workflowResult.dependenciesInstalled &&
+        workflowResult.installCommand
+      ) {
+        const installCommandString =
+          `${workflowResult.installCommand.command} ${workflowResult.installCommand.args.join(" ")}`.trim();
         const lastWarning =
           workflowResult.warnings.at(-1) ??
           this.safeTranslate(
@@ -299,27 +300,45 @@ export class InitCommand extends BaseCommand {
     const stepMessage = (step: InitWorkflowStep): string | undefined => {
       switch (step) {
         case "scaffold":
-          return this.safeTranslate("init.step.scaffold", "Scaffolding project...");
+          return this.safeTranslate(
+            "init.step.scaffold",
+            "Scaffolding project...",
+          );
         case "saveConfig":
           return this.safeTranslate(
             "vscode.init.step.save_config",
             "Saving StackCode configuration...",
           );
         case "generateReadme":
-          return this.safeTranslate("init.step.readme", "Generating README.md...");
+          return this.safeTranslate(
+            "init.step.readme",
+            "Generating README.md...",
+          );
         case "generateGitignore":
-          return this.safeTranslate("init.step.gitignore", "Creating .gitignore...");
+          return this.safeTranslate(
+            "init.step.gitignore",
+            "Creating .gitignore...",
+          );
         case "setupHusky":
-          return this.safeTranslate("init.step.husky", "Configuring Husky hooks...");
+          return this.safeTranslate(
+            "init.step.husky",
+            "Configuring Husky hooks...",
+          );
         case "initializeGit":
-          return this.safeTranslate("init.step.git", "Initializing Git repository...");
+          return this.safeTranslate(
+            "init.step.git",
+            "Initializing Git repository...",
+          );
         case "validateDependencies":
           return this.safeTranslate(
             "init.step.validate_deps",
             "Validating local dependencies...",
           );
         case "installDependencies":
-          return this.safeTranslate("init.step.deps", "Installing project dependencies...");
+          return this.safeTranslate(
+            "init.step.deps",
+            "Installing project dependencies...",
+          );
         case "completed":
           return this.safeTranslate(
             "vscode.init.project_initialized_successfully",
@@ -341,7 +360,9 @@ export class InitCommand extends BaseCommand {
         const message = this.safeTranslate(messageKey, messageKey);
         progress.report({ message });
       },
-      onMissingDependencies: async (details: InitWorkflowDependencyDecision) => {
+      onMissingDependencies: async (
+        details: InitWorkflowDependencyDecision,
+      ) => {
         await vscode.window.showWarningMessage(
           this.formatMissingDependenciesMessage(details),
         );

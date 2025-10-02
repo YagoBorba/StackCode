@@ -24,7 +24,10 @@ export class ProgressManager implements vscode.Disposable {
   private _disposables: vscode.Disposable[] = [];
   private _currentState: ProgressState = { inProgress: false };
   private _webviewProviders: Set<WebviewProgressListener> = new Set();
-  private _progressReporter?: vscode.Progress<{ message?: string; increment?: number }>;
+  private _progressReporter?: vscode.Progress<{
+    message?: string;
+    increment?: number;
+  }>;
 
   /**
    * Register a webview provider to receive progress updates
@@ -76,14 +79,11 @@ export class ProgressManager implements vscode.Disposable {
       percentage,
     };
 
-    // Broadcast to webviews
     this._broadcastProgress(event);
     this._broadcastState();
 
-    // Update VS Code progress reporter if available
     if (this._progressReporter) {
-      const increment =
-        percentage - (this._currentState.percentage || 0);
+      const increment = percentage - (this._currentState.percentage || 0);
       this._progressReporter.report({
         message,
         increment: increment > 0 ? increment : undefined,
@@ -112,7 +112,6 @@ export class ProgressManager implements vscode.Disposable {
     });
     this._broadcastState();
 
-    // Reset after a short delay
     setTimeout(() => {
       if (!this._currentState.inProgress) {
         this._currentState = { inProgress: false };
@@ -158,11 +157,7 @@ export class ProgressManager implements vscode.Disposable {
     workflowType: T,
   ): (progress: { step: string; message?: string }) => void {
     return (progress) => {
-      this.reportProgress(
-        workflowType,
-        progress.step,
-        progress.message,
-      );
+      this.reportProgress(workflowType, progress.step, progress.message);
     };
   }
 
@@ -237,5 +232,10 @@ export class ProgressManager implements vscode.Disposable {
  * Interface that webview providers must implement to receive progress updates
  */
 export interface WebviewProgressListener {
-  sendMessage(message: WebviewProgressMessage | WebviewProgressStateMessage | WebviewProgressCompleteMessage): void;
+  sendMessage(
+    message:
+      | WebviewProgressMessage
+      | WebviewProgressStateMessage
+      | WebviewProgressCompleteMessage,
+  ): void;
 }

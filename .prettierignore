@@ -1,0 +1,22 @@
+# Build outputs
+**/dist
+**/out
+**/build
+
+# Coverage
+**/coverage
+
+# Dependencies
+**/node_modules
+
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Generated files
+*.log
+*.tsbuildinfo
+
+# VS Code extension specific
+*.vsix

@@ -47,7 +47,10 @@ interface ProgressCompleteMessage {
   };
 }
 
-type VSCodeMessage = ProgressMessage | ProgressStateMessage | ProgressCompleteMessage;
+type VSCodeMessage =
+  | ProgressMessage
+  | ProgressStateMessage
+  | ProgressCompleteMessage;
 
 /**
  * Custom hook to manage progress state from VS Code extension
@@ -63,17 +66,14 @@ export function useProgress() {
 
       switch (message.type) {
         case "progress":
-          // Individual progress event (less common, mainly for logging)
           console.log("[WebviewUI] Progress event:", message.payload);
           break;
 
         case "progressState":
-          // Full state update (primary mechanism)
           setProgressState(message.payload);
           break;
 
         case "progressComplete":
-          // Workflow completed (success or failure)
           if (message.payload.success) {
             setProgressState({
               inProgress: false,
@@ -90,7 +90,6 @@ export function useProgress() {
             });
           }
 
-          // Clear after a delay
           setTimeout(() => {
             setProgressState({ inProgress: false });
           }, 5000);

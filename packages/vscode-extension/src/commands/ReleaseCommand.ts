@@ -23,7 +23,10 @@ export class ReleaseCommand extends BaseCommand {
   private readonly progressManager: ProgressManager;
   private outputChannel?: vscode.OutputChannel;
 
-  constructor(authService: GitHubAuthService, progressManager: ProgressManager) {
+  constructor(
+    authService: GitHubAuthService,
+    progressManager: ProgressManager,
+  ) {
     super();
     this.authService = authService;
     this.progressManager = progressManager;
@@ -48,7 +51,6 @@ export class ReleaseCommand extends BaseCommand {
 
       const cwd = workspaceFolder.uri.fsPath;
 
-      // Start progress tracking
       this.progressManager.startWorkflow("release");
 
       const result = await vscode.window.withProgress(
@@ -66,11 +68,16 @@ export class ReleaseCommand extends BaseCommand {
 
       this.progressManager.clearVSCodeProgressReporter();
 
-      // Complete or fail workflow based on result
       if (result.status === "prepared") {
-        this.progressManager.completeWorkflow("release", "Release prepared successfully");
+        this.progressManager.completeWorkflow(
+          "release",
+          "Release prepared successfully",
+        );
       } else {
-        this.progressManager.failWorkflow("release", result.error || "Release workflow cancelled");
+        this.progressManager.failWorkflow(
+          "release",
+          result.error || "Release workflow cancelled",
+        );
       }
 
       await this.handleReleaseResult(result, cwd);
@@ -93,7 +100,6 @@ export class ReleaseCommand extends BaseCommand {
     return {
       onProgress: (workflowProgress) => {
         this.reportReleaseProgress(workflowProgress, progress);
-        // Also report to ProgressManager for webview updates
         this.progressManager.reportProgress(
           "release",
           workflowProgress.step,
@@ -178,9 +184,7 @@ export class ReleaseCommand extends BaseCommand {
         await this.showWarning(t("common.operation_cancelled"));
         break;
       default:
-        await this.showError(
-          result.error ?? t("common.error_generic"),
-        );
+        await this.showError(result.error ?? t("common.error_generic"));
     }
   }
 
@@ -313,9 +317,13 @@ export class ReleaseCommand extends BaseCommand {
       return { owner: info.owner, repo: info.repo };
     }
 
-    const remoteUrl = await getCommandOutput("git", ["remote", "get-url", "origin"], {
-      cwd,
-    });
+    const remoteUrl = await getCommandOutput(
+      "git",
+      ["remote", "get-url", "origin"],
+      {
+        cwd,
+      },
+    );
     const match = remoteUrl.match(/github\.com[/:]([\w-]+)\/([\w-.]+)/);
     if (!match) {
       throw new Error(t("git.error_parsing_remote"));
@@ -329,7 +337,8 @@ export class ReleaseCommand extends BaseCommand {
    */
   private ensureOutputChannel(): vscode.OutputChannel {
     if (!this.outputChannel) {
-      this.outputChannel = vscode.window.createOutputChannel("StackCode Release");
+      this.outputChannel =
+        vscode.window.createOutputChannel("StackCode Release");
     }
     return this.outputChannel;
   }

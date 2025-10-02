@@ -57,7 +57,11 @@ export async function activate(context: vscode.ExtensionContext) {
   initCommand = new InitCommand();
   generateCommand = new GenerateCommand();
   gitCommand = new GitCommand();
-  commitCommand = new CommitCommand(gitHubAuthService, gitMonitor, progressManager);
+  commitCommand = new CommitCommand(
+    gitHubAuthService,
+    gitMonitor,
+    progressManager,
+  );
   validateCommand = new ValidateCommand();
   releaseCommand = new ReleaseCommand(gitHubAuthService, progressManager);
   configCommand = new ConfigCommand();

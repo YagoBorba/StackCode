@@ -1,5 +1,5 @@
 /**
- * Hook de tradução para componentes React da extensão VSCode
+ * Translation hook for VSCode extension React components
  */
 
 const translations = {
@@ -77,7 +77,7 @@ export function useTranslation() {
 }
 
 /**
- * Função utilitária para tradução direta
+ * Utility function for direct translation
  */
 export function translate(key: string, language: "pt" | "en" = "pt"): string {
   const translation =

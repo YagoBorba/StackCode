@@ -4,7 +4,7 @@ import { ProactiveNotificationManager } from "../notifications/ProactiveNotifica
 import { ConfigurationManager } from "../config/ConfigurationManager";
 
 /**
- * Comando de teste para verificar detecção de repositório GitHub
+ * Test command to verify GitHub repository detection
  */
 export class TestGitHubDetectionCommand {
   private gitMonitor: GitMonitor;

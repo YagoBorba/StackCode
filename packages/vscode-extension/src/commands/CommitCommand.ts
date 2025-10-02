@@ -51,10 +51,7 @@ export class CommitCommand extends BaseCommand {
 
       const scope = await vscode.window.showInputBox({
         prompt: this.translate("commit.prompt.scope", "Scope (optional)"),
-        placeHolder: this.translate(
-          "commit.prompt.scope",
-          "Scope (optional)",
-        ),
+        placeHolder: this.translate("commit.prompt.scope", "Scope (optional)"),
       });
 
       const shortDescription = await this.promptRequiredText(
@@ -96,7 +93,6 @@ export class CommitCommand extends BaseCommand {
 
       const issueReferences = await this.resolveIssueReferences();
 
-      // Start progress tracking
       this.progressManager.startWorkflow("commit");
 
       const result = await vscode.window.withProgress(
@@ -123,7 +119,6 @@ export class CommitCommand extends BaseCommand {
             {
               onProgress: (workflowProgress) => {
                 this.reportCommitProgress(workflowProgress.step, progress);
-                // Also report to ProgressManager for webview updates
                 this.progressManager.reportProgress(
                   "commit",
                   workflowProgress.step,
@@ -138,14 +133,19 @@ export class CommitCommand extends BaseCommand {
       this.progressManager.clearVSCodeProgressReporter();
 
       if (result.status === "committed") {
-        this.progressManager.completeWorkflow("commit", "Commit created successfully");
+        this.progressManager.completeWorkflow(
+          "commit",
+          "Commit created successfully",
+        );
         this.appendCommitMessage(result.message ?? shortDescription);
         await this.showSuccess(t("commit.success"));
         return;
       }
 
-      // Workflow was cancelled or failed
-      this.progressManager.failWorkflow("commit", result.error || "Commit workflow cancelled");
+      this.progressManager.failWorkflow(
+        "commit",
+        result.error || "Commit workflow cancelled",
+      );
 
       if (result.reason === "no-staged-changes") {
         await this.showWarning(t("commit.error_no_changes_staged"));
@@ -153,7 +153,8 @@ export class CommitCommand extends BaseCommand {
       }
 
       const errorMessage =
-        result.error ?? this.translate("common.error_generic", "An error occurred.");
+        result.error ??
+        this.translate("common.error_generic", "An error occurred.");
       await this.showError(errorMessage);
     } catch (error) {
       await this.showError(
@@ -248,16 +249,13 @@ export class CommitCommand extends BaseCommand {
         return this.promptManualIssueReference();
       }
 
-      // Get current repository
       const repository = await this.gitMonitor.getCurrentGitHubRepository();
       if (!repository) {
         return this.promptManualIssueReference();
       }
 
-      // Get authenticated client
       const client = await this.authService.getAuthenticatedClient();
 
-      // Use centralized issues workflow from core
       const result = await runIssuesWorkflow({
         client,
         repository: {
@@ -289,9 +287,13 @@ export class CommitCommand extends BaseCommand {
 
       return selections
         .map((item) =>
-          this.translate("commit.issues.reference_entry", "closes #{issueNumber}", {
-            issueNumber: item.issue.number,
-          }),
+          this.translate(
+            "commit.issues.reference_entry",
+            "closes #{issueNumber}",
+            {
+              issueNumber: item.issue.number,
+            },
+          ),
         )
         .join(", ");
     } catch (error) {
@@ -376,7 +378,8 @@ export class CommitCommand extends BaseCommand {
    */
   private ensureOutputChannel(): vscode.OutputChannel {
     if (!this.outputChannel) {
-      this.outputChannel = vscode.window.createOutputChannel("StackCode Commit");
+      this.outputChannel =
+        vscode.window.createOutputChannel("StackCode Commit");
     }
     return this.outputChannel;
   }

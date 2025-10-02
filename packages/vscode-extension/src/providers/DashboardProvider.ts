@@ -4,7 +4,10 @@ import * as fs from "fs";
 import { runIssuesWorkflow, clearRepositoryCache } from "@stackcode/core";
 import { GitHubAuthService } from "../services/GitHubAuthService";
 import { GitMonitor } from "../monitors/GitMonitor";
-import { ProgressManager, WebviewProgressListener } from "../services/ProgressManager";
+import {
+  ProgressManager,
+  WebviewProgressListener,
+} from "../services/ProgressManager";
 import type {
   WebviewProgressMessage,
   WebviewProgressStateMessage,
@@ -17,7 +20,10 @@ import type {
  * Implements WebviewProgressListener to receive and display progress updates.
  */
 export class DashboardProvider
-  implements vscode.WebviewViewProvider, vscode.Disposable, WebviewProgressListener
+  implements
+    vscode.WebviewViewProvider,
+    vscode.Disposable,
+    WebviewProgressListener
 {
   public static readonly viewType = "stackcode.dashboard";
   private _view?: vscode.WebviewView;
@@ -176,13 +182,19 @@ export class DashboardProvider
 
       if (result.status === "error") {
         if (this._progressManager) {
-          this._progressManager.failWorkflow("issues", result.error || "Failed to fetch issues");
+          this._progressManager.failWorkflow(
+            "issues",
+            result.error || "Failed to fetch issues",
+          );
         }
         throw new Error(result.error || "Failed to fetch issues");
       }
 
       if (this._progressManager) {
-        this._progressManager.completeWorkflow("issues", `Fetched ${result.issues.length} issues`);
+        this._progressManager.completeWorkflow(
+          "issues",
+          `Fetched ${result.issues.length} issues`,
+        );
       }
 
       this.sendMessage({
@@ -254,7 +266,7 @@ export class DashboardProvider
           mode: "production",
         },
       });
-    } catch (e) {
+    } catch {
       this.sendMessage({
         type: "updateStats",
         payload: { files: 0, error: "Failed to scan files" },
@@ -347,14 +359,14 @@ export class DashboardProvider
         <div class="status">Development Mode</div>
         <h2>🏗️ StackCode Dashboard</h2>
         <div class="error-message">
-            <strong>Build Required:</strong> O webview-ui precisa ser compilado primeiro.
+            <strong>Build Required:</strong> The webview-ui needs to be compiled first.
             <br><br>
-            Execute: <code>npm run build:ui</code>
+            Run: <code>npm run build:ui</code>
             <br><br>
-            Erro: ${error instanceof Error ? error.message : "Manifest não encontrado"}
+            Error: ${error instanceof Error ? error.message : "Manifest not found"}
         </div>
-        <p>Status da extensão: ✅ Ativa</p>
-        <p>Workspace: ${vscode.workspace.workspaceFolders?.[0]?.name || "Nenhum"}</p>
+        <p>Extension Status: ✅ Active</p>
+        <p>Workspace: ${vscode.workspace.workspaceFolders?.[0]?.name || "None"}</p>
     </div>
 </body>
 </html>`;

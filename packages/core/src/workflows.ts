@@ -69,9 +69,9 @@ export interface InitWorkflowDependencyDecision {
 export interface InitWorkflowHooks {
   onProgress?(progress: InitWorkflowProgress): Promise<void> | void;
   onEducationalMessage?(messageKey: string): Promise<void> | void;
-  onMissingDependencies?(details: InitWorkflowDependencyDecision):
-    | Promise<void>
-    | void;
+  onMissingDependencies?(
+    details: InitWorkflowDependencyDecision,
+  ): Promise<void> | void;
   confirmContinueAfterMissingDependencies?(
     decision: InitWorkflowDependencyDecision,
   ): Promise<boolean> | boolean;
@@ -80,9 +80,7 @@ export interface InitWorkflowHooks {
 export interface InitWorkflowResult {
   status: "completed" | "cancelled";
   projectPath: string;
-  dependencyValidation: Awaited<
-    ReturnType<typeof validateStackDependencies>
-  >;
+  dependencyValidation: Awaited<ReturnType<typeof validateStackDependencies>>;
   dependenciesInstalled: boolean;
   installCommand?: {
     command: string;
@@ -123,14 +121,9 @@ export interface GenerateWorkflowHooks {
   }): Promise<string[] | undefined> | string[] | undefined;
 }
 
-export type GenerateWorkflowFileStatus =
-  | "created"
-  | "overwritten"
-  | "skipped";
+export type GenerateWorkflowFileStatus = "created" | "overwritten" | "skipped";
 
-export type GenerateWorkflowFileSkipReason =
-  | "overwrite-declined"
-  | "error";
+export type GenerateWorkflowFileSkipReason = "overwrite-declined" | "error";
 
 export interface GenerateWorkflowFileResult {
   fileType: GenerateFileType;
@@ -246,7 +239,6 @@ export async function runProjectValidateWorkflow(
     });
   }
 
-
   const gitPath = path.join(options.projectPath, ".git");
   if (!(await fileExists(gitPath))) {
     issues.push({
@@ -256,7 +248,6 @@ export async function runProjectValidateWorkflow(
       filePath: gitPath,
     });
   }
-
 
   const nodeStacks = new Set([
     "node-js",
@@ -278,7 +269,8 @@ export async function runProjectValidateWorkflow(
     }
     const lockPathNpm = path.join(options.projectPath, "package-lock.json");
     const lockPathYarn = path.join(options.projectPath, "yarn.lock");
-    const hasLock = (await fileExists(lockPathNpm)) || (await fileExists(lockPathYarn));
+    const hasLock =
+      (await fileExists(lockPathNpm)) || (await fileExists(lockPathYarn));
     if (!hasLock) {
       issues.push({
         id: "missing-lockfile",
@@ -287,8 +279,13 @@ export async function runProjectValidateWorkflow(
       });
     }
 
-
-    if (config.stack === "node-ts" || config.stack === "react" || config.stack === "angular" || config.stack === "vue" || config.stack === "svelte") {
+    if (
+      config.stack === "node-ts" ||
+      config.stack === "react" ||
+      config.stack === "angular" ||
+      config.stack === "vue" ||
+      config.stack === "svelte"
+    ) {
       const tsconfigPath = path.join(options.projectPath, "tsconfig.json");
       if (!(await fileExists(tsconfigPath))) {
         issues.push({
@@ -300,7 +297,6 @@ export async function runProjectValidateWorkflow(
       }
     }
   }
-
 
   if (config.stack === "python") {
     const pyproject = path.join(options.projectPath, "pyproject.toml");
@@ -316,12 +312,14 @@ export async function runProjectValidateWorkflow(
     }
   }
 
-
   if (config.stack === "java") {
     const pom = path.join(options.projectPath, "pom.xml");
     const gradle = path.join(options.projectPath, "build.gradle");
     const gradleKts = path.join(options.projectPath, "build.gradle.kts");
-    const hasBuild = (await fileExists(pom)) || (await fileExists(gradle)) || (await fileExists(gradleKts));
+    const hasBuild =
+      (await fileExists(pom)) ||
+      (await fileExists(gradle)) ||
+      (await fileExists(gradleKts));
     if (!hasBuild) {
       issues.push({
         id: "missing-java-build-file",
@@ -330,7 +328,6 @@ export async function runProjectValidateWorkflow(
       });
     }
   }
-
 
   if (config.stack === "go") {
     const goMod = path.join(options.projectPath, "go.mod");
@@ -343,7 +340,6 @@ export async function runProjectValidateWorkflow(
       });
     }
   }
-
 
   if (config.stack === "php") {
     const composer = path.join(options.projectPath, "composer.json");
@@ -365,7 +361,6 @@ export async function runProjectValidateWorkflow(
       });
     }
   }
-
 
   if (config.features?.husky) {
     const huskyDir = path.join(options.projectPath, ".husky");
@@ -503,15 +498,12 @@ export async function runInitWorkflow(
   await runCommand("git", ["init"], { cwd: options.projectPath });
 
   await reportProgress("validateDependencies");
-  await sendEducationalMessage(
-    "educational.dependency_validation_explanation",
-  );
+  await sendEducationalMessage("educational.dependency_validation_explanation");
   const dependencyValidation = await validateStackDependencies(options.stack);
 
   let shouldContinue = true;
   const warnings: string[] = [];
   let dependenciesInstalled = false;
-  let installCommand: InstallCommand | undefined;
 
   if (!dependencyValidation.isValid) {
     const decision: InitWorkflowDependencyDecision = {
@@ -524,9 +516,8 @@ export async function runInitWorkflow(
     }
 
     if (hooks.confirmContinueAfterMissingDependencies) {
-      shouldContinue = await hooks.confirmContinueAfterMissingDependencies(
-        decision,
-      );
+      shouldContinue =
+        await hooks.confirmContinueAfterMissingDependencies(decision);
     }
 
     if (!shouldContinue) {
@@ -541,7 +532,7 @@ export async function runInitWorkflow(
   }
 
   await reportProgress("installDependencies");
-  installCommand = STACK_INSTALL_COMMANDS[options.stack];
+  const installCommand = STACK_INSTALL_COMMANDS[options.stack];
 
   try {
     await runCommand(installCommand.command, installCommand.args, {
@@ -586,9 +577,7 @@ export async function runGenerateWorkflow(
     }
   };
 
-  const sendEducationalMessage = async (
-    messageKey: string,
-  ): Promise<void> => {
+  const sendEducationalMessage = async (messageKey: string): Promise<void> => {
     if (hooks.onEducationalMessage) {
       await hooks.onEducationalMessage(messageKey);
     }
@@ -732,8 +721,6 @@ export async function runValidateWorkflow(
   return { isValid };
 }
 
-
-
 export type CommitWorkflowStep =
   | "checkingStaged"
   | "buildingMessage"
@@ -775,11 +762,9 @@ export async function runCommitWorkflow(
 
   try {
     await report({ step: "checkingStaged" });
-    const status = await getCommandOutput(
-      "git",
-      ["status", "--porcelain"],
-      { cwd: options.cwd },
-    );
+    const status = await getCommandOutput("git", ["status", "--porcelain"], {
+      cwd: options.cwd,
+    });
     if (!status) {
       return { status: "cancelled", reason: "no-staged-changes" };
     }
@@ -810,8 +795,6 @@ export async function runCommitWorkflow(
     return { status: "cancelled", reason: "error", error: err };
   }
 }
-
-
 
 export type GitStartWorkflowStep =
   | "switchingBase"
@@ -915,7 +898,7 @@ export async function runGitFinishWorkflow(
       ["remote", "get-url", "origin"],
       { cwd: options.cwd },
     );
-    const match = remoteUrl.match(/github\.com[\/:]([\w-]+\/[\w-.]+)/);
+    const match = remoteUrl.match(/github\.com[/:]([\w-]+\/[\w-.]+)/);
     const repoPath = match ? match[1].replace(".git", "") : null;
     const prUrl = repoPath
       ? `https://github.com/${repoPath}/pull/new/${currentBranch}`
@@ -927,8 +910,6 @@ export async function runGitFinishWorkflow(
     return { status: "cancelled", error: err };
   }
 }
-
-
 
 export type ReleaseWorkflowStep =
   | "detectingStrategy"
@@ -961,9 +942,9 @@ export interface ReleaseWorkflowHooks {
     newVersion: string;
   }): Promise<boolean> | boolean;
   displayIndependentPlan?(plan: PackageBumpInfo[]): Promise<void> | void;
-  confirmIndependentRelease?(plan: PackageBumpInfo[]):
-    | Promise<boolean>
-    | boolean;
+  confirmIndependentRelease?(
+    plan: PackageBumpInfo[],
+  ): Promise<boolean> | boolean;
 }
 
 export interface ReleaseWorkflowGitHubInfo {
@@ -1084,7 +1065,9 @@ export async function runReleaseWorkflow(
       await report({ step: "lockedGeneratingChangelog" });
       const changelog = await generateChangelog(monorepoInfo);
       const changelogPath = path.join(options.cwd, changelogFilename);
-      const existing = await fs.readFile(changelogPath, "utf-8").catch(() => "");
+      const existing = await fs
+        .readFile(changelogPath, "utf-8")
+        .catch(() => "");
       await fs.writeFile(
         changelogPath,
         existing ? `${changelog}\n${existing}` : `${changelog}\n`,
@@ -1102,7 +1085,6 @@ export async function runReleaseWorkflow(
         github,
       };
     }
-
 
     await report({ step: "independentFindingChanges" });
     const changedPackages = await findChangedPackages(

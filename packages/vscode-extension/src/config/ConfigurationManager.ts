@@ -6,7 +6,6 @@ export class ConfigurationManager {
   constructor() {
     this.configuration = vscode.workspace.getConfiguration("stackcode");
 
-    // Listen for configuration changes
     vscode.workspace.onDidChangeConfiguration(
       (event: vscode.ConfigurationChangeEvent) => {
         if (event.affectsConfiguration("stackcode")) {

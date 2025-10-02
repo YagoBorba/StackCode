@@ -7,9 +7,23 @@ on:
     branches: [main, develop]
 
 jobs:
-  build:
-    name: Build & Install
+  # Job matrix para rodar múltiplos checks em paralelo
+  quality-checks:
+    name: ${{ matrix.check-name }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false # Continua mesmo se um falhar
+      matrix:
+        include:
+          - check-name: "Build"
+            check-command: "build"
+          - check-name: "Lint"
+            check-command: "lint"
+          - check-name: "Format Check"
+            check-command: "format:check"
+          - check-name: "Tests"
+            check-command: "test"
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,74 +37,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Build é necessário antes de outros checks
       - name: Build project
+        if: matrix.check-command != 'build'
         run: npm run build
 
-  test:
-    name: Test
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build project
-        run: npm run build
-
-      - name: Run tests
-        run: npm test
-
-  lint:
-    name: Lint
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build project
-        run: npm run build
-
-      - name: Run ESLint
-        run: npm run lint
-
-  format_check:
-    name: Format Check
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build project
-        run: npm run build
-
-      - name: Run Prettier Check
-        run: npm run format:check
+      - name: Run ${{ matrix.check-name }}
+        run: npm run ${{ matrix.check-command }}

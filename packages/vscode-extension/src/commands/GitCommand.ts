@@ -1,10 +1,7 @@
 import * as vscode from "vscode";
 import { BaseCommand } from "./BaseCommand";
 import { t } from "@stackcode/i18n";
-import {
-  runGitStartWorkflow,
-  runGitFinishWorkflow,
-} from "@stackcode/core";
+import { runGitStartWorkflow, runGitFinishWorkflow } from "@stackcode/core";
 
 export class GitCommand extends BaseCommand {
   async execute(): Promise<void> {
@@ -160,8 +157,8 @@ export class GitCommand extends BaseCommand {
           if (repo && repo.state.HEAD) {
             currentBranch = repo.state.HEAD.name || "current branch";
           }
-        } catch {
-          // Git API unavailable - use generic message
+        } catch (error) {
+          console.warn("Git API unavailable:", error);
         }
       }
 
@@ -216,7 +213,7 @@ export class GitCommand extends BaseCommand {
             const errorMessage =
               result.error === "not-on-branch"
                 ? t("vscode.git.branch_name_required")
-                : result.error ?? t("vscode.common.unknown_error");
+                : (result.error ?? t("vscode.common.unknown_error"));
             throw new Error(errorMessage);
           }
 

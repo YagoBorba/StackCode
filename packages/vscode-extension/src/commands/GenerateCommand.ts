@@ -54,7 +54,9 @@ export class GenerateCommand extends BaseCommand {
     }
   }
 
-  private async ensureWorkspaceFolder(): Promise<vscode.WorkspaceFolder | undefined> {
+  private async ensureWorkspaceFolder(): Promise<
+    vscode.WorkspaceFolder | undefined
+  > {
     const workspaceFolder = this.getCurrentWorkspaceFolder();
     if (!workspaceFolder) {
       await this.showError(t("vscode.common.no_workspace_folder"));
@@ -97,7 +99,9 @@ export class GenerateCommand extends BaseCommand {
     }
   }
 
-  private createWorkflowHooks(progress: vscode.Progress<{ message?: string }>): GenerateWorkflowHooks {
+  private createWorkflowHooks(
+    progress: vscode.Progress<{ message?: string }>,
+  ): GenerateWorkflowHooks {
     return {
       onProgress: async ({ step }: { step: GenerateWorkflowStep }) => {
         const message = this.stepMessage(step);
@@ -108,16 +112,20 @@ export class GenerateCommand extends BaseCommand {
       },
       shouldOverwriteFile: async ({
         fileType,
-        filePath,
       }: {
         fileType: GenerateFileType;
         filePath: string;
       }) => {
         const confirmLabel = t("vscode.generate.overwrite");
-        const message = fileType === "readme"
-          ? t("vscode.generate.readme_exists_overwrite")
-          : t("vscode.generate.gitignore_exists_overwrite");
-        const choice = await vscode.window.showWarningMessage(message, { modal: true }, confirmLabel);
+        const message =
+          fileType === "readme"
+            ? t("vscode.generate.readme_exists_overwrite")
+            : t("vscode.generate.gitignore_exists_overwrite");
+        const choice = await vscode.window.showWarningMessage(
+          message,
+          { modal: true },
+          confirmLabel,
+        );
         return choice === confirmLabel;
       },
     };
@@ -153,11 +161,12 @@ export class GenerateCommand extends BaseCommand {
       if (f.fileType === "readme") {
         await this.showSuccess(t("vscode.generate.readme_has_been_generated"));
       } else if (f.fileType === "gitignore") {
-        await this.showSuccess(t("vscode.generate.gitignore_has_been_generated"));
+        await this.showSuccess(
+          t("vscode.generate.gitignore_has_been_generated"),
+        );
       }
     }
 
-    // Offer to open files
     for (const ft of fileTypes) {
       const filePath = path.join(
         workspaceFolder.uri.fsPath,
@@ -178,7 +187,6 @@ export class GenerateCommand extends BaseCommand {
       }
     }
 
-    // Show translated warnings if any
     if (result.warnings.length > 0) {
       for (const w of result.warnings) {
         await this.showWarning(t(w));
@@ -192,13 +200,10 @@ export class GenerateCommand extends BaseCommand {
     }
 
     try {
-      const result = await this.runWorkflowWithProgress(
-        workspaceFolder,
-        {
-          projectPath: workspaceFolder.uri.fsPath,
-          files: ["readme"],
-        },
-      );
+      const result = await this.runWorkflowWithProgress(workspaceFolder, {
+        projectPath: workspaceFolder.uri.fsPath,
+        files: ["readme"],
+      });
 
       await this.handleWorkflowOutcome(workspaceFolder, result, ["readme"]);
     } catch (error) {
@@ -220,14 +225,11 @@ export class GenerateCommand extends BaseCommand {
     }
 
     try {
-      const result = await this.runWorkflowWithProgress(
-        workspaceFolder,
-        {
-          projectPath: workspaceFolder.uri.fsPath,
-          files: ["gitignore"],
-          gitignoreTechnologies: technologies,
-        },
-      );
+      const result = await this.runWorkflowWithProgress(workspaceFolder, {
+        projectPath: workspaceFolder.uri.fsPath,
+        files: ["gitignore"],
+        gitignoreTechnologies: technologies,
+      });
 
       await this.handleWorkflowOutcome(workspaceFolder, result, ["gitignore"]);
     } catch (error) {
@@ -249,14 +251,11 @@ export class GenerateCommand extends BaseCommand {
     }
 
     try {
-      const result = await this.runWorkflowWithProgress(
-        workspaceFolder,
-        {
-          projectPath: workspaceFolder.uri.fsPath,
-          files: fileTypes,
-          gitignoreTechnologies,
-        },
-      );
+      const result = await this.runWorkflowWithProgress(workspaceFolder, {
+        projectPath: workspaceFolder.uri.fsPath,
+        files: fileTypes,
+        gitignoreTechnologies,
+      });
 
       await this.handleWorkflowOutcome(workspaceFolder, result, fileTypes);
     } catch (error) {

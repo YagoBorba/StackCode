@@ -3,11 +3,11 @@ import { BaseCommand } from "./BaseCommand";
 import { GitHubAuthService } from "../services/GitHubAuthService";
 
 /**
- * AuthCommand - Gerencia comandos de autenticação GitHub
+ * AuthCommand - Manages GitHub authentication commands
  *
- * Comandos disponíveis:
+ * Available commands:
  * - stackcode.auth.login: Inicia processo de login
- * - stackcode.auth.logout: Remove autenticação
+ * - stackcode.auth.logout: Removes authentication
  */
 export class AuthCommand extends BaseCommand {
   private _authService: GitHubAuthService;
@@ -18,7 +18,7 @@ export class AuthCommand extends BaseCommand {
   }
 
   /**
-   * Implementação do método abstrato - mostra status da autenticação
+   * Abstract method implementation - shows authentication status
    */
   public async execute(): Promise<void> {
     await this.showStatus();
@@ -85,7 +85,7 @@ export class AuthCommand extends BaseCommand {
   }
 
   /**
-   * Mostra status atual da autenticação
+   * Shows current authentication status
    */
   public async showStatus(): Promise<void> {
     if (this._authService.isAuthenticated) {

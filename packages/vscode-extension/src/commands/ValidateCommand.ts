@@ -58,17 +58,17 @@ export class ValidateCommand extends BaseCommand {
         return;
       }
 
-      // Show a summary of issues
       const summary = resultIssues
         .map((i) => `• ${t(i.messageKey)}`)
         .join("\n");
       await this.showWarning(
-        t("vscode.validate.issues_summary", { count: String(resultIssues.length) }) +
+        t("vscode.validate.issues_summary", {
+          count: String(resultIssues.length),
+        }) +
           "\n" +
           summary,
       );
 
-      // Offer to generate missing files if applicable
       const missingFiles: string[] = [];
       const hasMissingReadme = resultIssues.some(
         (i) => i.id === "missing-readme",

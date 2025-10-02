@@ -129,7 +129,6 @@ export class ProactiveNotificationManager {
   async runFullBestPracticesCheck(): Promise<void> {
     const issues: string[] = [];
 
-    // Check if working on main branch
     try {
       const gitExtension =
         vscode.extensions.getExtension("vscode.git")?.exports;
@@ -143,11 +142,9 @@ export class ProactiveNotificationManager {
         }
       }
     } catch (error: unknown) {
-      // Git extension not available or error accessing it
       console.log("Git extension error:", error);
     }
 
-    // Check for missing files
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     if (workspaceFolder) {
       const files = await vscode.workspace.fs.readDirectory(
@@ -180,7 +177,6 @@ export class ProactiveNotificationManager {
   }
 
   private async handleApplyFix(message: string): Promise<void> {
-    // Enhanced fix handling with specific actions
     if (message.includes("README")) {
       await vscode.commands.executeCommand("stackcode.generate.readme");
     } else if (message.includes("gitignore")) {
@@ -258,7 +254,5 @@ export class ProactiveNotificationManager {
     outputChannel.show();
   }
 
-  dispose(): void {
-    // Cleanup if needed
-  }
+  dispose(): void {}
 }

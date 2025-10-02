@@ -92,8 +92,12 @@ export default function IssuesPanel({
         </div>
         <div className="flex flex-col items-center justify-center py-8">
           <RefreshCw className="w-8 h-8 text-blue-400 animate-spin mb-3" />
-          <span className="text-slate-300 font-medium">{t("github.ui.fetching_issues")}</span>
-          <span className="text-slate-400 text-sm mt-1">{t("github.ui.please_wait")}</span>
+          <span className="text-slate-300 font-medium">
+            {t("github.ui.fetching_issues")}
+          </span>
+          <span className="text-slate-400 text-sm mt-1">
+            {t("github.ui.please_wait")}
+          </span>
         </div>
       </div>
     );

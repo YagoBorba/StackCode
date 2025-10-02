@@ -72,11 +72,7 @@ const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
       {/* Content */}
       <div className="p-3">
         {/* Message */}
-        {message && (
-          <p className="text-sm text-slate-300 mb-2">
-            {message}
-          </p>
-        )}
+        {message && <p className="text-sm text-slate-300 mb-2">{message}</p>}
 
         {/* Current Step */}
         {currentStep && !error && (
