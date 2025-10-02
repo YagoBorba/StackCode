@@ -237,7 +237,7 @@ export class ReleaseCommand extends BaseCommand {
 
     try {
       await this.ensureAuthenticated();
-      const client = this.authService.getAuthenticatedClient();
+      const client = await this.authService.getAuthenticatedClient();
       const { owner, repo } = await this.resolveRepositoryInfo(
         params.cwd,
         params.githubInfo,
