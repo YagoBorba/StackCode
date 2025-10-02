@@ -3,20 +3,28 @@ import fs from "fs/promises";
 import path from "path";
 import {
   runInitWorkflow,
+  type InitWorkflowHooks,
+  type InitWorkflowOptions,
+} from "../src/workflows/init.js";
+import {
   runGenerateWorkflow,
+  type GenerateWorkflowHooks,
+  type GenerateWorkflowOptions,
+} from "../src/workflows/generate.js";
+import {
   runValidateWorkflow,
+  type ValidateWorkflowHooks,
+  type ValidateWorkflowOptions,
+} from "../src/workflows/validate.js";
+import {
   runCommitWorkflow,
   runGitStartWorkflow,
   runGitFinishWorkflow,
+} from "../src/workflows/git.js";
+import {
   runReleaseWorkflow,
-  type InitWorkflowHooks,
-  type InitWorkflowOptions,
-  type GenerateWorkflowHooks,
-  type GenerateWorkflowOptions,
-  type ValidateWorkflowHooks,
-  type ValidateWorkflowOptions,
   type ReleaseWorkflowHooks,
-} from "../src/workflows.js";
+} from "../src/workflows/release.js";
 import * as scaffoldModule from "../src/scaffold.js";
 import * as utilsModule from "../src/utils.js";
 import * as generatorsModule from "../src/generators.js";
