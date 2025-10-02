@@ -3,7 +3,7 @@ import {
   fetchRepositoryIssues,
   type GitHubIssue,
   type FetchIssuesOptions,
-} from "./github.js";
+} from "../github.js";
 
 /**
  * Repository information required for issues workflow
