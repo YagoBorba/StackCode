@@ -146,8 +146,6 @@ export interface GenerateWorkflowResult {
   warnings: string[];
 }
 
-// ===== Validate Workflow (commit message) =====
-
 export type ValidateWorkflowStep = "validating" | "completed";
 
 export interface ValidateWorkflowProgress {
@@ -166,8 +164,6 @@ export interface ValidateWorkflowResult {
   isValid: boolean;
 }
 
-// ===== Project Validation Workflow =====
-
 export type ProjectValidateSeverity = "info" | "warning" | "error";
 
 export type ProjectValidateStep =
@@ -182,7 +178,7 @@ export interface ProjectValidateProgress {
 
 export interface ProjectValidateIssue {
   id: string;
-  messageKey: string; // i18n key
+  messageKey: string;
   severity: ProjectValidateSeverity;
   filePath?: string;
 }
@@ -230,7 +226,6 @@ export async function runProjectValidateWorkflow(
   const config = await loadStackCodeConfig(options.projectPath);
 
   await report("checkingFiles", "core-files");
-  // Core files
   const readmePath = path.join(options.projectPath, "README.md");
   if (!(await fileExists(readmePath))) {
     issues.push({
@@ -251,7 +246,7 @@ export async function runProjectValidateWorkflow(
     });
   }
 
-  // Git repo
+
   const gitPath = path.join(options.projectPath, ".git");
   if (!(await fileExists(gitPath))) {
     issues.push({
@@ -262,7 +257,7 @@ export async function runProjectValidateWorkflow(
     });
   }
 
-  // Stack-dependent checks (node stacks)
+
   const nodeStacks = new Set([
     "node-js",
     "node-ts",
@@ -292,7 +287,7 @@ export async function runProjectValidateWorkflow(
       });
     }
 
-    // Node with TypeScript: check tsconfig.json (warning only)
+
     if (config.stack === "node-ts" || config.stack === "react" || config.stack === "angular" || config.stack === "vue" || config.stack === "svelte") {
       const tsconfigPath = path.join(options.projectPath, "tsconfig.json");
       if (!(await fileExists(tsconfigPath))) {
@@ -306,7 +301,7 @@ export async function runProjectValidateWorkflow(
     }
   }
 
-  // Python
+
   if (config.stack === "python") {
     const pyproject = path.join(options.projectPath, "pyproject.toml");
     const reqs = path.join(options.projectPath, "requirements.txt");
@@ -321,7 +316,7 @@ export async function runProjectValidateWorkflow(
     }
   }
 
-  // Java
+
   if (config.stack === "java") {
     const pom = path.join(options.projectPath, "pom.xml");
     const gradle = path.join(options.projectPath, "build.gradle");
@@ -336,7 +331,7 @@ export async function runProjectValidateWorkflow(
     }
   }
 
-  // Go
+
   if (config.stack === "go") {
     const goMod = path.join(options.projectPath, "go.mod");
     if (!(await fileExists(goMod))) {
@@ -349,7 +344,7 @@ export async function runProjectValidateWorkflow(
     }
   }
 
-  // PHP
+
   if (config.stack === "php") {
     const composer = path.join(options.projectPath, "composer.json");
     const composerLock = path.join(options.projectPath, "composer.lock");
@@ -371,7 +366,7 @@ export async function runProjectValidateWorkflow(
     }
   }
 
-  // Husky checks
+
   if (config.features?.husky) {
     const huskyDir = path.join(options.projectPath, ".husky");
     const hasHusky = await fileExists(huskyDir);
@@ -737,7 +732,7 @@ export async function runValidateWorkflow(
   return { isValid };
 }
 
-// ===== Commit Workflow =====
+
 
 export type CommitWorkflowStep =
   | "checkingStaged"
@@ -752,12 +747,12 @@ export interface CommitWorkflowProgress {
 
 export interface CommitWorkflowOptions {
   cwd: string;
-  type: string; // feat, fix, etc.
+  type: string;
   scope?: string;
   shortDescription: string;
-  longDescription?: string; // supports \n separators already
+  longDescription?: string;
   breakingChanges?: string;
-  affectedIssues?: string; // e.g., closes #123
+  affectedIssues?: string;
 }
 
 export interface CommitWorkflowHooks {
@@ -816,7 +811,7 @@ export async function runCommitWorkflow(
   }
 }
 
-// ===== Git Start/Finish Workflows =====
+
 
 export type GitStartWorkflowStep =
   | "switchingBase"
@@ -832,8 +827,8 @@ export interface GitStartWorkflowProgress {
 export interface GitStartWorkflowOptions {
   cwd: string;
   branchName: string;
-  branchType: string; // feature, fix, etc.
-  baseBranch?: string; // default develop
+  branchType: string;
+  baseBranch?: string;
 }
 
 export interface GitStartWorkflowHooks {
@@ -933,7 +928,7 @@ export async function runGitFinishWorkflow(
   }
 }
 
-// ===== Release Workflow =====
+
 
 export type ReleaseWorkflowStep =
   | "detectingStrategy"
@@ -1108,7 +1103,7 @@ export async function runReleaseWorkflow(
       };
     }
 
-    // Independent strategy
+
     await report({ step: "independentFindingChanges" });
     const changedPackages = await findChangedPackages(
       monorepoInfo.packages,

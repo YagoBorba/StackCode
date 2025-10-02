@@ -7,7 +7,6 @@ import path from "path";
 export default defineConfig({
   root: path.resolve(__dirname),
 
-  // Configuração do CSS com PostCSS
   css: {
     postcss: path.resolve(__dirname, "postcss.config.js"),
   },
