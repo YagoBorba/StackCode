@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Release command for CLI.
+ * Handles version bumping, changelog generation, and GitHub release creation.
+ */
+
 import type { CommandModule } from "yargs";
 import { t } from "@stackcode/i18n";
 import * as ui from "./ui.js";
@@ -18,6 +23,12 @@ import {
   type CLIAuthFacade,
 } from "../services/githubAuth.js";
 
+/**
+ * Handles GitHub release creation after a successful version release.
+ *
+ * @param params - Release parameters including tag name and notes
+ * @param authManager - CLI authentication facade for token management
+ */
 async function handleGitHubReleaseCreation(
   params: {
     tagName: string;
@@ -69,6 +80,13 @@ async function handleGitHubReleaseCreation(
   }
 }
 
+/**
+ * Resolves a valid GitHub token for API calls.
+ * Checks stored token first, then prompts for new one if needed.
+ *
+ * @param authManager - CLI authentication facade
+ * @returns Valid GitHub token or null if unavailable
+ */
 async function resolveGitHubToken(
   authManager: CLIAuthFacade,
 ): Promise<string | null> {
@@ -101,6 +119,12 @@ async function resolveGitHubToken(
   return token;
 }
 
+/**
+ * Falls back to parsing git remote URL to determine GitHub repository.
+ *
+ * @param cwd - Current working directory
+ * @returns GitHub repository info or null if not found
+ */
 async function fallbackResolveRepository(
   cwd: string,
 ): Promise<ReleaseWorkflowGitHubInfo | null> {

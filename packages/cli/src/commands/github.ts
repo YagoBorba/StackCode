@@ -1,3 +1,8 @@
+/**
+ * @fileoverview GitHub integration commands for CLI.
+ * Provides authentication management and issue listing functionality.
+ */
+
 import { CommandModule } from "yargs";
 import { fetchRepositoryIssues, getErrorMessage } from "@stackcode/core";
 import { t, initI18n } from "@stackcode/i18n";
@@ -23,9 +28,10 @@ interface IssuesArgs {
   limit?: number;
 }
 
-
 /**
- * Comando para autenticação GitHub
+ * Creates the GitHub authentication command module.
+ *
+ * @returns Command module for managing GitHub authentication
  */
 function getAuthCommand(): CommandModule<Record<string, unknown>, AuthArgs> {
   return {
@@ -126,7 +132,9 @@ function getAuthCommand(): CommandModule<Record<string, unknown>, AuthArgs> {
 }
 
 /**
- * Comando para listar issues
+ * Creates the GitHub issues listing command module.
+ *
+ * @returns Command module for listing and filtering repository issues
  */
 function getIssuesCommand(): CommandModule<
   Record<string, unknown>,
