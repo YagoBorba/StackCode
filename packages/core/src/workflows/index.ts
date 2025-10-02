@@ -17,3 +17,4 @@ export * from "./generate.js";
 export * from "./validate.js";
 export * from "./git.js";
 export * from "./release.js";
+export * from "./issues.js";

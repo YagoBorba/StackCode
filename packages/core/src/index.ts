@@ -37,7 +37,7 @@ export {
   type IssuesWorkflowProgress,
   type IssuesWorkflowHooks,
   type IssuesCacheStats,
-} from "./issues-workflow.js";
+} from "./workflows/issues.js";
 
 export {
   detectVersioningStrategy,
