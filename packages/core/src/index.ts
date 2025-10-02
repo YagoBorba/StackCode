@@ -59,6 +59,9 @@ export {
   type InitWorkflowDependencyDecision,
   type InitWorkflowHooks,
   type InitWorkflowResult,
+} from "./workflows/init.js";
+
+export {
   runGenerateWorkflow,
   type GenerateFileType,
   type GenerateWorkflowStep,
@@ -69,7 +72,7 @@ export {
   type GenerateWorkflowFileResult,
   type GenerateWorkflowFileStatus,
   type GenerateWorkflowFileSkipReason,
-} from "./workflows.js";
+} from "./workflows/generate.js";
 
 export {
   runValidateWorkflow,
@@ -78,9 +81,6 @@ export {
   type ValidateWorkflowStep,
   type ValidateWorkflowHooks,
   type ValidateWorkflowResult,
-} from "./workflows.js";
-
-export {
   runProjectValidateWorkflow,
   type ProjectValidateOptions,
   type ProjectValidateProgress,
@@ -88,7 +88,7 @@ export {
   type ProjectValidateIssue,
   type ProjectValidateResult,
   type ProjectValidateSeverity,
-} from "./workflows.js";
+} from "./workflows/validate.js";
 
 export {
   runCommitWorkflow,
@@ -109,7 +109,7 @@ export {
   type GitFinishWorkflowStep,
   type GitFinishWorkflowHooks,
   type GitFinishWorkflowResult,
-} from "./workflows.js";
+} from "./workflows/git.js";
 
 export {
   runReleaseWorkflow,
@@ -119,4 +119,4 @@ export {
   type ReleaseWorkflowStep,
   type ReleaseWorkflowResult,
   type ReleaseWorkflowGitHubInfo,
-} from "./workflows.js";
+} from "./workflows/release.js";
