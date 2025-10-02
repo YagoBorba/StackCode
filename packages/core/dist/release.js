@@ -1,9 +1,19 @@
+/**
+ * @fileoverview Release management utilities for versioning and changelog generation.
+ * Supports both monorepo (independent/locked) and single-package strategies.
+ */
 import fs from "fs/promises";
 import path from "path";
 import semver from "semver";
 import { Bumper } from "conventional-recommended-bump";
 import conventionalChangelog from "conventional-changelog-core";
 import { getCommandOutput, runCommand } from "./utils.js";
+/**
+ * Safely reads and parses a package.json file.
+ *
+ * @param filePath - Path to the package.json file
+ * @returns Parsed package.json object or null if reading fails
+ */
 async function _safeReadJson(filePath) {
     try {
         const content = await fs.readFile(filePath, "utf-8");
@@ -13,6 +23,13 @@ async function _safeReadJson(filePath) {
         return null;
     }
 }
+/**
+ * Finds all package paths in a monorepo workspace.
+ *
+ * @param rootDir - Root directory of the monorepo
+ * @param rootPackageJson - Parsed root package.json
+ * @returns Array of package directory paths
+ */
 async function _findPackagePaths(rootDir, rootPackageJson) {
     const packagePaths = [];
     let workspaces;
@@ -53,6 +70,13 @@ async function _findPackagePaths(rootDir, rootPackageJson) {
     }
     return packagePaths;
 }
+/**
+ * Retrieves the latest git tags for packages in a monorepo.
+ *
+ * @param packageNames - Array of package names to find tags for
+ * @param projectRoot - Root directory of the project
+ * @returns Map of package names to their latest tags
+ */
 async function _getLatestTags(packageNames, projectRoot) {
     const tagMap = new Map();
     try {
@@ -75,6 +99,12 @@ async function _getLatestTags(packageNames, projectRoot) {
     }
     return tagMap;
 }
+/**
+ * Detects the versioning strategy of a project (monorepo or single package).
+ *
+ * @param startPath - Starting directory to analyze
+ * @returns Monorepo information including strategy, packages, and versions
+ */
 export async function detectVersioningStrategy(startPath) {
     const rootDir = startPath;
     const rootPackageJsonPath = path.join(rootDir, "package.json");
@@ -96,6 +126,13 @@ export async function detectVersioningStrategy(startPath) {
     }
     return { strategy: "locked", rootDir, rootVersion, packages };
 }
+/**
+ * Finds packages that have changes since their last git tag.
+ *
+ * @param allPackages - Array of all packages to check
+ * @param projectRoot - Root directory of the project
+ * @returns Array of packages that have been modified
+ */
 export async function findChangedPackages(allPackages, projectRoot) {
     const packageNames = allPackages.map((p) => p.name);
     const latestTags = await _getLatestTags(packageNames, projectRoot);
@@ -115,11 +152,24 @@ export async function findChangedPackages(allPackages, projectRoot) {
         return !latestTags.has(pkg.name);
     });
 }
+/**
+ * Gets the recommended version bump type based on conventional commits.
+ *
+ * @param projectRoot - Root directory of the project
+ * @returns Recommended bump type ('major', 'minor', or 'patch')
+ */
 export async function getRecommendedBump(projectRoot) {
     const bumper = new Bumper(projectRoot).loadPreset("angular");
     const recommendation = await bumper.bump();
     return recommendation?.releaseType || "patch";
 }
+/**
+ * Determines version bumps for each changed package based on conventional commits.
+ *
+ * @param changedPackages - Array of packages that have changes
+ * @param projectRoot - Root directory of the project
+ * @returns Array of package bump information
+ */
 export async function determinePackageBumps(changedPackages) {
     const bumpInfoPromises = changedPackages.map(async (pkg) => {
         const bumpType = await getRecommendedBump(pkg.path);
@@ -129,6 +179,13 @@ export async function determinePackageBumps(changedPackages) {
     const results = await Promise.all(bumpInfoPromises);
     return results.filter((info) => info !== null);
 }
+/**
+ * Generates a changelog based on conventional commits.
+ *
+ * @param monorepoInfo - Monorepo information
+ * @param pkgInfo - Optional package bump info for package-specific changelog
+ * @returns Promise resolving to the generated changelog content
+ */
 export function generateChangelog(monorepoInfo, pkgInfo) {
     return new Promise((resolve, reject) => {
         let changelogContent = "";
@@ -144,6 +201,12 @@ export function generateChangelog(monorepoInfo, pkgInfo) {
         stream.on("error", reject);
     });
 }
+/**
+ * Updates the version field in a package's package.json file.
+ *
+ * @param pkgInfo - Package bump information containing the new version
+ * @returns Promise that resolves when the file is updated
+ */
 export async function updatePackageVersion(pkgInfo) {
     const pkgJsonPath = path.join(pkgInfo.pkg.path, "package.json");
     const pkgJson = await _safeReadJson(pkgJsonPath);
@@ -152,6 +215,13 @@ export async function updatePackageVersion(pkgInfo) {
         await fs.writeFile(pkgJsonPath, JSON.stringify(pkgJson, null, 2) + "\n");
     }
 }
+/**
+ * Updates all package versions to a single version (locked strategy).
+ *
+ * @param monorepoInfo - Monorepo information
+ * @param newVersion - New version to apply to all packages
+ * @returns Promise that resolves when all versions are updated
+ */
 export async function updateAllVersions(monorepoInfo, newVersion) {
     const allPaths = [
         path.join(monorepoInfo.rootDir, "package.json"),
@@ -165,6 +235,13 @@ export async function updateAllVersions(monorepoInfo, newVersion) {
         }
     }));
 }
+/**
+ * Commits release changes and creates git tags for released packages.
+ *
+ * @param packages - Array of package bump information
+ * @param projectRoot - Root directory of the project
+ * @returns Promise that resolves when commit and tags are created
+ */
 export async function performReleaseCommit(packages, projectRoot) {
     const filesToAdd = [];
     let commitMessage = "chore(release): release\n\n";

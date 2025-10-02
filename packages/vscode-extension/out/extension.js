@@ -41,7 +41,6 @@ const TestGitHubDetectionCommand_1 = require("./commands/TestGitHubDetectionComm
 const DashboardProvider_1 = require("./providers/DashboardProvider");
 const ProjectViewProvider_1 = require("./providers/ProjectViewProvider");
 const GitHubAuthService_1 = require("./services/GitHubAuthService");
-const GitHubIssuesService_1 = require("./services/GitHubIssuesService");
 let proactiveManager;
 let gitMonitor;
 let fileMonitor;
@@ -49,7 +48,6 @@ let configManager;
 let dashboardProvider;
 let projectViewProvider;
 let gitHubAuthService;
-let gitHubIssuesService;
 // Command instances
 let initCommand;
 let generateCommand;
@@ -74,18 +72,16 @@ async function activate(context) {
     // Initialize monitors FIRST (dependencies for other services)
     gitMonitor = new GitMonitor_1.GitMonitor(proactiveManager, configManager);
     fileMonitor = new FileMonitor_1.FileMonitor(proactiveManager, configManager);
-    // Initialize GitHub issues service (depends on gitMonitor)
-    gitHubIssuesService = new GitHubIssuesService_1.GitHubIssuesService(gitHubAuthService, gitMonitor);
     // Initialize providers (after services are ready)
-    dashboardProvider = new DashboardProvider_1.DashboardProvider(context, gitHubIssuesService, gitHubAuthService);
+    dashboardProvider = new DashboardProvider_1.DashboardProvider(context, gitHubAuthService, gitMonitor);
     projectViewProvider = new ProjectViewProvider_1.ProjectViewProvider(context.workspaceState);
     // Initialize commands
     initCommand = new InitCommand_1.InitCommand();
     generateCommand = new GenerateCommand_1.GenerateCommand();
     gitCommand = new GitCommand_1.GitCommand();
-    commitCommand = new CommitCommand_1.CommitCommand();
+    commitCommand = new CommitCommand_1.CommitCommand(gitHubAuthService, gitMonitor);
     validateCommand = new ValidateCommand_1.ValidateCommand();
-    releaseCommand = new ReleaseCommand_1.ReleaseCommand();
+    releaseCommand = new ReleaseCommand_1.ReleaseCommand(gitHubAuthService);
     configCommand = new ConfigCommand_1.ConfigCommand();
     authCommand = new AuthCommand_1.AuthCommand(gitHubAuthService);
     // Register webview providers
@@ -126,10 +122,8 @@ async function activate(context) {
         vscode.commands.registerCommand("stackcode.checkBestPractices", () => validateCommand.execute()),
         // Project view commands
         vscode.commands.registerCommand("stackcode.projectView.refresh", () => projectViewProvider.refresh()),
-        // Webview commands
         vscode.commands.registerCommand("webviewReady", () => {
             console.log("[StackCode] Webview is ready!");
-            // Pode enviar dados iniciais aqui se necessário
         }),
         vscode.commands.registerCommand("stackcode.webview.init", () => initCommand.execute()),
         vscode.commands.registerCommand("stackcode.webview.generate.readme", () => generateCommand.generateReadme()),

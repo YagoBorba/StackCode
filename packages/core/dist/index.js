@@ -8,6 +8,7 @@ export { scaffoldProject, setupHusky } from "./scaffold.js";
 export { validateCommitMessage } from "./validator.js";
 export * from "./github.js";
 export * from "./types.js";
+export { runIssuesWorkflow, clearIssuesCache, clearExpiredIssuesCache, clearRepositoryCache, getIssuesCacheSize, getIssuesCacheStats, } from "./issues-workflow.js";
 export { detectVersioningStrategy, getRecommendedBump, updateAllVersions, generateChangelog, findChangedPackages, determinePackageBumps, updatePackageVersion, performReleaseCommit, } from "./release.js";
 export { runInitWorkflow, runGenerateWorkflow, } from "./workflows.js";
 export { runValidateWorkflow, } from "./workflows.js";

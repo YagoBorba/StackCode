@@ -1,7 +1,17 @@
+/**
+ * @fileoverview Release command for CLI.
+ * Handles version bumping, changelog generation, and GitHub release creation.
+ */
 import { t } from "@stackcode/i18n";
 import * as ui from "./ui.js";
 import { runReleaseWorkflow, createGitHubRelease, getCommandOutput, getErrorMessage, } from "@stackcode/core";
 import { createCLIAuthFacade, getCurrentRepository, } from "../services/githubAuth.js";
+/**
+ * Handles GitHub release creation after a successful version release.
+ *
+ * @param params - Release parameters including tag name and notes
+ * @param authManager - CLI authentication facade for token management
+ */
 async function handleGitHubReleaseCreation(params, authManager) {
     const shouldCreateRelease = await ui.promptToCreateGitHubRelease();
     if (!shouldCreateRelease)
@@ -37,6 +47,13 @@ async function handleGitHubReleaseCreation(params, authManager) {
         }
     }
 }
+/**
+ * Resolves a valid GitHub token for API calls.
+ * Checks stored token first, then prompts for new one if needed.
+ *
+ * @param authManager - CLI authentication facade
+ * @returns Valid GitHub token or null if unavailable
+ */
 async function resolveGitHubToken(authManager) {
     const storedToken = await authManager.getToken();
     if (storedToken) {
@@ -62,6 +79,12 @@ async function resolveGitHubToken(authManager) {
     }
     return token;
 }
+/**
+ * Falls back to parsing git remote URL to determine GitHub repository.
+ *
+ * @param cwd - Current working directory
+ * @returns GitHub repository info or null if not found
+ */
 async function fallbackResolveRepository(cwd) {
     try {
         const remoteUrl = (await getCommandOutput("git", ["remote", "get-url", "origin"], { cwd })).trim();

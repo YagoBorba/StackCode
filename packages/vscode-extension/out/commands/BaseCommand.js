@@ -49,8 +49,8 @@ class BaseCommand {
         terminal.sendText(command);
         terminal.show();
     }
-    async confirmAction(message, confirmText = "Yes") {
-        const result = await vscode.window.showWarningMessage(message, { modal: true }, confirmText, "Cancel");
+    async confirmAction(message, confirmText = "Yes", cancelText = "Cancel") {
+        const result = await vscode.window.showWarningMessage(message, { modal: true }, confirmText, cancelText);
         return result === confirmText;
     }
 }

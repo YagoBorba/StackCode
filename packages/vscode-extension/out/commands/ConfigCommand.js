@@ -27,6 +27,7 @@ exports.ConfigCommand = void 0;
 const vscode = __importStar(require("vscode"));
 const BaseCommand_1 = require("./BaseCommand");
 const i18n_1 = require("@stackcode/i18n");
+const core_1 = require("@stackcode/core");
 class ConfigCommand extends BaseCommand_1.BaseCommand {
     async execute() {
         try {
@@ -68,13 +69,41 @@ class ConfigCommand extends BaseCommand_1.BaseCommand {
                 }
             }
             else if (action.label === (0, i18n_1.t)("vscode.config.create_project_config")) {
-                const command = `npx @stackcode/cli config init`;
-                await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
-                this.showSuccess((0, i18n_1.t)("vscode.config.project_configuration_initialized"));
+                await this.createProjectConfig(workspaceFolder);
             }
         }
         catch (error) {
             this.showError((0, i18n_1.t)("vscode.config.failed_open_configuration", { error: String(error) }));
+        }
+    }
+    async createProjectConfig(workspaceFolder) {
+        try {
+            const configUri = vscode.Uri.joinPath(workspaceFolder.uri, ".stackcoderc.json");
+            try {
+                await vscode.workspace.fs.stat(configUri);
+                const overwrite = await this.confirmAction((0, i18n_1.t)("vscode.config.stackcoderc_exists_overwrite"), (0, i18n_1.t)("vscode.config.overwrite"), (0, i18n_1.t)("common.cancel"));
+                if (!overwrite) {
+                    return;
+                }
+            }
+            catch {
+                // File does not exist yet - continue without prompt
+            }
+            const defaultConfig = {
+                stack: undefined,
+                features: {
+                    commitValidation: false,
+                    husky: false,
+                    docker: false,
+                },
+            };
+            await (0, core_1.saveStackCodeConfig)(workspaceFolder.uri.fsPath, defaultConfig);
+            const document = await vscode.workspace.openTextDocument(configUri);
+            await vscode.window.showTextDocument(document);
+            await this.showSuccess((0, i18n_1.t)("vscode.config.project_configuration_initialized"));
+        }
+        catch (error) {
+            await this.showError((0, i18n_1.t)("vscode.config.failed_create_config", { error: String(error) }));
         }
     }
 }

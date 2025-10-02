@@ -8,6 +8,7 @@ export { scaffoldProject, setupHusky } from "./scaffold.js";
 export { validateCommitMessage } from "./validator.js";
 export * from "./github.js";
 export * from "./types.js";
+export { runIssuesWorkflow, clearIssuesCache, clearExpiredIssuesCache, clearRepositoryCache, getIssuesCacheSize, getIssuesCacheStats, type IssuesWorkflowRepository, type IssuesWorkflowOptions, type IssuesWorkflowResult, type IssuesWorkflowStep, type IssuesWorkflowProgress, type IssuesWorkflowHooks, type IssuesCacheStats, } from "./issues-workflow.js";
 export { detectVersioningStrategy, getRecommendedBump, updateAllVersions, generateChangelog, findChangedPackages, determinePackageBumps, updatePackageVersion, performReleaseCommit, } from "./release.js";
 export { runInitWorkflow, type InitFeature, type InitWorkflowStep, type InitWorkflowOptions, type InitWorkflowProgress, type InitWorkflowDependencyDecision, type InitWorkflowHooks, type InitWorkflowResult, runGenerateWorkflow, type GenerateFileType, type GenerateWorkflowStep, type GenerateWorkflowOptions, type GenerateWorkflowProgress, type GenerateWorkflowHooks, type GenerateWorkflowResult, type GenerateWorkflowFileResult, type GenerateWorkflowFileStatus, type GenerateWorkflowFileSkipReason, } from "./workflows.js";
 export { runValidateWorkflow, type ValidateWorkflowOptions, type ValidateWorkflowProgress, type ValidateWorkflowStep, type ValidateWorkflowHooks, type ValidateWorkflowResult, } from "./workflows.js";

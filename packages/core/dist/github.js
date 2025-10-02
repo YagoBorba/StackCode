@@ -1,10 +1,10 @@
 import { Octokit } from "@octokit/rest";
 /**
- * Busca issues de um repositório GitHub
+ * Fetches issues from a GitHub repository.
  *
- * @param octokit - Cliente Octokit autenticado
- * @param options - Opções de busca
- * @returns Promise com array de issues formatadas
+ * @param octokit - Authenticated Octokit client
+ * @param options - Fetch options for filtering and pagination
+ * @returns Promise resolving to an array of formatted issues
  */
 export async function fetchRepositoryIssues(octokit, options) {
     const { owner, repo, state = "open", assignee, labels, sort = "updated", direction = "desc", per_page = 30, } = options;
@@ -20,7 +20,6 @@ export async function fetchRepositoryIssues(octokit, options) {
             direction,
             per_page,
         });
-        // Filtrar apenas issues (não pull requests)
         const issues = response.data.filter((issue) => !issue.pull_request);
         console.log(`[Core] Found ${issues.length} issues`);
         return issues.map((issue) => ({
@@ -53,6 +52,12 @@ export async function fetchRepositoryIssues(octokit, options) {
         throw new Error(`Failed to fetch repository issues: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
 }
+/**
+ * Creates a GitHub release for a repository.
+ *
+ * @param options - Release options including repository info, tag, and notes
+ * @returns Promise that resolves when release is created
+ */
 export async function createGitHubRelease(options) {
     const { owner, repo, tagName, releaseNotes, token } = options;
     const octokit = new Octokit({ auth: token });
