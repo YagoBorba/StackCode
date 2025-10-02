@@ -8,7 +8,7 @@ O StackCode segue uma **arquitetura de monorepo modular** com clara separação 
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                   Ecossistema StackCode                    │
+│                    Ecossistema StackCode                   │
 ├─────────────────────────────────────────────────────────────┤
 │  Pacote CLI            │  Extensão VS Code                │
 │  (@stackcode/cli)      │  (stackcode-vscode)              │
@@ -50,602 +50,360 @@ O StackCode segue uma **arquitetura de monorepo modular** com clara separação 
 
 **Componentes Principais:**
 
-- **Comandos**: Implementações dos comandos CLI (`init`, `generate`, `commit`, etc.)
-- **Manipuladores de Argumentos**: Parsing e validação de argumentos usando Yargs
-- **Modo Educacional**: Sistema de aprendizado contextual com explicações de melhores práticas
-- **Utilitários**: Funções auxiliares específicas da CLI
-
-**Responsabilidades:**
-
-- Parsing de argumentos de linha de comando
-- Interação com o usuário via terminal
-- Fornecimento de explicações educacionais contextuais
-- Orquestração de chamadas para o pacote core
-- Tratamento de erros e apresentação de resultados
-
-### 2. **@stackcode/core** - Lógica de Negócio Central
-
-**Propósito:** Implementa toda a lógica de negócio principal e funcionalidades centrais.
-
-**Componentes Principais:**
-
-- **Geradores**: Criação de projetos a partir de templates
-- **Validadores**: Validação de código e configurações
-- **Integração GitHub**: API e funcionalidades de integração
-- **Gerenciamento de Release**: Automação de release de versões
-- **Sistema de Templates**: Mecanismo de scaffolding e templates
-- **Utilitários**: Funções compartilhadas entre pacotes
-
-**Responsabilidades:**
-
-- Processamento de templates e scaffolding
-- Integração com APIs externas (GitHub)
-- Validação de estruturas de projeto
-- Geração automática de documentação
-- Gerenciamento de dependências e configurações
-
-### 3. **@stackcode/i18n** - Internacionalização
-
-**Propósito:** Fornece suporte multi-idioma para toda a suite StackCode.
-
-**Componentes Principais:**
-
-- **Gerenciador de Locales**: Carregamento e gerenciamento de traduções
-- **Sistema de Tradução**: API de tradução e fallbacks
-- **Detecção de Idioma**: Detecção automática do idioma preferido do usuário
-
-**Responsabilidades:**
-
-- Carregamento de arquivos de tradução
-- Fornecimento de strings localizadas
-- Gerenciamento de idiomas suportados
-- Fallback para idioma padrão quando necessário
-
-### 4. **stackcode-vscode** - Extensão VS Code
-
-**Propósito:** Integração nativa com VS Code para experiência de desenvolvimento aprimorada.
-
-**Componentes Principais:**
-
-- **Comandos da Extensão**: Comandos VS Code que utilizam funcionalidades do StackCode
-- **Providers**: Providers de dashboard, tree view e webview
-- **Monitores**: Monitoramento de arquivos e mudanças do Git
-- **Gerenciador de Notificações**: Sistema de notificações proativas
-- **UI Webview**: Interface de usuário rica baseada na web
-
-**Responsabilidades:**
-
-- Integração com comandos VS Code
-- Monitoramento de atividade do workspace
-- Fornecimento de UI rica via webviews
-- Notificações contextuais e proativas
-
-## 🔄 Fluxo de Dados e Interações
-
-### Fluxo Típico de Comando CLI
-
-```
-Usuário → CLI Input → Yargs Parser → Command Handler → @stackcode/core → Execução → Resultado
-```
-
-### Fluxo da Extensão VS Code
-
-```
-Ação do Usuário → Comando VS Code → Extension Handler → @stackcode/core → Atualização UI → Feedback Visual
-```
-
-### Fluxo de Internacionalização
-
-```
-Solicitação de String → i18n Manager → Carregamento de Locale → String Traduzida → Interface do Usuário
-```
-
-## 🎯 Princípios de Design
-
-### 1. **Separação de Responsabilidades**
-
-Cada pacote tem responsabilidades claramente definidas:
-
-- **CLI**: Interação com usuário e parsing de comandos
-- **Core**: Lógica de negócio e processamento
-- **i18n**: Localização e traduções
-- **VSCode**: Integração com editor e UI rica
-
-### 2. **Reutilização de Código**
-
-- Funcionalidades centrais ficam no pacote `@stackcode/core`
-- Interfaces (CLI e VS Code) consomem a mesma lógica de negócio
-- Sistema de templates compartilhado entre todos os pontos de entrada
-
-### 3. **Extensibilidade**
-
-- Sistema de templates permite adição fácil de novos stacks
-- Arquitetura de plugins para extensões futuras
-- APIs bem definidas entre pacotes
-
-### 4. **Type Safety**
-
-- TypeScript em todo o projeto
-- Tipos compartilhados entre pacotes
-- Validação de runtime com schemas quando necessário
-
-### 5. **Testabilidade**
-
-- Unidades testáveis pequenas e focadas
-- Mocking de dependências externas
-- Testes de integração entre pacotes
-
-## 🔧 Tecnologias e Dependências
-
-### Tecnologias Core
-
-- **TypeScript**: Linguagem principal para type safety
-- **Node.js**: Runtime para CLI e extensão
-- **ESM**: Módulos ES para estrutura moderna
-- **Yargs**: Biblioteca CLI para parsing de argumentos
-
-### Ferramentas de Build
-
-- **TypeScript Compiler**: Transpilação de TypeScript
-- **ESBuild**: Bundling rápido para a extensão VS Code
-- **npm workspaces**: Gerenciamento de monorepo
-
-### Testes e Qualidade
-
-- **Jest**: Framework de testes principal
-- **ESLint**: Linting de código
-- **Prettier**: Formatação de código
-
-### Integrações Externas
-
-- **GitHub API**: Para funcionalidades de repositório
-- **VS Code API**: Para integração com editor
-- **npm registry**: Para publicação de pacotes
-
-## 📁 Organização de Código
-
-### Estrutura de Diretórios
-
-```
-packages/
-├── cli/                    # Interface linha de comando
-│   ├── src/
-│   │   ├── commands/       # Implementações de comandos
-│   │   ├── types/          # Tipos específicos da CLI
-│   │   └── index.ts        # Ponto de entrada
-│   └── test/               # Testes da CLI
-├── core/                   # Lógica de negócio principal
-│   ├── src/
-│   │   ├── templates/      # Templates de projeto
-│   │   ├── generators.ts   # Lógica de geração
-│   │   ├── validator.ts    # Sistema de validação
-│   │   └── types.ts        # Tipos compartilhados
-│   └── test/               # Testes do core
-├── i18n/                   # Sistema de internacionalização
-│   ├── src/
-│   │   ├── locales/        # Arquivos de tradução
-│   │   └── index.ts        # API de i18n
-│   └── test/               # Testes de i18n
-└── vscode-extension/       # Extensão VS Code
-    ├── src/
-    │   ├── commands/       # Comandos da extensão
-    │   ├── providers/      # Providers VS Code
-    │   ├── webview-ui/     # Interface webview
-    │   └── extension.ts    # Ponto de entrada
-    └── test/               # Testes da extensão
-```
-
-### Convenções de Nomenclatura
-
-- **Arquivos**: camelCase para arquivos TypeScript
-- **Classes**: PascalCase para classes e interfaces
-- **Constantes**: UPPER_SNAKE_CASE para constantes
-- **Funções**: camelCase para funções e métodos
-
-## 🔒 Considerações de Segurança
-
-### Validação de Input
-
-- Todas as entradas do usuário são validadas e sanitizadas
-- Uso de esquemas de validação onde apropriado
-- Prevenção de path traversal em operações de arquivo
-
-### Gerenciamento de Dependências
-
-- Auditoria regular de dependências para vulnerabilidades
-- Pinning de versões de dependências críticas
-- Uso de dependências mínimas necessárias
-
-### Tratamento de Dados Sensíveis
-
-- Tokens e credenciais nunca são logados
-- Uso de variáveis de ambiente para dados sensíveis
-- Criptografia para dados persistidos quando necessário
-
-## 🚀 Estratégia de Release
-
-### Versionamento
-
-- **Semantic Versioning**: Major.Minor.Patch
-- **Versões Synchronized**: Todos os pacotes mantêm versão sincronizada
-- **Changelog**: Changelog detalhado para cada release
-
-### Pipeline de Release
-
-1. **Desenvolvimento**: Feature branches com PRs
-2. **Testes**: CI/CD automatizado com testes completos
-3. **Staging**: Release candidates para testes
-4. **Produção**: Release para npm registry
-5. **Documentação**: Atualização de docs e guias
-
-### Compatibilidade
-
-- **Breaking Changes**: Apenas em major versions
-- **Deprecations**: Avisos em minor versions antes de remoção
-- **Migrations**: Guias de migração para breaking changes
-
-## 🔄 Fluxos de Desenvolvimento
-
-### Adicionando Novo Stack de Tecnologia
-
-1. Criar template em `packages/core/src/templates/novo-stack/`
-2. Adicionar tipo em `packages/core/src/types.ts`
-3. Implementar gerador em `packages/core/src/generators.ts`
-4. Adicionar testes em `packages/core/test/`
-5. Atualizar documentação
-
-### Adicionando Novo Comando CLI
-
-1. Criar handler em `packages/cli/src/commands/`
-2. Registrar comando em `packages/cli/src/index.ts`
-3. Implementar lógica em `packages/core/src/`
-4. Adicionar testes para CLI e core
-5. Atualizar documentação de comandos
-
-### Adicionando Funcionalidade VS Code
-
-1. Implementar comando em `packages/vscode-extension/src/commands/`
-2. Registrar em `package.json` da extensão
-3. Adicionar UI necessária em webview
-4. Implementar testes da extensão
-5. Testar integração completa
-
-## 📊 Métricas e Monitoramento
-
-### Métricas de Qualidade
-
-- **Cobertura de Testes**: >80% para todos os pacotes
-- **Type Coverage**: >95% TypeScript coverage
-- **Linting**: Zero issues ESLint/Prettier
-
-### Métricas de Performance
-
-- **Bundle Size**: Monitorar tamanho da extensão VS Code
-- **Startup Time**: Tempo de inicialização da CLI
-- **Memory Usage**: Uso de memória durante geração de projetos
-
-### Métricas de Uso
-
-- **Downloads**: Estatísticas npm registry
-- **Comando Usage**: Telemetria anônima de comandos populares
-- **Error Rates**: Monitoramento de erros em produção
-
-## 🔮 Evolução da Arquitetura
-
-### Próximas Iterações
-
-- **Plugin System**: Sistema de plugins para extensibilidade
-- **Cloud Integration**: Integração com serviços cloud
-- **AI Templates**: Templates gerados por IA
-- **Real-time Collaboration**: Funcionalidades colaborativas
-
-### Considerações de Escalabilidade
-
-- **Micro-frontends**: Possível divisão da extensão VS Code
-- **Service Architecture**: Migração para arquitetura de serviços
-- **Caching**: Sistema de cache para templates e metadados
-
----
-
-_Para mais informações sobre desenvolvimento e contribuição, veja o [Guia de Contribuição](CONTRIBUTING.md)._
-
-- **Command Layer:** Entry points for all CLI operations
-- **Command Handlers:** Individual command implementations
-- **Interactive Prompts:** User guidance and input collection
-- **Error Handling:** Consistent error reporting and recovery
-
-**Architecture:**
+- **Camada de Comandos:** Pontos de entrada para todas as operações CLI
+- **Manipuladores de Comandos:** Implementações de comandos individuais
+- **Prompts Interativos:** Orientação e coleta de entrada do usuário
+- **Modo Educacional:** Sistema de aprendizado contextual com explicações de melhores práticas
+- **Tratamento de Erros:** Relatório de erros consistente e recuperação
+
+**Arquitetura:**
 
 ```typescript
 cli/
 ├── src/
-│   ├── index.ts              # Main CLI entry point
-│   ├── commands/             # Command implementations
-│   │   ├── init.ts           # Project scaffolding
-│   │   ├── generate.ts       # File generation
-│   │   ├── commit.ts         # Conventional commits
-│   │   ├── git.ts            # Git workflow management
-│   │   ├── release.ts        # Version management
-│   │   ├── validate.ts       # Commit validation
-│   │   └── config.ts         # Configuration management
-│   └── types/                # CLI-specific type definitions
-└── test/                     # Command tests
+│   ├── index.ts              # Ponto de entrada principal da CLI
+│   ├── educational-mode.ts   # Gerenciamento do modo educacional
+│   ├── commands/             # Implementações de comandos
+│   │   ├── init.ts           # Scaffolding de projeto
+│   │   ├── generate.ts       # Geração de arquivos
+│   │   ├── commit.ts         # Commits convencionais
+│   │   ├── git.ts            # Gerenciamento de workflow Git
+│   │   ├── release.ts        # Gerenciamento de versão
+│   │   ├── validate.ts       # Validação de commits
+│   │   ├── config.ts         # Gerenciamento de configuração
+│   │   └── ui.ts             # Prompts interativos e feedback
+│   └── types/                # Definições de tipos específicos da CLI
+└── test/                     # Testes de comandos
 ```
 
 ### 2. **@stackcode/core** - Motor de Lógica de Negócio
 
 **Propósito:** Contém toda a lógica de negócio, utilitários e templates.
 
-**Key Components:**
+**Componentes Principais:**
 
-- **Generators:** Project and file generation logic
-- **Validators:** Commit message and project validation
-- **GitHub Integration:** API interactions and automation
-- **Release Management:** Semantic versioning and changelog generation
-- **Template System:** Configurable project templates
+- **Geradores:** Lógica de geração de projetos e arquivos
+- **Validadores:** Validação de mensagens de commit e dependências do sistema
+- **Integração GitHub:** Interações com API e automação
+- **Gerenciamento de Release:** Versionamento semântico e geração de changelog
+- **Sistema de Templates:** Templates de projeto configuráveis
+- **Validação de Dependências:** Validação inteligente de ferramentas do sistema
 
-**Architecture:**
+**Arquitetura:**
 
 ```typescript
 core/
 ├── src/
-│   ├── index.ts              # Core exports
-│   ├── generators.ts         # Project/file generators
-│   ├── validator.ts          # Validation logic
-│   ├── github.ts             # GitHub API integration
-│   ├── release.ts            # Version management
-│   ├── scaffold.ts           # Project scaffolding
-│   ├── utils.ts              # Shared utilities
-│   ├── types.ts              # Core type definitions
-│   └── templates/            # Project templates
-│       ├── common/           # Shared template files
-│       ├── node-js/          # Node.js templates
-│       ├── react/            # React templates
-│       ├── vue/              # Vue.js templates
-│       ├── python/           # Python templates
-│       ├── java/             # Java templates
-│       ├── go/               # Go templates
-│       ├── php/              # PHP templates
-│       ├── gitignore/        # .gitignore templates
-│       └── readme/           # README templates
-└── test/                     # Core logic tests
+│   ├── index.ts              # Exportações do core
+│   ├── generators.ts         # Geradores de projeto/arquivo
+│   ├── validator.ts          # Lógica de validação
+│   ├── github.ts             # Integração com API GitHub
+│   ├── release.ts            # Gerenciamento de versão
+│   ├── scaffold.ts           # Scaffolding de projeto
+│   ├── utils.ts              # Utilitários compartilhados
+│   ├── types.ts              # Definições de tipos do core
+│   └── templates/            # Templates de projeto
+│       ├── common/           # Arquivos de template compartilhados
+│       ├── node-js/          # Templates Node.js
+│       ├── react/            # Templates React
+│       ├── vue/              # Templates Vue.js
+│       ├── python/           # Templates Python
+│       ├── java/             # Templates Java
+│       ├── go/               # Templates Go
+│       ├── php/              # Templates PHP
+│       ├── gitignore/        # Templates .gitignore
+│       └── readme/           # Templates README
+└── test/                     # Testes de lógica do core
 ```
 
 ### 3. **@stackcode/i18n** - Internacionalização
 
-**Propósito:** Gerencia suporte multilíngue em todos os pacotes.
+**Propósito:** Gerencia suporte multi-idioma em todos os pacotes.
 
-**Features:**
+**Funcionalidades:**
 
-- Dynamic locale detection
-- Translation loading and caching
-- Language switching
-- Fallback mechanisms
+- Detecção dinâmica de locale
+- Carregamento e cache de traduções
+- Troca de idioma
+- Mecanismos de fallback
 
-**Architecture:**
+**Arquitetura:**
 
 ```typescript
 i18n/
 ├── src/
-│   ├── index.ts              # i18n exports
-│   └── locales/              # Translation files
-│       ├── en.json           # English translations
-│       └── pt.json           # Portuguese translations
+│   ├── index.ts              # Exportações i18n
+│   └── locales/              # Arquivos de tradução
+│       ├── en.json           # Traduções em inglês
+│       └── pt.json           # Traduções em português
 ```
 
-### 4. **stackcode-vscode** - VS Code Extension
+### 4. **stackcode-vscode** - Extensão VS Code
 
-**Propósito:** Integra a funcionalidade do StackCode diretamente no VS Code.
+**Propósito:** Integra funcionalidade do StackCode diretamente no VS Code.
 
-**Key Components:**
+**Componentes Principais:**
 
-- **Extension Commands:** VS Code command palette integration
-- **File Monitors:** Real-time file change detection
-- **Git Monitors:** Git state monitoring
-- **Dashboard Provider:** Interactive project dashboard
-- **Webview UI:** Rich user interface components
-- **Notification System:** Proactive user guidance
+- **Comandos da Extensão:** Integração com paleta de comandos do VS Code
+- **Monitores de Arquivo:** Detecção de mudanças em tempo real
+- **Monitores Git:** Monitoramento do estado do Git
+- **Provider de Dashboard:** Dashboard interativo do projeto
+- **UI Webview:** Componentes de interface rica
+- **Sistema de Notificações:** Orientação proativa ao usuário
 
-**Architecture:**
+**Arquitetura:**
 
 ```typescript
 vscode-extension/
 ├── src/
-│   ├── extension.ts          # Extension entry point
-│   ├── commands/             # VS Code commands
-│   ├── config/               # Configuration management
-│   ├── monitors/             # File and Git monitoring
-│   ├── notifications/        # Notification system
-│   ├── providers/            # VS Code providers
-│   ├── services/             # Extension services
-│   └── webview-ui/           # React-based UI
-└── test/                     # Extension tests
+│   ├── extension.ts          # Ponto de entrada da extensão
+│   ├── commands/             # Comandos do VS Code
+│   ├── config/               # Gerenciamento de configuração
+│   ├── monitors/             # Monitoramento de arquivos e Git
+│   ├── notifications/        # Sistema de notificações
+│   ├── providers/            # Providers do VS Code
+│   ├── services/             # Serviços da extensão
+│   └── webview-ui/           # UI baseada em React
+└── test/                     # Testes da extensão
 ```
 
-## 🔄 Data Flow and Interactions
+## 🔄 Fluxo de Dados e Interações
 
-### Command Execution Flow
+### Fluxo de Execução de Comandos
 
-1. **User Input:** CLI command or VS Code action
-2. **Command Parsing:** Yargs (CLI) or VS Code API
-3. **Core Logic:** Business logic execution in `@stackcode/core`
-4. **i18n Processing:** Localized messages via `@stackcode/i18n`
-5. **Output:** Results displayed to user
+1. **Entrada do Usuário:** Comando CLI ou ação no VS Code
+2. **Análise de Comandos:** Yargs (CLI) ou API do VS Code
+3. **Lógica do Core:** Execução da lógica de negócio em `@stackcode/core`
+4. **Processamento i18n:** Mensagens localizadas via `@stackcode/i18n`
+5. **Saída:** Resultados exibidos ao usuário
 
-### Cross-Package Dependencies
+### Dependências Entre Pacotes
 
 ```mermaid
 graph TD
-    A[CLI Package] --> C[Core Package]
-    A --> D[i18n Package]
-    B[VS Code Extension] --> C
+    A[Pacote CLI] --> C[Pacote Core]
+    A --> D[Pacote i18n]
+    B[Extensão VS Code] --> C
     B --> D
     C --> D
 ```
 
-## 🎯 Design Principles
+## 🎯 Princípios de Design
 
-### 1. **Separation of Concerns**
+### 1. **Separação de Responsabilidades**
 
-- **CLI Package:** User interface and command handling
-- **Core Package:** Business logic and utilities
-- **i18n Package:** Internationalization concerns
-- **VS Code Extension:** IDE integration
+- **Pacote CLI:** Interface do usuário e manipulação de comandos
+- **Pacote Core:** Lógica de negócio e utilitários
+- **Pacote i18n:** Preocupações de internacionalização
+- **Extensão VS Code:** Integração com IDE
 
-### 2. **Dependency Inversion**
+### 2. **Inversão de Dependências**
 
-- Higher-level modules don't depend on lower-level modules
-- Both depend on abstractions (interfaces)
-- External dependencies are injected, not hardcoded
+- Módulos de alto nível não dependem de módulos de baixo nível
+- Ambos dependem de abstrações (interfaces)
+- Dependências externas são injetadas, não codificadas
 
-### 3. **Single Responsibility**
+### 3. **Responsabilidade Única**
 
-- Each package has a clearly defined purpose
-- Functions and classes have single, well-defined responsibilities
-- Templates are modular and composable
+- Cada pacote tem um propósito claramente definido
+- Funções e classes têm responsabilidades únicas e bem definidas
+- Templates são modulares e combináveis
 
-### 4. **Open/Closed Principle**
+### 4. **Princípio Aberto/Fechado**
 
-- System is open for extension (new templates, commands)
-- Closed for modification (core logic remains stable)
+- Sistema é aberto para extensão (novos templates, comandos)
+- Fechado para modificação (lógica do core permanece estável)
 
-## 🛠️ Technology Stack
+## 🔍 Arquitetura de Validação do Sistema
 
-### Core Technologies
+### Sistema de Validação de Dependências
 
-- **TypeScript:** Type safety and modern JavaScript features
-- **Node.js:** Runtime environment
-- **ESM:** Modern module system
+O StackCode implementa um sistema abrangente de validação de dependências para garantir inicialização suave de projetos em diferentes stacks de tecnologia.
 
-### CLI-Specific
+#### Componentes Principais
 
-- **Yargs:** Command-line argument parsing
-- **Inquirer:** Interactive command-line prompts
+**1. Detecção de Disponibilidade de Comandos (`isCommandAvailable`)**
 
-### VS Code Extension-Specific
+```typescript
+// Detecção de comando multiplataforma
+const isAvailable = await isCommandAvailable("go");
+// Usa 'which' (Unix) ou 'where' (Windows)
+```
 
-- **VS Code API:** Extension development framework
-- **React:** Webview UI components
-- **Vite:** Build tool for webview assets
+**2. Mapeamento de Dependências de Stack (`getStackDependencies`)**
 
-### Development Tools
+```typescript
+const stackMap = {
+  go: ["go"],
+  php: ["composer", "php"],
+  java: ["mvn", "java"],
+  python: ["pip", "python"],
+  react: ["npm"],
+  vue: ["npm"],
+};
+```
 
-- **Vitest/Jest:** Testing frameworks
-- **ESLint:** Code linting
-- **Prettier:** Code formatting
-- **GitHub Actions:** CI/CD pipeline
+**3. Validação Abrangente (`validateStackDependencies`)**
 
-## 📁 File Organization Strategy
+```typescript
+const result = await validateStackDependencies("go");
+// Retorna: { isValid, missingDependencies, availableDependencies }
+```
 
-### Monorepo Structure
+#### Fluxo de Validação
+
+```mermaid
+graph TD
+    A[Usuário executa 'stc init'] --> B[Selecionar Stack de Tecnologia]
+    B --> C[Validar Dependências do Stack]
+    C --> D{Todas as Dependências Disponíveis?}
+    D -->|Sim| E[✅ Prosseguir com Instalação]
+    D -->|Não| F[⚠️ Mostrar Dependências Faltando]
+    F --> G[Exibir Instruções de Instalação]
+    G --> H{Usuário Escolhe Continuar?}
+    H -->|Sim| I[🚧 Criar Apenas Estrutura do Projeto]
+    H -->|Não| J[❌ Cancelar Operação]
+    E --> K[🎉 Completar Configuração do Projeto]
+    I --> L[⚠️ Instalação Manual de Dependências Necessária]
+```
+
+#### Estratégia de Tratamento de Erros
+
+- **Degradação Graciosa:** Criação de projeto é bem-sucedida mesmo sem dependências
+- **Mensagens Informativas:** Instruções claras de instalação com URLs oficiais
+- **Escolha do Usuário:** Opção de prosseguir ou cancelar quando dependências estão faltando
+- **Suporte i18n:** Mensagens de erro localizadas em múltiplos idiomas
+
+## 🛠️ Stack de Tecnologia
+
+### Tecnologias Principais
+
+- **TypeScript:** Segurança de tipos e recursos modernos do JavaScript
+- **Node.js:** Ambiente de execução
+- **ESM:** Sistema de módulos moderno
+
+### Específicas da CLI
+
+- **Yargs:** Análise de argumentos de linha de comando
+- **Inquirer:** Prompts interativos de linha de comando
+
+### Específicas da Extensão VS Code
+
+- **API do VS Code:** Framework de desenvolvimento de extensões
+- **React:** Componentes UI para webview
+- **Vite:** Ferramenta de build para assets webview
+
+### Ferramentas de Desenvolvimento
+
+- **Vitest/Jest:** Frameworks de teste
+- **ESLint:** Linting de código
+- **Prettier:** Formatação de código
+- **GitHub Actions:** Pipeline CI/CD
+
+## 📁 Estratégia de Organização de Arquivos
+
+### Estrutura de Monorepo
 
 ```
 StackCode/
-├── packages/                 # All packages
-│   ├── cli/                  # CLI package
-│   ├── core/                 # Core business logic
-│   ├── i18n/                 # Internationalization
-│   └── vscode-extension/     # VS Code extension
-├── docs/                     # Project documentation
-├── scripts/                  # Build and utility scripts
-└── types/                    # Shared type definitions
+├── packages/                 # Todos os pacotes
+│   ├── cli/                  # Pacote CLI
+│   ├── core/                 # Lógica de negócio principal
+│   ├── i18n/                 # Internacionalização
+│   └── vscode-extension/     # Extensão VS Code
+├── docs/                     # Documentação do projeto
+├── scripts/                  # Scripts de build e utilitários
+└── types/                    # Definições de tipos compartilhados
 ```
 
-### Package Structure Conventions
+### Convenções de Estrutura de Pacotes
 
-Each package follows consistent patterns:
+Cada pacote segue padrões consistentes:
 
-- `src/` - Source code
-- `test/` - Test files
-- `dist/` - Compiled output
-- `package.json` - Package configuration
-- `tsconfig.json` - TypeScript configuration
-- `README.md` - Package documentation
-- `CHANGELOG.md` - Version history
+- `src/` - Código fonte
+- `test/` - Arquivos de teste
+- `dist/` - Saída compilada
+- `package.json` - Configuração do pacote
+- `tsconfig.json` - Configuração TypeScript
+- `README.md` - Documentação do pacote
+- `CHANGELOG.md` - Histórico de versões
 
-## 🔧 Build System
+## 🔧 Sistema de Build
 
-### TypeScript Compilation
+### Compilação TypeScript
 
-- **Monorepo Build:** `tsc --build` for cross-package dependencies
-- **Asset Copying:** Templates and locales copied to `dist/`
-- **Executable Permissions:** CLI entry point marked as executable
+- **Build de Monorepo:** `tsc --build` para dependências entre pacotes
+- **Cópia de Assets:** Templates e locales copiados para `dist/`
+- **Permissões de Executável:** Ponto de entrada CLI marcado como executável
 
-### VS Code Extension Build
+### Build da Extensão VS Code
 
-- **Extension Compilation:** TypeScript to JavaScript
-- **Webview Build:** Vite for React components
-- **Package Generation:** `.vsix` file creation
+- **Compilação da Extensão:** TypeScript para JavaScript
+- **Build de Webview:** Vite para componentes React
+- **Geração de Pacote:** Criação de arquivo `.vsix`
 
-## 🧪 Testing Strategy
+## 🧪 Estratégia de Testes
 
-### Unit Testing
+### Testes Unitários
 
-- **Core Logic:** Comprehensive tests for business logic
-- **CLI Commands:** Command execution and error handling
-- **Validators:** Input validation and error cases
+- **Lógica do Core:** Testes abrangentes para lógica de negócio
+- **Comandos CLI:** Execução de comandos e tratamento de erros
+- **Validadores:** Validação de entrada e casos de erro
 
-### Integration Testing
+### Testes de Integração
 
-- **Cross-Package:** Ensure packages work together
-- **Template Generation:** Verify output correctness
-- **GitHub Integration:** API interaction testing
+- **Entre Pacotes:** Garantir que pacotes funcionem juntos
+- **Geração de Templates:** Verificar correção da saída
+- **Integração GitHub:** Teste de interação com API
 
-## 🎓 Arquitetura do Modo Educacional
+## ⚙️ Sistema de Validação de Dependências
 
-### Visão Geral
+### Visão Geral da Arquitetura
 
-O Modo Educacional é uma funcionalidade transversal que melhora a experiência do usuário fornecendo explicações contextuais e orientações sobre melhores práticas em todo o kit de ferramentas StackCode.
+O StackCode inclui um sistema inteligente de validação de dependências que previne crashes e fornece orientação útil quando ferramentas necessárias estão faltando.
 
-### Implementação
+### Componentes
+
+#### 1. **Detecção de Comandos (`isCommandAvailable`)**
 
 ```typescript
-// Fluxo do Modo Educacional
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│ Comando Usuário │ -> │ Detecção Modo   │ -> │ Mostrar Mensag. │
-│  --educate ou   │    │ Config Global + │    │ Melhores Prátic.│
-│ config global   │    │ Flag Comando    │    │ & Explicações   │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+// Verifica se um comando existe no PATH do sistema
+const isGoAvailable = await isCommandAvailable("go");
 ```
 
-### Componentes Principais
+#### 2. **Mapeamento de Stacks (`getStackDependencies`)**
 
-- **`educational-mode.ts`:** Lógica central do modo educacional
-  - `initEducationalMode()`: Detecta configuração e flags de comando
-  - `showEducationalMessage()`: Exibe dicas contextuais
-  - `showBestPractice()`: Mostra explicações de melhores práticas
-  - `showSecurityTip()`: Destaca considerações de segurança
+```typescript
+// Mapeia cada stack para suas ferramentas necessárias
+const goDeps = getStackDependencies("go"); // Retorna: ['go']
+const phpDeps = getStackDependencies("php"); // Retorna: ['composer', 'php']
+```
 
-- **Integração de Configuração:**
-  - Configuração global: `stackcode config set educate true/false`
-  - Flag por comando: `--educate` em qualquer comando
-  - Configuração interativa via `stackcode config`
+#### 3. **Motor de Validação (`validateStackDependencies`)**
 
-- **Sistema de Mensagens:**
-  - Explicações internacionalizadas (PT/EN/ES)
-  - Mensagens de fallback para confiabilidade
-  - Conteúdo contextual baseado no comando
+```typescript
+// Validação abrangente com resultados detalhados
+const result = await validateStackDependencies("go");
+// Retorna: { isValid: boolean, missingDependencies: string[], availableDependencies: string[] }
+```
 
-### Cobertura do Conteúdo Educacional
+### Fluxo de Validação
 
-- **Inicialização de Projetos:** Explica decisões de scaffolding e dependências
-- **Geração de Arquivos:** Descreve propósito do .gitignore, README, etc.
-- **Fluxos Git:** Explica commits convencionais e benefícios do controle de versão
-- **Práticas de Segurança:** Destaca importância do .gitignore para segredos
-- **Benefícios da Automação:** Mostra valor do Husky, CI/CD e automação de releases
+1. **Verificação Pré-Instalação:** Antes de tentar instalação de dependências
+2. **Notificação do Usuário:** Avisos claros sobre ferramentas faltando
+3. **Orientação de Instalação:** Links diretos para baixar dependências faltando
+4. **Degradação Graciosa:** Opção de continuar sem ferramentas
+5. **Tratamento de Erros:** Falha controlada ao invés de crashes
 
-## 🚀 Deployment and Distribution
+### Dependências de Stacks Suportados
 
-### NPM Packages
-
-- **@stackcode/cli:** Published to NPM for global installation
-- **@stackcode/core:** Internal package, not published separately
-- **@stackcode/i18n:** Internal package, not published separately
-
-### VS Code Extension
-
-- **Marketplace:** Published to VS Code Marketplace
-- **VSIX:** Direct installation package available
+| Stack                                | Ferramentas Necessárias | Status da Validação |
+| ------------------------------------ | ----------------------- | ------------------- |
+| `go`                                 | `go`                    | ✅                  |
+| `php`                                | `composer`, `php`       | ✅                  |
+| `java`                               | `mvn`, `java`           | ✅                  |
+| `python`                             | `pip`, `python`         | ✅                  |
+| `node-js`, `node-ts`, `react`, `vue` | `npm`                   | ✅                  |
 
 ## 🎓 Arquitetura do Modo Educacional
 
@@ -690,19 +448,32 @@ O Modo Educacional é um recurso transversal que aprimora a experiência do usu�
 - **Práticas de Segurança:** Destaca importância do .gitignore para segredos
 - **Benefícios da Automação:** Mostra valor do Husky, CI/CD e automação de releases
 
-## 🔮 Extensibility Points
+## 🚀 Implantação e Distribuição
 
-### Template System
+### Pacotes NPM
 
-- **Custom Templates:** Easy addition of new project types
-- **Template Composition:** Combining multiple template sources
-- **Dynamic Configuration:** Runtime template customization
+- **@stackcode/cli:** Publicado no NPM para instalação global
+- **@stackcode/core:** Pacote interno, não publicado separadamente
+- **@stackcode/i18n:** Pacote interno, não publicado separadamente
 
-### Command System
+### Extensão VS Code
 
-- **Plugin Architecture:** Suporte futuro para comandos personalizados
-- **Middleware Support:** Hooks pré/pós comando
-- **Configuration Extension:** Regras personalizadas de validação e geração
+- **Marketplace:** Publicado no VS Code Marketplace
+- **VSIX:** Pacote de instalação direta disponível
+
+## 🔮 Pontos de Extensibilidade
+
+### Sistema de Templates
+
+- **Templates Personalizados:** Adição fácil de novos tipos de projeto
+- **Composição de Templates:** Combinando múltiplas fontes de template
+- **Configuração Dinâmica:** Personalização de template em tempo de execução
+
+### Sistema de Comandos
+
+- **Arquitetura de Plugin:** Suporte futuro para comandos personalizados
+- **Suporte a Middleware:** Hooks pré/pós comando
+- **Extensão de Configuração:** Regras personalizadas de validação e geração
 
 ## 📚 Recursos Adicionais
 

@@ -82,7 +82,6 @@ cli/
 
 **Key Components:**
 
-- **Workflows:** Orchestration layer for multi-step operations
 - **Generators:** Project and file generation logic
 - **Validators:** Commit message validation and system dependency validation
 - **GitHub Integration:** API interactions and automation
@@ -96,14 +95,6 @@ cli/
 core/
 ├── src/
 │   ├── index.ts              # Core exports
-│   ├── workflows/            # Workflow orchestration (NEW)
-│   │   ├── index.ts          # Workflows module entry
-│   │   ├── init.ts           # Project initialization
-│   │   ├── generate.ts       # File generation
-│   │   ├── validate.ts       # Validation operations
-│   │   ├── git.ts            # Git workflows
-│   │   └── release.ts        # Release management
-│   ├── workflows.ts          # Legacy re-export (deprecated)
 │   ├── generators.ts         # Project/file generators
 │   ├── validator.ts          # Validation logic
 │   ├── github.ts             # GitHub API integration
@@ -178,116 +169,21 @@ vscode-extension/
 
 ## 🔄 Data Flow and Interactions
 
-### Workflow Architecture
-
-StackCode implements a **workflow-based architecture** that provides a clear separation between UI concerns and business logic. This architecture enables both the CLI and VS Code extension to share the same core functionality while providing their own UI experiences.
-
-#### Workflow Layers
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        UI Layer                             │
-│  ┌──────────────────┐           ┌──────────────────┐       │
-│  │   CLI Commands   │           │  VS Code Commands│       │
-│  │   - Inquirer     │           │  - Webview UI    │       │
-│  │   - Spinners     │           │  - TreeView      │       │
-│  │   - Console      │           │  - Notifications │       │
-│  └────────┬─────────┘           └────────┬─────────┘       │
-└───────────┼──────────────────────────────┼─────────────────┘
-            │                              │
-            └──────────────┬───────────────┘
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  Workflow Orchestration                     │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │  Core Workflows (@stackcode/core/workflows)          │  │
-│  │  ┌────────────┐  ┌────────────┐  ┌────────────┐     │  │
-│  │  │   Init     │  │  Generate  │  │  Validate  │     │  │
-│  │  └────────────┘  └────────────┘  └────────────┘     │  │
-│  │  ┌────────────┐  ┌────────────┐                     │  │
-│  │  │    Git     │  │  Release   │                     │  │
-│  │  └────────────┘  └────────────┘                     │  │
-│  └──────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Business Logic                           │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │  Generators • Validators • Scaffold • Release        │  │
-│  │  GitHub API • Templates • Utils                      │  │
-│  └──────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-```
-
-#### Workflow Pattern
-
-Each workflow follows a consistent pattern:
-
-1. **Options Interface:** Defines required inputs
-2. **Hooks Interface:** Provides callbacks for UI integration
-3. **Progress Reporting:** Step-by-step updates via `onProgress` hook
-4. **Educational Messages:** Contextual learning via `onEducationalMessage` hook
-5. **User Confirmations:** Interactive decisions via confirmation hooks
-6. **Result Object:** Standardized output with status and data
-
-**Example: Init Workflow**
-
-```typescript
-// 1. Define Options
-interface InitWorkflowOptions {
-  projectPath: string;
-  projectName: string;
-  stack: SupportedStack;
-  features: InitFeature[];
-}
-
-// 2. Define Hooks for UI Integration
-interface InitWorkflowHooks {
-  onProgress?(progress: InitWorkflowProgress): Promise<void> | void;
-  onEducationalMessage?(messageKey: string): Promise<void> | void;
-  onMissingDependencies?(details: InitWorkflowDependencyDecision): Promise<void> | void;
-  confirmContinueAfterMissingDependencies?(decision: InitWorkflowDependencyDecision): Promise<boolean> | boolean;
-}
-
-// 3. Execute Workflow
-const result = await runInitWorkflow(options, {
-  onProgress: (progress) => {
-    // CLI: Show spinner with progress.step
-    // VS Code: Update TreeView or notification
-  },
-  onEducationalMessage: (key) => {
-    // CLI: Log to console if educate mode is on
-    // VS Code: Show info message
-  }
-});
-```
-
-#### Workflow Benefits
-
-- **UI Independence:** Core logic doesn't depend on any UI framework
-- **Testability:** Workflows can be tested without UI
-- **Consistency:** Same behavior across CLI and VS Code extension
-- **Progress Tracking:** Fine-grained progress updates for better UX
-- **Extensibility:** Easy to add new workflows or extend existing ones
-
 ### Command Execution Flow
 
 1. **User Input:** CLI command or VS Code action
 2. **Command Parsing:** Yargs (CLI) or VS Code API
-3. **Workflow Orchestration:** Core workflows coordinate operations
-4. **Business Logic:** Low-level operations in `@stackcode/core`
-5. **i18n Processing:** Localized messages via `@stackcode/i18n`
-6. **Output:** Results displayed to user via UI hooks
+3. **Core Logic:** Business logic execution in `@stackcode/core`
+4. **i18n Processing:** Localized messages via `@stackcode/i18n`
+5. **Output:** Results displayed to user
 
 ### Cross-Package Dependencies
 
 ```mermaid
 graph TD
-    A[CLI Package] --> E[Core Workflows]
-    B[VS Code Extension] --> E
-    E[Core Workflows] --> C[Core Package]
+    A[CLI Package] --> C[Core Package]
     A --> D[i18n Package]
+    B[VS Code Extension] --> C
     B --> D
     C --> D
 ```
@@ -413,8 +309,6 @@ StackCode/
 ├── packages/                 # All packages
 │   ├── cli/                  # CLI package
 │   ├── core/                 # Core business logic
-│   │   └── src/
-│   │       └── workflows/    # Workflow orchestration (domain-based)
 │   ├── i18n/                 # Internationalization
 │   └── vscode-extension/     # VS Code extension
 ├── docs/                     # Project documentation
@@ -428,30 +322,11 @@ Each package follows consistent patterns:
 
 - `src/` - Source code
 - `test/` - Test files
-- `dist/` - Compiled output (ignored in git)
-- `out/` - Build artifacts (ignored in git)
+- `dist/` - Compiled output
 - `package.json` - Package configuration
 - `tsconfig.json` - TypeScript configuration
 - `README.md` - Package documentation
 - `CHANGELOG.md` - Version history
-
-### Domain-Based Code Organization
-
-The core package organizes workflows by domain to improve maintainability:
-
-- **`workflows/init.ts`** - Project initialization workflow
-- **`workflows/generate.ts`** - File generation workflow
-- **`workflows/validate.ts`** - Validation workflows
-- **`workflows/git.ts`** - Git operation workflows
-- **`workflows/release.ts`** - Release management workflow
-- **`workflows/index.ts`** - Unified exports
-
-This organization:
-- ✅ Improves code navigation and discoverability
-- ✅ Reduces file size for easier maintenance
-- ✅ Groups related functionality logically
-- ✅ Makes it easier to test individual domains
-- ✅ Facilitates parallel development
 
 ## 🔧 Build System
 
