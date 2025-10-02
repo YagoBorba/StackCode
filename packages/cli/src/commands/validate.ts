@@ -1,6 +1,6 @@
 import { CommandModule, ArgumentsCamelCase } from "yargs";
 import { t } from "@stackcode/i18n";
-import { validateCommitMessage } from "@stackcode/core";
+import { runValidateWorkflow } from "@stackcode/core";
 import * as ui from "./ui.js";
 import { initEducationalMode, showBestPractice } from "../educational-mode.js";
 
@@ -19,11 +19,12 @@ export const getValidateCommand = (): CommandModule<object, ValidateArgs> => ({
       demandOption: true,
     });
   },
-  handler: (argv: ArgumentsCamelCase<ValidateArgs>) => {
+  handler: async (argv: ArgumentsCamelCase<ValidateArgs>) => {
     initEducationalMode(argv.educate || false);
 
     const message = argv.message as string;
-    if (validateCommitMessage(message)) {
+    const result = await runValidateWorkflow({ message });
+    if (result.isValid) {
       ui.log.success(`✔ ${t("validate.success")}`);
       showBestPractice("educational.commit_validation_explanation");
     } else {

@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { BaseCommand } from "./BaseCommand";
 import { t } from "@stackcode/i18n";
+import { saveStackCodeConfig, type StackCodeConfig } from "@stackcode/core";
 
 export class ConfigCommand extends BaseCommand {
   async execute(): Promise<void> {
@@ -52,13 +53,57 @@ export class ConfigCommand extends BaseCommand {
           this.showError(t("vscode.config.stackcoderc_not_found"));
         }
       } else if (action.label === t("vscode.config.create_project_config")) {
-        const command = `npx @stackcode/cli config init`;
-        await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
-        this.showSuccess(t("vscode.config.project_configuration_initialized"));
+        await this.createProjectConfig(workspaceFolder);
       }
     } catch (error) {
       this.showError(
         t("vscode.config.failed_open_configuration", { error: String(error) }),
+      );
+    }
+  }
+
+  private async createProjectConfig(
+    workspaceFolder: vscode.WorkspaceFolder,
+  ): Promise<void> {
+    try {
+      const configUri = vscode.Uri.joinPath(
+        workspaceFolder.uri,
+        ".stackcoderc.json",
+      );
+
+      try {
+        await vscode.workspace.fs.stat(configUri);
+        const overwrite = await this.confirmAction(
+          t("vscode.config.stackcoderc_exists_overwrite"),
+          t("vscode.config.overwrite"),
+          t("common.cancel"),
+        );
+        if (!overwrite) {
+          return;
+        }
+      } catch (error) {
+        console.warn("Failed to read existing config:", error);
+      }
+
+      const defaultConfig: StackCodeConfig = {
+        stack: undefined,
+        features: {
+          commitValidation: false,
+          husky: false,
+          docker: false,
+        },
+      };
+
+      await saveStackCodeConfig(workspaceFolder.uri.fsPath, defaultConfig);
+
+      const document = await vscode.workspace.openTextDocument(configUri);
+      await vscode.window.showTextDocument(document);
+      await this.showSuccess(
+        t("vscode.config.project_configuration_initialized"),
+      );
+    } catch (error) {
+      await this.showError(
+        t("vscode.config.failed_create_config", { error: String(error) }),
       );
     }
   }

@@ -4,6 +4,7 @@
     "error_generic": "✖ Ocorreu um erro.",
     "yes": "Sim",
     "no": "Não",
+    "continue": "Continuar",
     "error_demand_command": "Você precisa especificar pelo menos um comando.",
     "educate_flag_description": "Ativar modo educacional com explicações detalhadas",
     "back": "Voltar",
@@ -87,6 +88,8 @@
       "login_github": "Entrar no GitHub",
       "error_loading_issues": "Erro ao carregar issues",
       "loading_issues": "Carregando issues...",
+      "fetching_issues": "Buscando issues do GitHub...",
+      "please_wait": "Por favor, aguarde enquanto carregamos as issues",
       "view_on_github": "Ver no GitHub",
       "created_by": "Criado por",
       "updated": "Atualizado",
@@ -108,6 +111,19 @@
       "link_github_issues": "Vincular issues do GitHub automaticamente?",
       "select_issues_to_link": "Selecione as issues que este commit resolve",
       "select_at_least_one_issue": "Selecione pelo menos uma issue ou cancele"
+    },
+    "output_channel_title": "Mensagem de commit",
+    "placeholder": {
+      "issue_reference": "fecha #123"
+    },
+    "issues": {
+      "reference_entry": "fecha #{issueNumber}"
+    },
+    "progress": {
+      "checking_staged": "Verificando alterações preparadas...",
+      "building_message": "Construindo mensagem de commit...",
+      "committing": "Executando git commit...",
+      "completed": "Commit concluído com sucesso."
     },
     "types": {
       "feat": "feat:     Uma nova funcionalidade",
@@ -222,7 +238,8 @@
     "error": {
       "deps_install_failed": "⚠️ Falha na instalação de dependências: {error}",
       "deps_install_manual": "O projeto foi criado com sucesso, mas você precisará instalar as dependências manualmente.",
-      "suggested_command": "Comando sugerido:"
+      "suggested_command": "Comando sugerido:",
+      "deps_install_unknown": "Erro desconhecido"
     },
     "success": {
       "ready": "✅ Sucesso! Seu projeto está pronto.",
@@ -234,6 +251,13 @@
   },
   "release": {
     "command_description": "Auxilia com versionamento e release do projeto.",
+    "workflow_completed": "Fluxo de release concluído com sucesso.",
+    "step_detecting_strategy": "Detectando estratégia de versionamento...",
+    "step_calculating_bump": "Calculando incremento de versão recomendado...",
+    "step_determining_bumps": "Determinando incrementos de versão por pacote...",
+    "independent_mode_preparing_plan": "Preparando plano de release independente...",
+    "step_completed": "Release concluído com sucesso.",
+    "independent_plan_entry": "{package} -> {currentVersion} → {newVersion} ({bumpType})",
     "start": "🚀 Iniciando processo de release...",
     "error_structure": "✖ Não foi possível determinar a estrutura do projeto. Você está na raiz de um monorepo com um diretório `packages`?",
     "detected_strategy": "ℹ️ Estratégia de versionamento detectada: {strategy}",
@@ -271,7 +295,22 @@
     "command_description": "Valida se uma string é uma mensagem de commit convencional.",
     "option_message_description": "A mensagem de commit a ser validada.",
     "success": "✔ Válido: Esta é uma mensagem de commit convencional válida.",
-    "error_invalid": "✖ Inválido: Esta não é uma mensagem de commit convencional válida."
+    "error_invalid": "✖ Inválido: Esta não é uma mensagem de commit convencional válida.",
+    "project": {
+      "missing_readme": "README.md não encontrado.",
+      "missing_gitignore": ".gitignore não encontrado.",
+      "git_not_initialized": "Repositório Git não inicializado.",
+      "missing_package_json": "package.json ausente para uma stack baseada em Node.",
+      "missing_lockfile": "Nenhum lockfile encontrado (package-lock.json ou yarn.lock).",
+      "missing_husky": "Diretório do Husky (.husky) não encontrado.",
+      "missing_commit_msg_hook": "Hook commit-msg do Husky não encontrado.",
+      "missing_tsconfig": "tsconfig.json ausente para projeto baseado em TypeScript.",
+      "missing_pyproject_or_requirements": "Nem pyproject.toml nem requirements.txt foram encontrados para projeto Python.",
+      "missing_java_build_file": "Nenhum arquivo de build Java encontrado (pom.xml, build.gradle ou build.gradle.kts).",
+      "missing_go_mod": "go.mod ausente para projeto Go.",
+      "missing_composer_json": "composer.json ausente para projeto PHP.",
+      "missing_composer_lock": "composer.lock não encontrado. Considere versionar um lockfile para instalações reproduzíveis."
+    }
   },
   "yargs": {
     "Commands:": "Comandos:",
@@ -308,24 +347,22 @@
       "open_project_config_description": "Editar arquivo .stackcoderc.json",
       "create_project_config": "Criar Configuração do Projeto",
       "create_project_config_description": "Criar um novo arquivo .stackcoderc.json",
+      "stackcoderc_exists_overwrite": ".stackcoderc.json já existe. Deseja sobrescrever?",
+      "overwrite": "Sobrescrever",
       "what_would_you_like_configure": "O que você gostaria de configurar?",
       "stackcoderc_not_found": "Arquivo .stackcoderc.json não encontrado. Use \"Criar Configuração do Projeto\" para criar um.",
       "project_configuration_initialized": "Configuração do projeto inicializada!",
-      "failed_open_configuration": "Falha ao abrir configuração:"
+      "failed_open_configuration": "Falha ao abrir configuração:",
+      "failed_create_config": "Falha ao criar configuração do projeto: {error}"
     },
     "commit": {
       "commit_dialog_opened": "Diálogo de commit aberto no terminal!",
       "failed_open_commit_dialog": "Falha ao abrir diálogo de commit:"
     },
     "release": {
-      "release_process_started": "Processo de release iniciado! Verifique o terminal para progresso.",
-      "failed_create_release": "Falha ao criar release:",
-      "are_you_sure_create_release": "Tem certeza de que deseja criar um novo release? Isso irá marcar o commit atual e publicar o release.",
-      "create_release": "Criar Release",
-      "creating_release": "Criando release",
-      "preparing_release": "Preparando release...",
-      "creating_release_message": "Criando release...",
-      "release_created": "Release criado!"
+      "are_you_sure_create_release": "Tem certeza de que deseja criar um release?",
+      "create_release": "Criar release",
+      "creating_release": "Criando release..."
     },
     "validate": {
       "failed_validate_project": "Falha ao validar projeto:",
@@ -333,7 +370,9 @@
       "running_validation": "Executando validação...",
       "checking_project_structure": "Verificando estrutura do projeto...",
       "validation_completed": "Validação concluída!",
-      "project_validation_completed": "Validação do projeto concluída! Verifique o terminal para resultados."
+      "project_validation_completed": "Validação do projeto concluída! Verifique o terminal para resultados.",
+      "issues_summary": "Encontrado(s) {count} problema(s):",
+      "enter_commit_message": "Digite uma mensagem de commit para validar"
     },
     "init": {
       "enter_project_name": "Digite o nome do projeto",
@@ -354,8 +393,21 @@
       "initializing_project": "Inicializando projeto {projectName}",
       "setting_up_structure": "Configurando estrutura do projeto...",
       "running_stackcode_cli": "Executando StackCode CLI...",
+      "step": {
+        "save_config": "Salvando configuração do StackCode..."
+      },
       "open_project": "Abrir Projeto",
       "later": "Mais tarde",
+      "features": {
+        "docker": {
+          "label": "Suporte Docker",
+          "description": "Adiciona configuração Docker ao projeto"
+        },
+        "husky": {
+          "label": "Hooks Husky",
+          "description": "Instala o Husky para reforçar convenções de commit"
+        }
+      },
       "stacks": {
         "node_ts": "Node.js com TypeScript",
         "react": "Aplicação React",

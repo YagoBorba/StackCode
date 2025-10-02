@@ -1,13 +1,13 @@
-cat <<EOF > .gitignore
 # Dependencies
 node_modules/
 .pnp
 .pnp.js
 .yarn/install-state.gz
 
-# Production
+# Production & Build Artifacts
 build/
 dist/
+out/
 .out/
 
 # Misc
@@ -37,4 +37,11 @@ lerna-debug.log*
 
 # TypeScript
 *.tsbuildinfo
-EOF
+
+# Test Coverage
+coverage/
+*.lcov
+.nyc_output/
+
+# VS Code Extension
+*.vsix

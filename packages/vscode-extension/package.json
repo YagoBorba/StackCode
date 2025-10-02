@@ -17,7 +17,12 @@
     "dev:ui": "vite --config src/webview-ui/vite.config.ts",
     "compile:ext": "tsc -p ./",
     "package": "vsce package",
-    "test": "jest"
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "test:integration": "jest --testPathPattern=integration",
+    "test:smoke": "ts-node src/test/runSmokeTest.ts",
+    "test:all": "npm run test && npm run test:integration && npm run test:smoke",
+    "pretest": "npm run compile:ext"
   },
   "categories": [
     "Other",
@@ -69,6 +74,12 @@
       {
         "command": "stackcode.validate",
         "title": "Validate Project Structure",
+        "category": "StackCode",
+        "icon": "$(check)"
+      },
+      {
+        "command": "stackcode.validate.commit",
+        "title": "Validate Commit Message",
         "category": "StackCode",
         "icon": "$(check)"
       },
@@ -250,26 +261,34 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.11",
+    "@types/glob": "^8.1.0",
     "@types/jest": "^29.5.14",
+    "@types/mocha": "^10.0.6",
     "@types/node": "^16.18.126",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "@types/vscode": "^1.85.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "@vscode/test-electron": "^2.3.9",
     "@vscode/vsce": "^2.19.0",
     "autoprefixer": "^10.4.21",
+    "glob": "^10.3.10",
     "jest": "^29.5.0",
     "lucide-react": "^0.539.0",
+    "mocha": "^10.3.0",
     "npm-run-all": "^4.1.5",
     "postcss": "^8.5.6",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "tailwindcss": "^4.1.11",
     "ts-jest": "^29.4.1",
+    "ts-node": "^10.9.2",
     "typescript": "^4.9.5",
     "vite": "^7.1.1"
   },
   "dependencies": {
+    "@octokit/rest": "^22.0.0",
+    "@stackcode/github-auth": "^1.0.0",
     "@stackcode/core": "^1.0.4",
     "@stackcode/i18n": "^1.0.4"
   },

@@ -26,6 +26,7 @@ export interface StackCodeConfig {
     defaultAuthor?: string;
     defaultLicense?: string;
     defaultDescription?: string;
+    stack?: SupportedStack | string;
     features?: {
         commitValidation?: boolean;
         husky?: boolean;

@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { validateCommitMessage } from "@stackcode/core";
+import { runValidateWorkflow } from "@stackcode/core";
 import { getValidateCommand } from "../../src/commands/validate";
 
 vi.mock("@stackcode/core", () => ({
-  validateCommitMessage: vi.fn(),
+  runValidateWorkflow: vi.fn(),
 }));
 vi.mock("@stackcode/i18n", () => ({ t: (key: string) => key }));
 
 const mockedCore = {
-  validateCommitMessage: vi.mocked(validateCommitMessage),
+  runValidateWorkflow: vi.mocked(runValidateWorkflow),
 };
 
 describe("Validate Command", () => {
@@ -23,32 +23,36 @@ describe("Validate Command", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
-  it("should log a success message for a valid commit message", () => {
+  it("should log a success message for a valid commit message", async () => {
     // Arrange
     const argv = { message: "feat: add new feature", _: [], $0: "stc" };
-    mockedCore.validateCommitMessage.mockReturnValue(true);
+    mockedCore.runValidateWorkflow.mockResolvedValue({ isValid: true });
 
     // Act
-    handler(argv);
+    await handler(argv as any);
 
     // Assert
-    expect(mockedCore.validateCommitMessage).toHaveBeenCalledWith(argv.message);
+    expect(mockedCore.runValidateWorkflow).toHaveBeenCalledWith({
+      message: argv.message,
+    });
     expect(console.log).toHaveBeenCalledWith(
       expect.stringContaining("validate.success"),
     );
     expect(mockProcessExit).not.toHaveBeenCalled();
   });
 
-  it("should log an error and exit with code 1 for an invalid commit message", () => {
+  it("should log an error and exit with code 1 for an invalid commit message", async () => {
     // Arrange
     const argv = { message: "invalid message", _: [], $0: "stc" };
-    mockedCore.validateCommitMessage.mockReturnValue(false);
+    mockedCore.runValidateWorkflow.mockResolvedValue({ isValid: false });
 
     // Act
-    handler(argv);
+    await handler(argv as any);
 
     // Assert
-    expect(mockedCore.validateCommitMessage).toHaveBeenCalledWith(argv.message);
+    expect(mockedCore.runValidateWorkflow).toHaveBeenCalledWith({
+      message: argv.message,
+    });
     expect(console.error).toHaveBeenCalledWith(
       expect.stringContaining("validate.error_invalid"),
     );

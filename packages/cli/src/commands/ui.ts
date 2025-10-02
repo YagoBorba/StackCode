@@ -2,9 +2,12 @@ import chalk from "chalk";
 import inquirer from "inquirer";
 import { t } from "@stackcode/i18n";
 import { type PackageBumpInfo } from "@stackcode/core";
-import { CLIAuthManager } from "./github.js";
-import { getCurrentRepository, fetchRepositoryIssues } from "./github.js";
-import { Octokit } from "@octokit/rest";
+import {
+  createCLIAuthFacade,
+  getCurrentRepository,
+  type CLIAuthFacade,
+} from "../services/githubAuth.js";
+import { fetchRepositoryIssues } from "@stackcode/core";
 
 export const log = {
   info: (message: string) => console.log(chalk.blue(message)),
@@ -340,8 +343,8 @@ export async function promptForCommitAnswers(): Promise<CommitAnswers> {
     },
   ]);
 
-  const authManager = new CLIAuthManager();
-  const hasGitHubAuth = authManager.getToken() !== null;
+  const authManager = createCLIAuthFacade();
+  const hasGitHubAuth = (await authManager.getToken()) !== null;
   const currentRepo = hasGitHubAuth ? getCurrentRepository() : null;
 
   let affectedIssues = "";
@@ -392,7 +395,7 @@ export async function promptForCommitAnswers(): Promise<CommitAnswers> {
  * Prompt para seleção de issues do GitHub
  */
 async function promptForGitHubIssues(
-  authManager: CLIAuthManager,
+  authManager: CLIAuthFacade,
   repository: { owner: string; repo: string },
 ): Promise<GitHubIssueChoice[]> {
   try {
@@ -400,8 +403,25 @@ async function promptForGitHubIssues(
       `📋 ${t("github.issues.fetching")} ${repository.owner}/${repository.repo}...`,
     );
 
-    const token = authManager.getToken()!;
-    const octokit = new Octokit({ auth: token });
+    const token = await authManager.getToken();
+    if (!token) {
+      log.warning(`❌ ${t("github.auth.not_authenticated")}`);
+      log.warning(t("github.auth.run_login"));
+      return [];
+    }
+
+    let octokit;
+    try {
+      octokit = await authManager.getClient();
+    } catch (error) {
+      log.error(`❌ ${t("github.auth.token_invalid")}`);
+      if (error instanceof Error) {
+        log.gray(error.message);
+      }
+      await authManager.removeToken();
+      log.warning(t("github.auth.run_login"));
+      return [];
+    }
 
     const issues = await fetchRepositoryIssues(octokit, {
       owner: repository.owner,

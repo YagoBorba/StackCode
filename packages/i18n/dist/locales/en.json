@@ -4,6 +4,8 @@
     "error_generic": "✖ An error occurred.",
     "yes": "Yes",
     "no": "No",
+    "continue": "Continue",
+    "cancel": "Cancel",
     "error_demand_command": "You need to specify at least one command.",
     "educate_flag_description": "Enable educational mode with detailed explanations"
   },
@@ -68,6 +70,8 @@
       "login_github": "Login to GitHub",
       "error_loading_issues": "Error loading issues",
       "loading_issues": "Loading issues...",
+      "fetching_issues": "Fetching issues from GitHub...",
+      "please_wait": "Please wait while we load the issues",
       "view_on_github": "View on GitHub",
       "created_by": "Created by",
       "updated": "Updated",
@@ -86,6 +90,19 @@
       "long_description": "Provide a longer description of the change (optional). Use '|' for newlines:",
       "breaking_changes": "Are there any BREAKING CHANGES? (optional)",
       "affected_issues": "Does this change affect any open issues? (e.g. 'closes #123') (optional)"
+    },
+    "output_channel_title": "Commit message",
+    "placeholder": {
+      "issue_reference": "closes #123"
+    },
+    "issues": {
+      "reference_entry": "closes #{issueNumber}"
+    },
+    "progress": {
+      "checking_staged": "Checking staged changes...",
+      "building_message": "Building commit message...",
+      "committing": "Running git commit...",
+      "completed": "Commit completed successfully."
     },
     "types": {
       "feat": "feat:     A new feature",
@@ -200,7 +217,8 @@
     "error": {
       "deps_install_failed": "⚠️ Dependency installation failed: {error}",
       "deps_install_manual": "The project was created successfully, but you'll need to install dependencies manually.",
-      "suggested_command": "Suggested command:"
+      "suggested_command": "Suggested command:",
+      "deps_install_unknown": "Unknown error"
     },
     "success": {
       "ready": "✅ Success! Your project is ready.",
@@ -212,6 +230,13 @@
   },
   "release": {
     "command_description": "Helps with versioning and releasing the project.",
+    "workflow_completed": "Release workflow completed successfully.",
+    "step_detecting_strategy": "Detecting release strategy...",
+    "step_calculating_bump": "Calculating recommended version bump...",
+    "step_determining_bumps": "Determining package version bumps...",
+    "independent_mode_preparing_plan": "Preparing independent release plan...",
+    "step_completed": "Release completed successfully.",
+    "independent_plan_entry": "{package} -> {currentVersion} → {newVersion} ({bumpType})",
     "start": "🚀 Starting release process...",
     "error_structure": "✖ Could not determine project structure. Are you in the root of a monorepo with a `packages` directory?",
     "detected_strategy": "ℹ️ Detected versioning strategy: {strategy}",
@@ -249,7 +274,22 @@
     "command_description": "Validates if a string is a conventional commit message.",
     "option_message_description": "The commit message string to validate.",
     "success": "✔ Valid: This is a valid conventional commit message.",
-    "error_invalid": "✖ Invalid: This is not a valid conventional commit message."
+    "error_invalid": "✖ Invalid: This is not a valid conventional commit message.",
+    "project": {
+      "missing_readme": "README.md is missing.",
+      "missing_gitignore": ".gitignore is missing.",
+      "git_not_initialized": "Git repository not initialized.",
+      "missing_package_json": "package.json is missing for a Node-based stack.",
+      "missing_lockfile": "No lockfile found (package-lock.json or yarn.lock).",
+      "missing_husky": "Husky directory (.husky) not found.",
+      "missing_commit_msg_hook": "Husky commit-msg hook not found.",
+      "missing_tsconfig": "tsconfig.json is missing for a TypeScript-based project.",
+      "missing_pyproject_or_requirements": "Neither pyproject.toml nor requirements.txt found for Python project.",
+      "missing_java_build_file": "No Java build file found (pom.xml, build.gradle, or build.gradle.kts).",
+      "missing_go_mod": "go.mod is missing for Go project.",
+      "missing_composer_json": "composer.json is missing for PHP project.",
+      "missing_composer_lock": "composer.lock not found. Consider committing a lockfile for reproducible installs."
+    }
   },
   "yargs": {
     "Commands:": "Commands:",
@@ -286,24 +326,22 @@
       "open_project_config_description": "Edit .stackcoderc.json file",
       "create_project_config": "Create Project Config",
       "create_project_config_description": "Create a new .stackcoderc.json file",
+      "stackcoderc_exists_overwrite": ".stackcoderc.json already exists. Overwrite?",
+      "overwrite": "Overwrite",
       "what_would_you_like_configure": "What would you like to configure?",
       "stackcoderc_not_found": ".stackcoderc.json file not found. Use \"Create Project Config\" to create one.",
       "project_configuration_initialized": "Project configuration initialized!",
-      "failed_open_configuration": "Failed to open configuration:"
+      "failed_open_configuration": "Failed to open configuration:",
+      "failed_create_config": "Failed to create project configuration: {error}"
+    },
+    "release": {
+      "are_you_sure_create_release": "Are you sure you want to create a release?",
+      "create_release": "Create Release",
+      "creating_release": "Creating release..."
     },
     "commit": {
       "commit_dialog_opened": "Commit dialog opened in terminal!",
       "failed_open_commit_dialog": "Failed to open commit dialog:"
-    },
-    "release": {
-      "release_process_started": "Release process started! Check terminal for progress.",
-      "failed_create_release": "Failed to create release:",
-      "are_you_sure_create_release": "Are you sure you want to create a new release? This will tag the current commit and publish the release.",
-      "create_release": "Create Release",
-      "creating_release": "Creating release",
-      "preparing_release": "Preparing release...",
-      "creating_release_message": "Creating release...",
-      "release_created": "Release created!"
     },
     "validate": {
       "failed_validate_project": "Failed to validate project:",
@@ -311,7 +349,9 @@
       "running_validation": "Running validation...",
       "checking_project_structure": "Checking project structure...",
       "validation_completed": "Validation completed!",
-      "project_validation_completed": "Project validation completed! Check terminal for results."
+      "project_validation_completed": "Project validation completed! Check terminal for results.",
+      "issues_summary": "Found {count} issue(s):",
+      "enter_commit_message": "Enter a commit message to validate"
     },
     "init": {
       "enter_project_name": "Enter project name",
@@ -332,8 +372,21 @@
       "initializing_project": "Initializing project {projectName}",
       "setting_up_structure": "Setting up project structure...",
       "running_stackcode_cli": "Running StackCode CLI...",
+      "step": {
+        "save_config": "Saving StackCode configuration..."
+      },
       "open_project": "Open Project",
       "later": "Later",
+      "features": {
+        "docker": {
+          "label": "Docker support",
+          "description": "Adds Docker configuration to the project"
+        },
+        "husky": {
+          "label": "Husky commit hooks",
+          "description": "Installs Husky to enforce commit conventions"
+        }
+      },
       "stacks": {
         "node_ts": "Node.js with TypeScript",
         "react": "React application",

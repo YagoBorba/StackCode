@@ -4,6 +4,8 @@
     "error_generic": "✖ Ocurrió un error.",
     "yes": "Sí",
     "no": "No",
+    "continue": "Continuar",
+    "cancel": "Cancelar",
     "error_demand_command": "Necesitas especificar al menos un comando.",
     "educate_flag_description": "Habilitar modo educativo con explicaciones detalladas"
   },
@@ -68,6 +70,8 @@
       "login_github": "Iniciar sesión en GitHub",
       "error_loading_issues": "Error cargando issues",
       "loading_issues": "Cargando issues...",
+      "fetching_issues": "Obteniendo issues de GitHub...",
+      "please_wait": "Por favor espere mientras cargamos los issues",
       "view_on_github": "Ver en GitHub",
       "created_by": "Creado por",
       "updated": "Actualizado",
@@ -86,6 +90,19 @@
       "long_description": "Proporciona una descripción más larga del cambio (opcional). Usa '|' para saltos de línea:",
       "breaking_changes": "¿Hay algún BREAKING CHANGE? (opcional)",
       "affected_issues": "¿Este cambio afecta algún issue abierto? (ej. 'closes #123') (opcional)"
+    },
+    "output_channel_title": "Mensaje de commit",
+    "placeholder": {
+      "issue_reference": "cierra #123"
+    },
+    "issues": {
+      "reference_entry": "cierra #{issueNumber}"
+    },
+    "progress": {
+      "checking_staged": "Comprobando cambios preparados...",
+      "building_message": "Construyendo mensaje de commit...",
+      "committing": "Ejecutando git commit...",
+      "completed": "Commit completado con éxito."
     },
     "types": {
       "feat": "feat:     Una nueva funcionalidad",
@@ -212,6 +229,13 @@
   },
   "release": {
     "command_description": "Ayuda con el versionado y lanzamiento del proyecto.",
+    "workflow_completed": "Flujo de publicación completado con éxito.",
+    "step_detecting_strategy": "Detectando estrategia de versión...",
+    "step_calculating_bump": "Calculando incremento de versión recomendado...",
+    "step_determining_bumps": "Determinando incrementos de versión por paquete...",
+    "independent_mode_preparing_plan": "Preparando plan de lanzamiento independiente...",
+    "step_completed": "Publicación completada con éxito.",
+    "independent_plan_entry": "{package} -> {currentVersion} → {newVersion} ({bumpType})",
     "start": "🚀 Iniciando proceso de release...",
     "error_structure": "✖ No se pudo determinar la estructura del proyecto. ¿Estás en la raíz de un monorepo con directorio `packages`?",
     "detected_strategy": "ℹ️ Estrategia de versionado detectada: {strategy}",
@@ -298,24 +322,22 @@
       "open_project_config_description": "Editar archivo .stackcoderc.json",
       "create_project_config": "Crear Configuración del Proyecto",
       "create_project_config_description": "Crear un nuevo archivo .stackcoderc.json",
+      "stackcoderc_exists_overwrite": ".stackcoderc.json ya existe. ¿Sobrescribir?",
+      "overwrite": "Sobrescribir",
       "what_would_you_like_configure": "¿Qué te gustaría configurar?",
       "stackcoderc_not_found": "Archivo .stackcoderc.json no encontrado. Usa \"Crear Configuración del Proyecto\" para crear uno.",
       "project_configuration_initialized": "¡Configuración del proyecto inicializada!",
-      "failed_open_configuration": "Falló abrir configuración:"
+      "failed_open_configuration": "Falló abrir configuración:",
+      "failed_create_config": "Error al crear la configuración del proyecto: {error}"
     },
     "commit": {
       "commit_dialog_opened": "¡Diálogo de commit abierto en terminal!",
       "failed_open_commit_dialog": "Falló abrir diálogo de commit:"
     },
     "release": {
-      "release_process_started": "¡Proceso de release iniciado! Verifica el terminal para el progreso.",
-      "failed_create_release": "Falló crear release:",
-      "are_you_sure_create_release": "¿Estás seguro de que quieres crear un nuevo release? Esto etiquetará el commit actual y publicará el release.",
-      "create_release": "Crear Release",
-      "creating_release": "Creando release",
-      "preparing_release": "Preparando release...",
-      "creating_release_message": "Creando release...",
-      "release_created": "¡Release creado!"
+      "are_you_sure_create_release": "¿Estás seguro de que quieres crear un lanzamiento?",
+      "create_release": "Crear lanzamiento",
+      "creating_release": "Creando lanzamiento..."
     },
     "validate": {
       "failed_validate_project": "Falló validar proyecto:",

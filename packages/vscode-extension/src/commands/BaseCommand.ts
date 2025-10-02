@@ -38,12 +38,13 @@ export abstract class BaseCommand {
   protected async confirmAction(
     message: string,
     confirmText: string = "Yes",
+    cancelText: string = "Cancel",
   ): Promise<boolean> {
     const result = await vscode.window.showWarningMessage(
       message,
       { modal: true },
       confirmText,
-      "Cancel",
+      cancelText,
     );
     return result === confirmText;
   }

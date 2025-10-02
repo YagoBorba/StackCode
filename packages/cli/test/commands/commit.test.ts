@@ -3,7 +3,13 @@ import { getCommitCommand } from "../../src/commands/commit";
 import * as core from "@stackcode/core";
 import * as ui from "../../src/commands/ui";
 
-vi.mock("@stackcode/core");
+vi.mock("@stackcode/core", () => ({
+  getCommandOutput: vi.fn(),
+  runCommitWorkflow: vi.fn(),
+  getErrorMessage: vi.fn((error: unknown) =>
+    error instanceof Error ? error.message : String(error ?? "error"),
+  ),
+}));
 vi.mock("../../src/commands/ui");
 
 describe("Commit Command Handler", () => {
@@ -33,14 +39,18 @@ describe("Commit Command Handler", () => {
       affectedIssues: "",
     });
 
-    const runCommandMock = vi.mocked(core.runCommand);
+    vi.mocked(core.runCommitWorkflow).mockResolvedValue({
+      status: "committed",
+      message: "feat(api): add new login endpoint",
+    });
 
     await handler({ _: [], $0: "stc" });
-    expect(runCommandMock).toHaveBeenCalledOnce();
-    expect(runCommandMock).toHaveBeenCalledWith(
-      "git",
-      ["commit", "-m", "feat(api): add new login endpoint"],
-      expect.anything(),
+    expect(core.runCommitWorkflow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "feat",
+        scope: "api",
+        shortDescription: "add new login endpoint",
+      }),
     );
   });
 
@@ -60,24 +70,24 @@ describe("Commit Command Handler", () => {
       affectedIssues: "closes #42",
     });
 
-    const runCommandMock = vi.mocked(core.runCommand);
+    vi.mocked(core.runCommitWorkflow).mockResolvedValue({
+      status: "committed",
+      message: "",
+    });
 
     await handler({ _: [], $0: "stc" });
 
-    const expectedMessage = `refactor(auth): use JWT service for authentication
-
-Implement new JWT service for better security.
-Separate concerns.
-
-BREAKING CHANGE: The token format has changed and now requires a new validation method.
-
-closes #42`;
-
-    expect(runCommandMock).toHaveBeenCalledOnce();
-    expect(runCommandMock).toHaveBeenCalledWith(
-      "git",
-      ["commit", "-m", expectedMessage],
-      { cwd: process.cwd() },
+    expect(core.runCommitWorkflow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "refactor",
+        scope: "auth",
+        shortDescription: "use JWT service for authentication",
+        longDescription:
+          "Implement new JWT service for better security.|Separate concerns.",
+        breakingChanges:
+          "The token format has changed and now requires a new validation method.",
+        affectedIssues: "closes #42",
+      }),
     );
   });
 });
