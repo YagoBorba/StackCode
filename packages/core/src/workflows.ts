@@ -1,9 +1,9 @@
 /**
  * @deprecated This file is maintained for backward compatibility.
  * Please import from '@stackcode/core/workflows' instead.
- * 
+ *
  * This module will be removed in a future major version.
- * 
+ *
  * Migration guide:
  * - Import from './workflows/index' or './workflows/<domain>'
  * - All types and functions are re-exported from the new location
