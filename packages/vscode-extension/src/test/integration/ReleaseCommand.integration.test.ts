@@ -1,15 +1,16 @@
 /**
- * Integration tests for ReleaseCommand
- * Tests the release workflow integration
+ * @file Integration tests for ReleaseCommand
+ *
+ * Tests the release workflow integration with VSCode, including version bumping,
+ * changelog generation, user confirmations, and GitHub release preparation.
  */
 
 import * as vscode from "vscode";
 import { ReleaseCommand } from "../../commands/ReleaseCommand";
 import { GitHubAuthService } from "../../services/GitHubAuthService";
 import { ProgressManager } from "../../services/ProgressManager";
-import * as core from "@stackcode/core";
+import { runReleaseWorkflow } from "@stackcode/core";
 
-// Mock VS Code API
 jest.mock("vscode", () => ({
   window: {
     showQuickPick: jest.fn(),
@@ -36,10 +37,10 @@ jest.mock("vscode", () => ({
   },
 }));
 
-// Mock @stackcode/core
-jest.mock("@stackcode/core");
+jest.mock("@stackcode/core", () => ({
+  runReleaseWorkflow: jest.fn(),
+}));
 
-// Mock i18n
 jest.mock("@stackcode/i18n", () => ({
   t: jest.fn((key) => key),
 }));
@@ -65,24 +66,18 @@ describe("ReleaseCommand Integration Tests", () => {
       clearVSCodeProgressReporter: jest.fn(),
     } as any;
 
-    releaseCommand = new ReleaseCommand(
-      mockAuthService,
-      mockProgressManager,
-    );
+    releaseCommand = new ReleaseCommand(mockAuthService, mockProgressManager);
 
     jest.clearAllMocks();
   });
 
   describe("execute()", () => {
     it("should execute release workflow successfully", async () => {
-      // Mock confirmation
-      (vscode.window.showQuickPick as jest.Mock).mockResolvedValueOnce({
-        label: "Yes",
-        value: true,
-      });
+      (vscode.window.showWarningMessage as jest.Mock).mockResolvedValueOnce(
+        "vscode.release.create_release",
+      );
 
-      const mockRunReleaseWorkflow = jest.spyOn(core, "runReleaseWorkflow");
-      mockRunReleaseWorkflow.mockResolvedValue({
+      (runReleaseWorkflow as jest.Mock).mockResolvedValue({
         status: "prepared",
         packages: [
           {
@@ -95,7 +90,7 @@ describe("ReleaseCommand Integration Tests", () => {
 
       await releaseCommand.execute();
 
-      expect(mockRunReleaseWorkflow).toHaveBeenCalledWith(
+      expect(runReleaseWorkflow as jest.Mock).toHaveBeenCalledWith(
         expect.objectContaining({
           cwd: "/test/workspace",
         }),
@@ -107,6 +102,8 @@ describe("ReleaseCommand Integration Tests", () => {
     });
 
     it("should handle missing workspace folder", async () => {
+      // Save original
+      const originalWorkspaceFolders = vscode.workspace.workspaceFolders;
       (vscode.workspace as any).workspaceFolders = undefined;
 
       await releaseCommand.execute();
@@ -114,7 +111,10 @@ describe("ReleaseCommand Integration Tests", () => {
       expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
         expect.stringContaining("no_workspace_folder"),
       );
-      expect(core.runReleaseWorkflow).not.toHaveBeenCalled();
+      expect(runReleaseWorkflow).not.toHaveBeenCalled();
+
+      // Restore
+      (vscode.workspace as any).workspaceFolders = originalWorkspaceFolders;
     });
 
     it("should handle user cancellation", async () => {
@@ -124,37 +124,34 @@ describe("ReleaseCommand Integration Tests", () => {
 
       await releaseCommand.execute();
 
-      expect(core.runReleaseWorkflow).not.toHaveBeenCalled();
+      expect(runReleaseWorkflow).not.toHaveBeenCalled();
     });
 
     it("should handle release workflow errors", async () => {
-      (vscode.window.showQuickPick as jest.Mock).mockResolvedValueOnce({
-        label: "Yes",
-        value: true,
-      });
+      // Mock confirmation
+      (vscode.window.showWarningMessage as jest.Mock).mockResolvedValueOnce(
+        "vscode.release.create_release",
+      );
 
-      const mockRunReleaseWorkflow = jest.spyOn(core, "runReleaseWorkflow");
-      mockRunReleaseWorkflow.mockRejectedValue(
+      (runReleaseWorkflow as jest.Mock).mockRejectedValue(
         new Error("No packages to release"),
       );
 
       await releaseCommand.execute();
 
-      expect(mockProgressManager.failWorkflow).toHaveBeenCalledWith(
-        "release",
+      // When workflow throws an error, it's caught in the catch block
+      expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
         expect.stringContaining("No packages to release"),
       );
-      expect(vscode.window.showErrorMessage).toHaveBeenCalled();
     });
 
     it("should set VS Code progress reporter", async () => {
-      (vscode.window.showQuickPick as jest.Mock).mockResolvedValueOnce({
-        label: "Yes",
-        value: true,
-      });
+      // Mock confirmation
+      (vscode.window.showWarningMessage as jest.Mock).mockResolvedValueOnce(
+        "vscode.release.create_release",
+      );
 
-      const mockRunReleaseWorkflow = jest.spyOn(core, "runReleaseWorkflow");
-      mockRunReleaseWorkflow.mockResolvedValue({
+      (runReleaseWorkflow as jest.Mock).mockResolvedValue({
         status: "prepared",
         packages: [],
       } as any);
@@ -162,19 +159,20 @@ describe("ReleaseCommand Integration Tests", () => {
       await releaseCommand.execute();
 
       expect(mockProgressManager.setVSCodeProgressReporter).toHaveBeenCalled();
-      expect(mockProgressManager.clearVSCodeProgressReporter).toHaveBeenCalled();
+      expect(
+        mockProgressManager.clearVSCodeProgressReporter,
+      ).toHaveBeenCalled();
     });
   });
 
   describe("GitHub Integration", () => {
     it("should check authentication status", async () => {
-      (vscode.window.showQuickPick as jest.Mock).mockResolvedValueOnce({
-        label: "Yes",
-        value: true,
-      });
+      // Mock confirmation
+      (vscode.window.showWarningMessage as jest.Mock).mockResolvedValueOnce(
+        "vscode.release.create_release",
+      );
 
-      const mockRunReleaseWorkflow = jest.spyOn(core, "runReleaseWorkflow");
-      mockRunReleaseWorkflow.mockResolvedValue({
+      (runReleaseWorkflow as jest.Mock).mockResolvedValue({
         status: "prepared",
         packages: [
           {

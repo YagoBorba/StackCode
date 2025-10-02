@@ -1,19 +1,21 @@
 /**
- * Integration tests for GitCommand
- * Tests git start and finish workflows
+ * @file Integration tests for GitCommand
+ *
+ * Tests Git Flow workflows (start branch, finish branch) with VSCode integration,
+ * including user input validation, branch creation, and remote push operations.
  */
 
 import * as vscode from "vscode";
 import { GitCommand } from "../../commands/GitCommand";
-import * as core from "@stackcode/core";
+import { runGitStartWorkflow, runGitFinishWorkflow } from "@stackcode/core";
 
-// Mock VS Code API
 jest.mock("vscode", () => ({
   window: {
     showQuickPick: jest.fn(),
     showInputBox: jest.fn(),
     showInformationMessage: jest.fn(),
     showErrorMessage: jest.fn(),
+    showWarningMessage: jest.fn(),
     withProgress: jest.fn((_, callback) => callback({ report: jest.fn() })),
   },
   workspace: {
@@ -25,6 +27,9 @@ jest.mock("vscode", () => ({
       },
     ],
   },
+  extensions: {
+    getExtension: jest.fn().mockReturnValue(null),
+  },
   ProgressLocation: {
     Notification: 15,
   },
@@ -33,10 +38,11 @@ jest.mock("vscode", () => ({
   },
 }));
 
-// Mock @stackcode/core
-jest.mock("@stackcode/core");
+jest.mock("@stackcode/core", () => ({
+  runGitStartWorkflow: jest.fn(),
+  runGitFinishWorkflow: jest.fn(),
+}));
 
-// Mock i18n
 jest.mock("@stackcode/i18n", () => ({
   t: jest.fn((key) => key),
 }));
@@ -51,22 +57,26 @@ describe("GitCommand Integration Tests", () => {
 
   describe("startBranch()", () => {
     it("should create and switch to a new branch", async () => {
-      // Mock user input
       (vscode.window.showInputBox as jest.Mock).mockResolvedValueOnce(
-        "feature/new-feature",
+        "new-feature",
       );
 
-      const mockRunGitStartWorkflow = jest.spyOn(core, "runGitStartWorkflow");
-      mockRunGitStartWorkflow.mockResolvedValue({
+      (vscode.window.showQuickPick as jest.Mock).mockResolvedValueOnce({
+        label: "feature",
+        description: "vscode.git.feature_description",
+      });
+
+      (runGitStartWorkflow as jest.Mock).mockResolvedValue({
         status: "created",
         branch: "feature/new-feature",
       } as any);
 
       await (gitCommand as any).startBranch();
 
-      expect(mockRunGitStartWorkflow).toHaveBeenCalledWith(
+      expect(runGitStartWorkflow).toHaveBeenCalledWith(
         expect.objectContaining({
-          branchName: "feature/new-feature",
+          branchName: "new-feature",
+          branchType: "feature",
           cwd: "/test/workspace",
         }),
         expect.any(Object),
@@ -76,14 +86,13 @@ describe("GitCommand Integration Tests", () => {
     });
 
     it("should validate branch name format", async () => {
-      // Mock invalid branch name
       (vscode.window.showInputBox as jest.Mock).mockResolvedValueOnce(
         "invalid branch name!",
       );
 
       await (gitCommand as any).startBranch();
 
-      expect(core.runGitStartWorkflow).not.toHaveBeenCalled();
+      expect(runGitStartWorkflow).not.toHaveBeenCalled();
     });
 
     it("should handle empty branch name", async () => {
@@ -92,47 +101,46 @@ describe("GitCommand Integration Tests", () => {
 
       await (gitCommand as any).startBranch();
 
-      expect(core.runGitStartWorkflow).not.toHaveBeenCalled();
+      expect(runGitStartWorkflow).not.toHaveBeenCalled();
     });
 
     it("should handle git workflow errors", async () => {
-      (vscode.window.showInputBox as jest.Mock).mockResolvedValueOnce(
-        "feature/test",
-      );
+      // Mock user input - branch name
+      (vscode.window.showInputBox as jest.Mock).mockResolvedValueOnce("test");
 
-      const mockRunGitStartWorkflow = jest.spyOn(core, "runGitStartWorkflow");
-      mockRunGitStartWorkflow.mockRejectedValue(
+      // Mock user input - branch type
+      (vscode.window.showQuickPick as jest.Mock).mockResolvedValueOnce({
+        label: "feature",
+        description: "vscode.git.feature_description",
+      });
+
+      (runGitStartWorkflow as jest.Mock).mockRejectedValue(
         new Error("Branch already exists"),
       );
 
       await (gitCommand as any).startBranch();
 
       expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
-        expect.stringContaining("Branch already exists"),
+        expect.stringContaining("vscode.git.failed_create_branch"),
       );
     });
   });
 
   describe("finishBranch()", () => {
     it("should merge and cleanup branch", async () => {
-      // Mock confirmation
-      (vscode.window.showQuickPick as jest.Mock).mockResolvedValueOnce({
-        label: "Yes",
-        value: true,
-      });
-
-      const mockRunGitFinishWorkflow = jest.spyOn(
-        core,
-        "runGitFinishWorkflow",
+      // Mock confirmation with showWarningMessage
+      (vscode.window.showWarningMessage as jest.Mock).mockResolvedValueOnce(
+        "vscode.git.finish_branch",
       );
-      mockRunGitFinishWorkflow.mockResolvedValue({
+
+      (runGitFinishWorkflow as jest.Mock).mockResolvedValue({
         status: "merged",
         branch: "feature/old-feature",
       } as any);
 
       await (gitCommand as any).finishBranch();
 
-      expect(mockRunGitFinishWorkflow).toHaveBeenCalledWith(
+      expect(runGitFinishWorkflow).toHaveBeenCalledWith(
         expect.objectContaining({
           cwd: "/test/workspace",
         }),
@@ -141,57 +149,61 @@ describe("GitCommand Integration Tests", () => {
     });
 
     it("should handle user cancellation", async () => {
-      (vscode.window.showQuickPick as jest.Mock).mockResolvedValueOnce(
+      // Mock user cancelling the confirmation
+      (vscode.window.showWarningMessage as jest.Mock).mockResolvedValueOnce(
         undefined,
       );
 
       await (gitCommand as any).finishBranch();
 
-      expect(core.runGitFinishWorkflow).not.toHaveBeenCalled();
+      expect(runGitFinishWorkflow).not.toHaveBeenCalled();
     });
   });
 
   describe("execute()", () => {
     it("should show action picker and execute start", async () => {
-      (vscode.window.showQuickPick as jest.Mock).mockResolvedValueOnce({
-        label: "start",
-      });
-      (vscode.window.showInputBox as jest.Mock).mockResolvedValueOnce(
-        "feature/test",
-      );
+      // Mock action selection
+      (vscode.window.showQuickPick as jest.Mock)
+        .mockResolvedValueOnce({
+          label: "start",
+        })
+        // Mock branch type selection
+        .mockResolvedValueOnce({
+          label: "feature",
+          description: "vscode.git.feature_description",
+        });
 
-      const mockRunGitStartWorkflow = jest.spyOn(core, "runGitStartWorkflow");
-      mockRunGitStartWorkflow.mockResolvedValue({
+      // Mock branch name input
+      (vscode.window.showInputBox as jest.Mock).mockResolvedValueOnce("test");
+
+      (runGitStartWorkflow as jest.Mock).mockResolvedValue({
         status: "created",
         branch: "feature/test",
       } as any);
 
       await gitCommand.execute();
 
-      expect(mockRunGitStartWorkflow).toHaveBeenCalled();
+      expect(runGitStartWorkflow).toHaveBeenCalled();
     });
 
     it("should show action picker and execute finish", async () => {
-      (vscode.window.showQuickPick as jest.Mock)
-        .mockResolvedValueOnce({
-          label: "finish",
-        })
-        .mockResolvedValueOnce({
-          label: "Yes",
-          value: true,
-        });
+      // Mock action selection
+      (vscode.window.showQuickPick as jest.Mock).mockResolvedValueOnce({
+        label: "finish",
+      });
 
-      const mockRunGitFinishWorkflow = jest.spyOn(
-        core,
-        "runGitFinishWorkflow",
+      // Mock confirmation
+      (vscode.window.showWarningMessage as jest.Mock).mockResolvedValueOnce(
+        "vscode.git.finish_branch",
       );
-      mockRunGitFinishWorkflow.mockResolvedValue({
+
+      (runGitFinishWorkflow as jest.Mock).mockResolvedValue({
         status: "merged",
       } as any);
 
       await gitCommand.execute();
 
-      expect(mockRunGitFinishWorkflow).toHaveBeenCalled();
+      expect(runGitFinishWorkflow).toHaveBeenCalled();
     });
   });
 });

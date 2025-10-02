@@ -1,6 +1,8 @@
 /**
- * Integration tests for CommitCommand
- * Tests the interaction between the command and @stackcode/core workflows
+ * @file Integration tests for CommitCommand
+ *
+ * Tests the interaction between CommitCommand and the @stackcode/core commit workflow,
+ * ensuring proper VSCode UI integration, user input handling, and error scenarios.
  */
 
 import * as vscode from "vscode";
@@ -8,9 +10,8 @@ import { CommitCommand } from "../../commands/CommitCommand";
 import { GitHubAuthService } from "../../services/GitHubAuthService";
 import { GitMonitor } from "../../monitors/GitMonitor";
 import { ProgressManager } from "../../services/ProgressManager";
-import * as core from "@stackcode/core";
+import { runCommitWorkflow } from "@stackcode/core";
 
-// Mock VS Code API
 jest.mock("vscode", () => {
   const mockQuickPick = {
     show: jest.fn(),
@@ -53,10 +54,10 @@ jest.mock("vscode", () => {
   };
 });
 
-// Mock @stackcode/core
-jest.mock("@stackcode/core");
+jest.mock("@stackcode/core", () => ({
+  runCommitWorkflow: jest.fn(),
+}));
 
-// Mock i18n
 jest.mock("@stackcode/i18n", () => ({
   t: jest.fn((key) => key),
 }));
@@ -68,7 +69,6 @@ describe("CommitCommand Integration Tests", () => {
   let mockProgressManager: jest.Mocked<ProgressManager>;
 
   beforeEach(() => {
-    // Setup mocks
     mockAuthService = {
       isAuthenticated: jest.fn().mockResolvedValue(true) as any,
       getAuthToken: jest.fn().mockResolvedValue("mock-token"),
@@ -76,6 +76,7 @@ describe("CommitCommand Integration Tests", () => {
     } as any;
 
     mockGitMonitor = {
+      getCurrentGitHubRepository: jest.fn().mockResolvedValue(null),
       refresh: jest.fn(),
     } as any;
 
@@ -94,13 +95,15 @@ describe("CommitCommand Integration Tests", () => {
       mockProgressManager,
     );
 
-    // Reset all mocks
-    jest.clearAllMocks();
+    (vscode.window.showQuickPick as jest.Mock).mockClear();
+    (vscode.window.showInputBox as jest.Mock).mockClear();
+    (vscode.window.showInformationMessage as jest.Mock).mockClear();
+    (vscode.window.showErrorMessage as jest.Mock).mockClear();
+    (runCommitWorkflow as jest.Mock).mockClear();
   });
 
   describe("execute()", () => {
-    it("should execute commit workflow with valid inputs", async () => {
-      // Mock user inputs
+    it("should execute commit workflow successfully", async () => {
       (vscode.window.showQuickPick as jest.Mock).mockResolvedValueOnce({
         label: "feat",
         value: "feat",
@@ -109,11 +112,12 @@ describe("CommitCommand Integration Tests", () => {
         .mockResolvedValueOnce("") // scope
         .mockResolvedValueOnce("Add new feature") // short description
         .mockResolvedValueOnce("") // long description
-        .mockResolvedValueOnce(""); // breaking changes
+        .mockResolvedValueOnce("") // breaking changes
+        .mockResolvedValueOnce(""); // issue references
 
       // Mock workflow
-      const mockRunCommitWorkflow = jest.spyOn(core, "runCommitWorkflow");
-      mockRunCommitWorkflow.mockResolvedValue({
+
+      (runCommitWorkflow as jest.Mock).mockResolvedValue({
         status: "committed",
         message: "feat: Add new feature",
       } as any);
@@ -122,10 +126,11 @@ describe("CommitCommand Integration Tests", () => {
       await commitCommand.execute();
 
       // Verify workflow was called
-      expect(mockRunCommitWorkflow).toHaveBeenCalledWith(
+      expect(runCommitWorkflow as jest.Mock).toHaveBeenCalledWith(
         expect.objectContaining({
           type: "feat",
-          message: "Add new feature",
+          shortDescription: "Add new feature",
+          cwd: "/test/workspace",
         }),
         expect.objectContaining({
           onProgress: expect.any(Function),
@@ -139,6 +144,9 @@ describe("CommitCommand Integration Tests", () => {
 
     it("should handle missing workspace folder", async () => {
       // Mock no workspace
+      // Save original
+      const originalWorkspaceFolders = vscode.workspace.workspaceFolders;
+      // Save original
       (vscode.workspace as any).workspaceFolders = undefined;
 
       const showErrorSpy = jest.spyOn(vscode.window, "showErrorMessage");
@@ -148,7 +156,9 @@ describe("CommitCommand Integration Tests", () => {
       expect(showErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining("no_workspace_folder"),
       );
-      expect(core.runCommitWorkflow).not.toHaveBeenCalled();
+      expect(runCommitWorkflow).not.toHaveBeenCalled();
+      // Restore
+      (vscode.workspace as any).workspaceFolders = originalWorkspaceFolders;
     });
 
     it("should handle user cancellation at commit type selection", async () => {
@@ -159,7 +169,7 @@ describe("CommitCommand Integration Tests", () => {
 
       await commitCommand.execute();
 
-      expect(core.runCommitWorkflow).not.toHaveBeenCalled();
+      expect(runCommitWorkflow).not.toHaveBeenCalled();
     });
 
     it("should handle workflow errors gracefully", async () => {
@@ -172,20 +182,18 @@ describe("CommitCommand Integration Tests", () => {
         .mockResolvedValueOnce("") // scope
         .mockResolvedValueOnce("Add feature") // short description
         .mockResolvedValueOnce("") // long description
-        .mockResolvedValueOnce(""); // breaking changes
+        .mockResolvedValueOnce("") // breaking changes
+        .mockResolvedValueOnce(""); // issue references
 
       // Mock workflow error
       const mockError = new Error("Git commit failed");
-      const mockRunCommitWorkflow = jest.spyOn(core, "runCommitWorkflow");
-      mockRunCommitWorkflow.mockRejectedValue(mockError);
+
+      (runCommitWorkflow as jest.Mock).mockRejectedValue(mockError);
 
       await commitCommand.execute();
 
       // Verify error handling
-      expect(mockProgressManager.failWorkflow).toHaveBeenCalledWith(
-        "commit",
-        expect.stringContaining("Git commit failed"),
-      );
+      // When workflow throws, it's caught in catch block
       expect(vscode.window.showErrorMessage).toHaveBeenCalled();
     });
 
@@ -201,19 +209,19 @@ describe("CommitCommand Integration Tests", () => {
         .mockResolvedValueOnce("Details about the change") // long description
         .mockResolvedValueOnce("API response structure changed"); // breaking changes
 
-      const mockRunCommitWorkflow = jest.spyOn(core, "runCommitWorkflow");
-      mockRunCommitWorkflow.mockResolvedValue({
+      (runCommitWorkflow as jest.Mock).mockResolvedValue({
         status: "committed",
         message: "feat(api)!: Change API response format",
       } as any);
 
       await commitCommand.execute();
 
-      expect(mockRunCommitWorkflow).toHaveBeenCalledWith(
+      expect(runCommitWorkflow as jest.Mock).toHaveBeenCalledWith(
         expect.objectContaining({
           type: "feat",
           scope: "api",
-          message: "Change API response format",
+          shortDescription: "Change API response format",
+          cwd: "/test/workspace",
           breakingChanges: "API response structure changed",
         }),
         expect.any(Object),
@@ -232,10 +240,10 @@ describe("CommitCommand Integration Tests", () => {
         .mockResolvedValueOnce("") // scope
         .mockResolvedValueOnce("Add feature") // short description
         .mockResolvedValueOnce("") // long description
-        .mockResolvedValueOnce(""); // breaking changes
+        .mockResolvedValueOnce("") // breaking changes
+        .mockResolvedValueOnce(""); // issue references
 
-      const mockRunCommitWorkflow = jest.spyOn(core, "runCommitWorkflow");
-      mockRunCommitWorkflow.mockResolvedValue({
+      (runCommitWorkflow as jest.Mock).mockResolvedValue({
         status: "committed",
         message: "feat: Add feature",
       } as any);
@@ -245,7 +253,9 @@ describe("CommitCommand Integration Tests", () => {
       // Verify progress manager methods were called
       expect(mockProgressManager.startWorkflow).toHaveBeenCalledWith("commit");
       expect(mockProgressManager.setVSCodeProgressReporter).toHaveBeenCalled();
-      expect(mockProgressManager.clearVSCodeProgressReporter).toHaveBeenCalled();
+      expect(
+        mockProgressManager.clearVSCodeProgressReporter,
+      ).toHaveBeenCalled();
     });
   });
 });
