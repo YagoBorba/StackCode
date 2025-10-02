@@ -37,4 +37,4 @@ lerna-debug.log*
 
 # TypeScript
 *.tsbuildinfo
-EOF
+EOFpackages/vscode-extension/coverage/
