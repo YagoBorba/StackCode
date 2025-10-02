@@ -24,6 +24,22 @@ export * from "./github.js";
 export * from "./types.js";
 
 export {
+  runIssuesWorkflow,
+  clearIssuesCache,
+  clearExpiredIssuesCache,
+  clearRepositoryCache,
+  getIssuesCacheSize,
+  getIssuesCacheStats,
+  type IssuesWorkflowRepository,
+  type IssuesWorkflowOptions,
+  type IssuesWorkflowResult,
+  type IssuesWorkflowStep,
+  type IssuesWorkflowProgress,
+  type IssuesWorkflowHooks,
+  type IssuesCacheStats,
+} from "./issues-workflow.js";
+
+export {
   detectVersioningStrategy,
   getRecommendedBump,
   updateAllVersions,

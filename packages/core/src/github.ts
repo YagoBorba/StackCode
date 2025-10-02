@@ -38,11 +38,11 @@ export interface FetchIssuesOptions {
 }
 
 /**
- * Busca issues de um repositório GitHub
+ * Fetches issues from a GitHub repository.
  *
- * @param octokit - Cliente Octokit autenticado
- * @param options - Opções de busca
- * @returns Promise com array de issues formatadas
+ * @param octokit - Authenticated Octokit client
+ * @param options - Fetch options for filtering and pagination
+ * @returns Promise resolving to an array of formatted issues
  */
 export async function fetchRepositoryIssues(
   octokit: Octokit,
@@ -73,7 +73,6 @@ export async function fetchRepositoryIssues(
       per_page,
     });
 
-    // Filtrar apenas issues (não pull requests)
     const issues = response.data.filter((issue) => !issue.pull_request);
 
     console.log(`[Core] Found ${issues.length} issues`);
@@ -115,6 +114,12 @@ export async function fetchRepositoryIssues(
   }
 }
 
+/**
+ * Creates a GitHub release for a repository.
+ *
+ * @param options - Release options including repository info, tag, and notes
+ * @returns Promise that resolves when release is created
+ */
 export async function createGitHubRelease(
   options: GitHubReleaseOptions,
 ): Promise<void> {
