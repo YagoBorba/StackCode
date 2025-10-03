@@ -98,7 +98,7 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
             </div>
 
             <div className="flex-1 min-w-0">
-              <h4 className="text-sm font-semibold text-white mb-1">
+              <h4 className="text-sm font-semibold text-slate-100 mb-1">
                 {notification.title}
               </h4>
               <p className="text-sm text-slate-300 leading-relaxed">
@@ -113,9 +113,9 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
                       onClick={() =>
                         handleAction(action.action, notification.id)
                       }
-                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                      className={`notification-action-btn px-3 py-1 rounded text-xs font-medium transition-colors ${
                         action.primary
-                          ? "bg-blue-600 hover:bg-blue-700 text-white"
+                          ? "bg-blue-600 hover:bg-blue-700 text-slate-100"
                           : "bg-slate-700 hover:bg-slate-600 text-slate-300"
                       }`}
                     >
@@ -132,7 +132,7 @@ const NotificationPanel: React.FC<NotificationPanelProps> = ({
 
             <button
               onClick={() => handleDismiss(notification.id)}
-              className="flex-shrink-0 text-slate-400 hover:text-white transition-colors"
+              className="flex-shrink-0 text-slate-400 hover:text-slate-200 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
