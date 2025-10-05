@@ -3,7 +3,6 @@ import {
   AlertCircle,
   ExternalLink,
   Clock,
-  User,
   Tag,
   RefreshCw,
   LogIn,
@@ -47,12 +46,19 @@ interface IssuesPanelProps {
   issuesState: IssuesState;
   onRefresh: () => void;
   onLogin: () => void;
+  vscode?: VsCodeApi;
+}
+
+// Mesmo tipo usado no App.tsx
+interface VsCodeApi {
+  postMessage(message: { type: string; payload?: unknown }): void;
 }
 
 export default function IssuesPanel({
   issuesState,
   onRefresh,
   onLogin,
+  vscode,
 }: IssuesPanelProps) {
   const { issues, loading, error, needsAuth } = issuesState;
   const { t } = useTranslation();
@@ -73,8 +79,13 @@ export default function IssuesPanel({
 
   // Função para abrir issue no GitHub
   const openIssue = (url: string) => {
-    // No VS Code, usar comando para abrir URL
-    // Na web, usar window.open
+    // Usar a API do VS Code passada como prop
+    if (vscode) {
+      vscode.postMessage({ type: "openExternal", payload: { url } });
+      return;
+    }
+    
+    // Fallback for development
     if (typeof window !== "undefined" && window.open) {
       window.open(url, "_blank");
     }
@@ -83,7 +94,7 @@ export default function IssuesPanel({
   // Estado de carregamento
   if (loading) {
     return (
-      <div className="bg-slate-800 rounded-lg border border-slate-700 p-6">
+      <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-blue-400" />
@@ -106,7 +117,7 @@ export default function IssuesPanel({
   // Estado de erro de autenticação
   if (needsAuth) {
     return (
-      <div className="bg-slate-800 rounded-lg border border-slate-700 p-6">
+      <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-yellow-400" />
@@ -136,7 +147,7 @@ export default function IssuesPanel({
   // Estado de erro
   if (error) {
     return (
-      <div className="bg-slate-800 rounded-lg border border-slate-700 p-6">
+      <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-red-400" />
@@ -166,7 +177,7 @@ export default function IssuesPanel({
   // Lista vazia
   if (issues.length === 0) {
     return (
-      <div className="bg-slate-800 rounded-lg border border-slate-700 p-6">
+      <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-green-400" />
@@ -193,7 +204,7 @@ export default function IssuesPanel({
 
   // Lista de issues
   return (
-    <div className="bg-slate-800 rounded-lg border border-slate-700 p-6">
+    <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
           <AlertCircle className="w-5 h-5 text-blue-400" />
@@ -215,7 +226,7 @@ export default function IssuesPanel({
         {issues.slice(0, 10).map((issue) => (
           <div
             key={issue.id}
-            className="border border-slate-600 rounded-lg p-4 hover:bg-slate-750 transition-colors cursor-pointer"
+            className="border border-slate-700 rounded-xl p-4 hover:bg-slate-800/40 transition-colors cursor-pointer"
             onClick={() => openIssue(issue.html_url)}
           >
             {/* Header da issue */}
@@ -226,16 +237,30 @@ export default function IssuesPanel({
                 </h4>
                 <div className="flex items-center gap-3 mt-2 text-xs text-slate-400">
                   <div className="flex items-center gap-1">
-                    <User className="w-3 h-3" />
+                    <img src={issue.user.avatar_url} alt={issue.user.login} className="w-4 h-4 rounded-full border border-slate-600" />
                     {issue.user.login}
                   </div>
                   <div className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     {formatRelativeTime(issue.updated_at)}
                   </div>
+                  <span className={`px-2 py-0.5 rounded-full border text-[10px] ${issue.state === "open" ? "bg-green-500/10 border-green-500/30 text-green-300" : "bg-slate-600/20 border-slate-500/30 text-slate-300"}`}>
+                    {issue.state.toUpperCase()}
+                  </span>
                 </div>
               </div>
-              <ExternalLink className="w-4 h-4 text-slate-400 flex-shrink-0" />
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openIssue(issue.html_url);
+                }}
+                className="text-slate-400 hover:text-white"
+                title="Open on GitHub"
+                aria-label="Open on GitHub"
+              >
+                <ExternalLink className="w-4 h-4 flex-shrink-0" />
+              </button>
             </div>
 
             {/* Labels */}
@@ -244,12 +269,11 @@ export default function IssuesPanel({
                 {issue.labels.slice(0, 3).map((label) => (
                   <span
                     key={label.name}
-                    className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs"
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] border"
                     style={{
-                      backgroundColor: `#${label.color}20`,
-                      borderColor: `#${label.color}40`,
+                      backgroundColor: `#${label.color}22`,
+                      borderColor: `#${label.color}55`,
                       color: `#${label.color}`,
-                      border: "1px solid",
                     }}
                   >
                     <Tag className="w-3 h-3" />

@@ -75,6 +75,12 @@ interface Notification {
 // Estado inicial para as estatísticas que receberemos.
 const initialStats = {
   files: 0,
+  branches: 0,
+  commits: 0,
+  issues: 0,
+  contributors: 0,
+  linesOfCode: 0,
+  needsAuth: false,
 };
 
 // Estado inicial para issues
@@ -87,6 +93,7 @@ const initialIssuesState: IssuesState = {
 
 function App() {
   const [currentView] = useState<"dashboard" | "project">("dashboard");
+  const [viewMode, setViewMode] = useState<"compact" | "sidebar" | "full">("full");
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: "1",
@@ -101,11 +108,20 @@ function App() {
       timestamp: new Date(),
     },
   ]);
+
+  // Auto-dismiss welcome notification after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setNotifications((prev) => prev.filter((n) => n.id !== "1"));
+    }, 5000); // 5 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [currentBranch, setCurrentBranch] = useState("main");
   const [hasChanges, setHasChanges] = useState(false);
   const [lastAction, setLastAction] = useState("Ready");
-  const [, setStats] = useState(initialStats);
+  const [stats, setStats] = useState(initialStats);
   const [isReady, setIsReady] = useState(false);
   const [issuesState, setIssuesState] =
     useState<IssuesState>(initialIssuesState);
@@ -135,11 +151,12 @@ function App() {
     // Listener para mensagens vindas da extensão (o "backend").
     const handleMessage = (event: MessageEvent) => {
       const message = event.data;
-      console.log("Message received from extension:", message);
 
       switch (message.type) {
         case "updateStats":
           setStats((prevStats) => ({ ...prevStats, ...message.payload }));
+          // Mark as ready once we receive stats
+          setIsReady(true);
           break;
         case "updateBranch":
           setCurrentBranch(message.payload?.branch || "main");
@@ -163,7 +180,6 @@ function App() {
 
     // Informa à extensão que a UI está pronta para receber dados.
     vscode.postMessage({ type: "webviewReady" });
-    setIsReady(true);
 
     // Função de limpeza para remover o listener.
     return () => {
@@ -172,7 +188,6 @@ function App() {
   }, [vscode]);
 
   const handleCommand = (command: string) => {
-    console.log("Executing command:", command);
     setLastAction(`Executed: ${command}`);
 
     // Send message to VSCode
@@ -199,6 +214,20 @@ function App() {
   };
 
   const handleQuickAction = (action: string) => {
+    // Controlar os modos de visualização
+    if (action === "expandSidebar") {
+      // Alterna: full ↔ sidebar (só mostra Quick Actions)
+      const newMode = viewMode === "sidebar" ? "full" : "sidebar";
+      setViewMode(newMode);
+      vscode.postMessage({ type: "resizePanel", payload: { mode: newMode } });
+      return;
+    }
+    if (action === "expandFull") {
+      // Sempre garante modo FULL (mostra tudo)
+      setViewMode("full");
+      vscode.postMessage({ type: "resizePanel", payload: { mode: "full" } });
+      return;
+    }
     handleCommand(action);
   };
 
@@ -214,22 +243,27 @@ function App() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-slate-900 text-white">
+    <div className="h-screen flex flex-col bg-slate-900 text-white overflow-hidden">
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar - Project View */}
-        <div className="w-80 border-r border-slate-700 flex-shrink-0">
+        <div className={`border-r border-slate-700 flex-shrink-0 overflow-y-auto ${
+          viewMode === "sidebar" ? "w-full" : "w-80"
+        } ${viewMode === "compact" ? "hidden" : ""}`}>
           <ProjectView onCommand={handleCommand} />
         </div>
 
-        {/* Main Panel */}
-        <div className="flex-1 overflow-auto">
-          {currentView === "dashboard" ? (
+        {/* Main Panel - Dashboard */}
+        <div className={`flex-1 overflow-y-auto overflow-x-hidden ${
+          viewMode === "sidebar" ? "hidden" : ""
+        }`}>
+            {currentView === "dashboard" ? (
             <Dashboard
               vscode={vscode}
               currentBranch={currentBranch}
               hasChanges={hasChanges}
               issues={issuesState}
+              stats={stats}
               onRefreshIssues={() => {
                 setIssuesState((prev) => ({ ...prev, loading: true }));
                 vscode.postMessage({ type: "refreshIssues" });

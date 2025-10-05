@@ -28,16 +28,20 @@ const vscode = __importStar(require("vscode"));
 const core_1 = require("@stackcode/core");
 const i18n_1 = require("@stackcode/i18n");
 const BaseCommand_1 = require("./BaseCommand");
+const AuthFlowManager_1 = require("../services/AuthFlowManager");
 /**
  * Handles Conventional Commit workflow in VS Code.
  * Prompts for commit details, links GitHub issues, and integrates progress feedback.
+ *
+ * Requires GitHub authentication to link issues.
  */
 class CommitCommand extends BaseCommand_1.BaseCommand {
-    constructor(authService, gitMonitor, progressManager) {
+    constructor(authService, gitMonitor, progressManager, context) {
         super();
         this.authService = authService;
         this.gitMonitor = gitMonitor;
         this.progressManager = progressManager;
+        this.authFlowManager = new AuthFlowManager_1.AuthFlowManager(authService, context);
     }
     async execute() {
         try {
@@ -45,6 +49,20 @@ class CommitCommand extends BaseCommand_1.BaseCommand {
             if (!workspaceFolder) {
                 await this.showError((0, i18n_1.t)("vscode.common.no_workspace_folder"));
                 return;
+            }
+            // Ensure authenticated for commit workflow
+            const authResult = await this.authFlowManager.ensureAuthenticated("To create commits with issue linking, StackCode needs GitHub access.\n\n" +
+                "This allows:\n" +
+                "• 📝 Link commits to GitHub issues\n" +
+                "• ✅ Auto-close issues with keywords\n" +
+                "• 📊 Track commit activity");
+            if (!authResult.authenticated) {
+                // User can still commit without auth, but won't have issue linking
+                const continueWithoutAuth = await vscode.window.showWarningMessage("⚠️ Continue without GitHub?\n\n" +
+                    "You can still create commits, but issue linking won't be available.", { modal: true }, "Continue", "Cancel");
+                if (continueWithoutAuth !== "Continue") {
+                    return;
+                }
             }
             const commitType = await this.selectCommitType();
             if (!commitType) {

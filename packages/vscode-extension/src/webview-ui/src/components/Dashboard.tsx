@@ -3,8 +3,6 @@ import {
   Rocket,
   Zap,
   GitBranch,
-  FileText,
-  CheckCircle,
   Star,
   Package,
   GitCommit,
@@ -13,8 +11,6 @@ import {
   Shield,
   TrendingUp,
   Activity,
-  Users,
-  Code,
 } from "lucide-react";
 import IssuesPanel from "./IssuesPanel";
 import ProgressIndicator from "./ProgressIndicator";
@@ -54,13 +50,16 @@ interface IssuesState {
   timestamp?: string;
 }
 
+interface VsCodeApi {
+  postMessage(message: { type: string; payload?: unknown }): void;
+}
+
 interface DashboardProps {
-  vscode?: {
-    postMessage: (message: { type: string; payload?: unknown }) => void;
-  };
+  vscode?: VsCodeApi;
   currentBranch?: string;
   hasChanges?: boolean;
   issues?: IssuesState;
+  stats?: ProjectStats;
   onRefreshIssues?: () => void;
   onLogin?: () => void;
 }
@@ -72,6 +71,18 @@ interface ProjectStats {
   issues: number;
   contributors: number;
   linesOfCode: number;
+  stars?: number;
+  forks?: number;
+  watchers?: number;
+  defaultBranch?: string;
+  isPrivate?: boolean;
+  needsAuth?: boolean;
+  error?: string;
+  recentActivity?: {
+    thisWeek?: number;
+    thisMonth?: number;
+    lastPush?: string;
+  };
 }
 
 interface ActivityItem {
@@ -88,52 +99,69 @@ const Dashboard: React.FC<DashboardProps> = ({
   // currentBranch = "main",
   // hasChanges = false,
   issues,
+  stats: propStats,
   onRefreshIssues,
   onLogin,
 }) => {
-  const [stats] = useState<ProjectStats>({
-    files: 23,
-    branches: 5,
-    commits: 42,
+  // Use stats from props or fallback to loading state
+  const stats = propStats || {
+    files: 0,
+    branches: 0,
+    commits: 0,
     issues: 0,
-    contributors: 3,
-    linesOfCode: 1247,
-  });
+    contributors: 0,
+    linesOfCode: 0,
+    needsAuth: false,
+  };
 
-  const [activities] = useState<ActivityItem[]>([
-    {
-      id: "1",
-      type: "release",
-      title: "VS Code Extension Created",
-      description: "Successfully packaged and installed StackCode extension",
-      timestamp: "2 min ago",
-      icon: <Package className="w-5 h-5" />,
-    },
-    {
-      id: "2",
-      type: "commit",
-      title: "Project Compiled",
-      description: "TypeScript compilation completed successfully",
-      timestamp: "5 min ago",
-      icon: <CheckCircle className="w-5 h-5" />,
-    },
-    {
-      id: "3",
-      type: "file",
-      title: "README Updated",
-      description: "Added new documentation sections",
-      timestamp: "15 min ago",
-      icon: <FileText className="w-5 h-5" />,
-    },
-    {
-      id: "4",
-      type: "branch",
-      title: "Feature Branch",
-      description: "Created feature/vscode-proactive-notifications",
-      timestamp: "30 min ago",
-      icon: <GitBranch className="w-5 h-5" />,
-    },
-  ]);
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
+
+  useEffect(() => {
+    const items: ActivityItem[] = [];
+    if (stats?.commits) {
+      items.push({
+        id: "commit-week",
+        type: "commit",
+        title: `${stats.commits} commits (approx)`,
+        description: "Total commits on repository",
+        timestamp: new Date().toISOString(),
+        icon: <GitCommit className="w-5 h-5" />,
+      });
+    }
+    if (stats?.recentActivity?.thisWeek !== undefined) {
+      items.push({
+        id: "week-commits",
+        type: "commit",
+        title: `${stats.recentActivity.thisWeek} commits this week`,
+        description: "Recent weekly activity",
+        timestamp: new Date().toISOString(),
+        icon: <Activity className="w-5 h-5" />,
+      });
+    }
+    if (stats?.recentActivity?.thisMonth !== undefined) {
+      items.push({
+        id: "month-commits",
+        type: "commit",
+        title: `${stats.recentActivity.thisMonth} commits this month`,
+        description: "Recent monthly activity",
+        timestamp: new Date().toISOString(),
+        icon: <Activity className="w-5 h-5" />,
+      });
+    }
+    // last push
+  const lastPush = stats?.recentActivity?.lastPush;
+    if (lastPush) {
+      items.push({
+        id: "last-push",
+        type: "commit",
+        title: "Last push",
+        description: new Date(lastPush).toLocaleString(),
+        timestamp: lastPush,
+        icon: <Activity className="w-5 h-5" />,
+      });
+    }
+    setActivities(items);
+  }, [stats]);
 
   const sendMessage = (type: string) => {
     if (vscode) {
@@ -242,7 +270,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
       <ProgressIndicator {...progressState} />
 
       <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 p-8">
@@ -262,14 +290,45 @@ const Dashboard: React.FC<DashboardProps> = ({
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
       </div>
 
-      <div className="max-w-7xl mx-auto p-6 space-y-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      {/* Auth Required Banner */}
+      {stats.needsAuth && (
+        <div className="max-w-7xl mx-auto p-6">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-center">
+            <Shield className="w-16 h-16 mx-auto mb-4 text-white" />
+            <h2 className="text-2xl font-bold mb-2">GitHub Authentication Required</h2>
+            <p className="text-blue-100 mb-6">
+              Connect your GitHub account to access repository statistics, issues, and more.
+            </p>
+            <button
+              onClick={() => vscode?.postMessage({ type: 'connectGitHub' })}
+              className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+            >
+              Connect to GitHub
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="w-full mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
           {[
             {
-              label: "Files",
-              value: stats.files,
-              icon: <FileText className="w-5 h-5" />,
-              color: "text-blue-400",
+              label: "Stars",
+              value: stats.stars ?? 0,
+              icon: <Star className="w-5 h-5" />,
+              color: "text-yellow-400",
+            },
+            {
+              label: "Forks",
+              value: stats.forks ?? 0,
+              icon: <Package className="w-5 h-5" />,
+              color: "text-emerald-400",
+            },
+            {
+              label: "Watchers",
+              value: stats.watchers ?? 0,
+              icon: <Activity className="w-5 h-5" />,
+              color: "text-cyan-400",
             },
             {
               label: "Branches",
@@ -288,18 +347,6 @@ const Dashboard: React.FC<DashboardProps> = ({
               value: stats.issues,
               icon: <Shield className="w-5 h-5" />,
               color: "text-red-400",
-            },
-            {
-              label: "Contributors",
-              value: stats.contributors,
-              icon: <Users className="w-5 h-5" />,
-              color: "text-orange-400",
-            },
-            {
-              label: "Lines",
-              value: stats.linesOfCode,
-              icon: <Code className="w-5 h-5" />,
-              color: "text-indigo-400",
             },
           ].map((stat, index) => (
             <div
@@ -325,7 +372,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <Zap className="w-6 h-6 text-yellow-400" />
                 <h2 className="text-2xl font-semibold" style={{ color: '#ffffff' }}>Quick Actions</h2>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
                 {quickActions.map((action) => (
                   <button
                     key={action.id}
@@ -353,6 +400,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               issuesState={issues}
               onRefresh={onRefreshIssues}
               onLogin={onLogin}
+              vscode={vscode}
             />
           )}
 

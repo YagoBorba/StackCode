@@ -4,7 +4,8 @@ import {
   CheckCircle,
   AlertTriangle,
   Clock,
-  Zap,
+  PanelLeftOpen,
+  Maximize2,
 } from "lucide-react";
 
 interface StatusBarProps {
@@ -59,15 +60,24 @@ const StatusBar: React.FC<StatusBarProps> = ({
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        {/* Quick Actions */}
-        <button
-          onClick={() => onQuickAction?.("stackcode.commit")}
-          className="flex items-center gap-1 px-2 py-1 rounded bg-blue-600 hover:bg-blue-700 transition-colors text-white text-xs"
-        >
-          <Zap className="w-3 h-3" />
-          Quick Commit
-        </button>
+      <div className="flex items-center gap-3">
+        {/* Expand Controls */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => onQuickAction?.("expandSidebar")}
+            className="p-1 rounded hover:bg-slate-700 transition-colors text-slate-400 hover:text-slate-200"
+            title="Show Sidebar Only"
+          >
+            <PanelLeftOpen className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={() => onQuickAction?.("expandFull")}
+            className="p-1 rounded hover:bg-slate-700 transition-colors text-slate-400 hover:text-slate-200"
+            title="Show Full View"
+          >
+            <Maximize2 className="w-4.5 h-4.5" />
+          </button>
+        </div>
 
         {/* Time */}
         <div className="text-slate-400">{time.toLocaleTimeString()}</div>

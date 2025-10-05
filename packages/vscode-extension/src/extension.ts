@@ -12,7 +12,10 @@ import { ReleaseCommand } from "./commands/ReleaseCommand";
 import { ConfigCommand } from "./commands/ConfigCommand";
 import { AuthCommand } from "./commands/AuthCommand";
 import { TestGitHubDetectionCommand } from "./commands/TestGitHubDetectionCommand";
+import { TestRemoteStatsCommand } from "./commands/TestRemoteStatsCommand";
 import { DashboardProvider } from "./providers/DashboardProvider";
+import { AuthFlowManager } from "./services/AuthFlowManager";
+import { GitHubRemoteStatsService } from "./services/GitHubRemoteStatsService";
 import { ProjectViewProvider } from "./providers/ProjectViewProvider";
 import { GitHubAuthService } from "./services/GitHubAuthService";
 import { ProgressManager } from "./services/ProgressManager";
@@ -33,6 +36,9 @@ let validateCommand: ValidateCommand;
 let releaseCommand: ReleaseCommand;
 let configCommand: ConfigCommand;
 let authCommand: AuthCommand;
+let authFlowManager: AuthFlowManager;
+let gitHubRemoteStatsService: GitHubRemoteStatsService;
+let testRemoteStatsCommand: TestRemoteStatsCommand;
 
 /**
  * Activates the StackCode VS Code extension.
@@ -47,6 +53,18 @@ export async function activate(context: vscode.ExtensionContext) {
   proactiveManager = new ProactiveNotificationManager(configManager);
   gitMonitor = new GitMonitor(proactiveManager, configManager);
   fileMonitor = new FileMonitor(proactiveManager, configManager);
+  
+  // Initialize auth flow and remote stats services
+  authFlowManager = new AuthFlowManager(gitHubAuthService, context);
+  gitHubRemoteStatsService = new GitHubRemoteStatsService(
+    gitHubAuthService,
+    gitMonitor,
+  );
+  testRemoteStatsCommand = new TestRemoteStatsCommand(
+    authFlowManager,
+    gitHubRemoteStatsService,
+  );
+  
   dashboardProvider = new DashboardProvider(
     context,
     gitHubAuthService,
@@ -61,9 +79,10 @@ export async function activate(context: vscode.ExtensionContext) {
     gitHubAuthService,
     gitMonitor,
     progressManager,
+    context,
   );
   validateCommand = new ValidateCommand();
-  releaseCommand = new ReleaseCommand(gitHubAuthService, progressManager);
+  releaseCommand = new ReleaseCommand(gitHubAuthService, progressManager, context);
   configCommand = new ConfigCommand();
   authCommand = new AuthCommand(gitHubAuthService);
   context.subscriptions.push(
@@ -119,6 +138,9 @@ export async function activate(context: vscode.ExtensionContext) {
     ),
     vscode.commands.registerCommand("stackcode.test.github.detection", () =>
       new TestGitHubDetectionCommand().execute(),
+    ),
+    vscode.commands.registerCommand("stackcode.test.stats", () =>
+      testRemoteStatsCommand.execute(),
     ),
     vscode.commands.registerCommand("stackcode.createBranch", () =>
       gitCommand.startBranch(),
