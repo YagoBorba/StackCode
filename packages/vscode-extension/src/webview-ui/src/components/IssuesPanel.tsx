@@ -49,7 +49,6 @@ interface IssuesPanelProps {
   vscode?: VsCodeApi;
 }
 
-// Mesmo tipo usado no App.tsx
 interface VsCodeApi {
   postMessage(message: { type: string; payload?: unknown }): void;
 }
@@ -63,7 +62,6 @@ export default function IssuesPanel({
   const { issues, loading, error, needsAuth } = issuesState;
   const { t } = useTranslation();
 
-  // Formatador de tempo relativo
   const formatRelativeTime = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -77,21 +75,16 @@ export default function IssuesPanel({
     return `${diffDays}d ago`;
   };
 
-  // Função para abrir issue no GitHub
   const openIssue = (url: string) => {
-    // Usar a API do VS Code passada como prop
     if (vscode) {
       vscode.postMessage({ type: "openExternal", payload: { url } });
       return;
     }
-    
-    // Fallback for development
     if (typeof window !== "undefined" && window.open) {
       window.open(url, "_blank");
     }
   };
 
-  // Estado de carregamento
   if (loading) {
     return (
       <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 p-6">
@@ -114,7 +107,6 @@ export default function IssuesPanel({
     );
   }
 
-  // Estado de erro de autenticação
   if (needsAuth) {
     return (
       <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 p-6">
@@ -144,7 +136,6 @@ export default function IssuesPanel({
     );
   }
 
-  // Estado de erro
   if (error) {
     return (
       <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 p-6">
@@ -174,7 +165,6 @@ export default function IssuesPanel({
     );
   }
 
-  // Lista vazia
   if (issues.length === 0) {
     return (
       <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 p-6">
@@ -202,7 +192,6 @@ export default function IssuesPanel({
     );
   }
 
-  // Lista de issues
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 p-6">
       <div className="flex items-center justify-between mb-4">
@@ -229,9 +218,8 @@ export default function IssuesPanel({
             className="border border-slate-700 rounded-xl p-4 hover:bg-slate-800/40 transition-colors cursor-pointer"
             onClick={() => openIssue(issue.html_url)}
           >
-            {/* Header da issue */}
             <div className="flex items-start justify-between gap-3">
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 overflow-hidden">
                 <h4 className="text-white font-medium truncate">
                   #{issue.number} {issue.title}
                 </h4>
@@ -263,7 +251,6 @@ export default function IssuesPanel({
               </button>
             </div>
 
-            {/* Labels */}
             {issue.labels.length > 0 && (
               <div className="flex gap-1 mt-3 flex-wrap">
                 {issue.labels.slice(0, 3).map((label) => (
@@ -288,7 +275,6 @@ export default function IssuesPanel({
               </div>
             )}
 
-            {/* Assignees */}
             {issue.assignees.length > 0 && (
               <div className="flex items-center gap-2 mt-3">
                 <span className="text-xs text-slate-400">Assigned to:</span>

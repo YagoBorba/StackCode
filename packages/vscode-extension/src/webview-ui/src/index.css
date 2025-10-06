@@ -36,6 +36,13 @@
     display: flex;
     flex-direction: column;
   }
+
+  :root {
+    /* Default main content max width; can be changed at runtime */
+    --stackcode-main-max-width: 1120px;
+    /* Default sidebar width when in full mode */
+    --stackcode-sidebar-width: 320px;
+  }
 }
 
 @layer utilities {
@@ -584,6 +591,48 @@
     background-color: rgba(80, 82, 88, 0.65) !important;
     border-color: rgba(110, 112, 118, 0.4) !important;
     color: #e4e4e7 !important;
+  }
+
+  /* Prevent horizontal overflow */
+  .overflow-x-hidden {
+    overflow-x: hidden;
+  }
+
+  /* Ensure grid items don't cause overflow */
+  .grid > * {
+    min-width: 0;
+  }
+
+  /* Text wrapping helpers for sidebar */
+  .whitespace-normal {
+    white-space: normal;
+  }
+  .break-words {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  /* Single-line ellipsis truncation */
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Responsive grid utilities */
+  @media (max-width: 640px) {
+    .sm\:grid-cols-2 {
+      grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+    .sm\:grid-cols-3 {
+      grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .xl\:grid-cols-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
   }
 }
 

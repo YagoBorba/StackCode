@@ -9,12 +9,10 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   </React.StrictMode>,
 );
 
-// Remove the initial loading banner injected by the extension HTML
 const loadingEl = document.getElementById("loading");
 if (loadingEl && loadingEl.parentElement) {
   try {
     loadingEl.parentElement.removeChild(loadingEl);
   } catch {
-    // ignore
   }
 }

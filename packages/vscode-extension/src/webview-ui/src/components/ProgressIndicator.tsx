@@ -48,7 +48,6 @@ const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
         ${error ? "border-red-500" : "border-blue-500"}
       `}
     >
-      {/* Header */}
       <div className="flex items-center justify-between p-3 border-b border-slate-700">
         <div className="flex items-center gap-2">
           {error ? (
@@ -69,26 +68,21 @@ const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
         )}
       </div>
 
-      {/* Content */}
       <div className="p-3">
-        {/* Message */}
         {message && <p className="text-sm text-slate-300 mb-2">{message}</p>}
 
-        {/* Current Step */}
         {currentStep && !error && (
           <p className="text-xs text-slate-400 mb-2">
             Step: <span className="text-slate-300">{currentStep}</span>
           </p>
         )}
 
-        {/* Error Message */}
         {error && (
           <div className="bg-red-900/20 border border-red-500/30 rounded p-2 mb-2">
             <p className="text-xs text-red-300">{error}</p>
           </div>
         )}
 
-        {/* Progress Bar */}
         {inProgress && !error && (
           <div className="relative">
             <div className="w-full bg-slate-700 rounded-full h-1.5 overflow-hidden">

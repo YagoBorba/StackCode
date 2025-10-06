@@ -16,7 +16,6 @@ import IssuesPanel from "./IssuesPanel";
 import ProgressIndicator from "./ProgressIndicator";
 import { useProgress } from "../hooks/useProgress";
 
-// Interfaces para Issues do GitHub
 interface GitHubIssue {
   id: number;
   number: number;
@@ -96,14 +95,11 @@ interface ActivityItem {
 
 const Dashboard: React.FC<DashboardProps> = ({
   vscode,
-  // currentBranch = "main",
-  // hasChanges = false,
   issues,
   stats: propStats,
   onRefreshIssues,
   onLogin,
 }) => {
-  // Use stats from props or fallback to loading state
   const stats = propStats || {
     files: 0,
     branches: 0,
@@ -148,7 +144,6 @@ const Dashboard: React.FC<DashboardProps> = ({
         icon: <Activity className="w-5 h-5" />,
       });
     }
-    // last push
   const lastPush = stats?.recentActivity?.lastPush;
     if (lastPush) {
       items.push({
@@ -243,11 +238,9 @@ const Dashboard: React.FC<DashboardProps> = ({
     },
   ];
 
-  // Use progress hook
   const progressState = useProgress();
 
   useEffect(() => {
-    // Animate numbers on load
     const animateNumbers = () => {
       const elements = document.querySelectorAll(".animate-number");
       elements.forEach((el) => {
@@ -270,7 +263,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-x-hidden">
       <ProgressIndicator {...progressState} />
 
       <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 p-8">
@@ -290,10 +283,14 @@ const Dashboard: React.FC<DashboardProps> = ({
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
       </div>
 
-      {/* Auth Required Banner */}
+      <div className="w-full max-w-2xl mx-auto mb-4">
+        <div className="bg-blue-900/60 border border-blue-700 rounded-xl p-3 text-center text-blue-200 text-xs">
+          <strong>Info:</strong> O tamanho da barra lateral do VS Code é ajustado manualmente pelo usuário. Para alterar a largura, arraste a divisória do painel lateral.
+        </div>
+      </div>
       {stats.needsAuth && (
-        <div className="max-w-7xl mx-auto p-6">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-center">
+        <div className="w-full px-4 sm:px-6 py-6">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 sm:p-8 text-center">
             <Shield className="w-16 h-16 mx-auto mb-4 text-white" />
             <h2 className="text-2xl font-bold mb-2">GitHub Authentication Required</h2>
             <p className="text-blue-100 mb-6">
@@ -309,7 +306,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         </div>
       )}
 
-      <div className="w-full mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
+  <div className="w-full px-4 sm:px-6 py-4 sm:py-6 space-y-8" style={{maxWidth: 'var(--stackcode-main-max-width)', margin: '0 auto'}}>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
           {[
             {
@@ -365,14 +362,14 @@ const Dashboard: React.FC<DashboardProps> = ({
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           <div className="lg:col-span-2">
             <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-6">
                 <Zap className="w-6 h-6 text-yellow-400" />
                 <h2 className="text-2xl font-semibold" style={{ color: '#ffffff' }}>Quick Actions</h2>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {quickActions.map((action) => (
                   <button
                     key={action.id}
@@ -394,7 +391,6 @@ const Dashboard: React.FC<DashboardProps> = ({
             </div>
           </div>
 
-          {/* GitHub Issues */}
           {issues && onRefreshIssues && onLogin && (
             <IssuesPanel
               issuesState={issues}
@@ -404,7 +400,6 @@ const Dashboard: React.FC<DashboardProps> = ({
             />
           )}
 
-          {/* Recent Activity */}
           <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
             <div className="flex items-center gap-3 mb-6">
               <Activity className="w-6 h-6 text-green-400" />
@@ -439,7 +434,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <Star className="w-6 h-6 text-yellow-400" />
             <h2 className="text-2xl font-semibold" style={{ color: '#ffffff' }}>Pro Tips</h2>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {tips.map((tip, index) => (
               <div
                 key={index}
