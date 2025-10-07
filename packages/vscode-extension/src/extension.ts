@@ -12,6 +12,7 @@ import { ReleaseCommand } from "./commands/ReleaseCommand";
 import { ConfigCommand } from "./commands/ConfigCommand";
 import { AuthCommand } from "./commands/AuthCommand";
 import { TestGitHubDetectionCommand } from "./commands/TestGitHubDetectionCommand";
+export async function activate(context: vscode.ExtensionContext) {
 import { TestRemoteStatsCommand } from "./commands/TestRemoteStatsCommand";
 import { DashboardProvider } from "./providers/DashboardProvider";
 import { AuthFlowManager } from "./services/AuthFlowManager";
@@ -84,7 +85,7 @@ export async function activate(context: vscode.ExtensionContext) {
   validateCommand = new ValidateCommand();
   releaseCommand = new ReleaseCommand(gitHubAuthService, progressManager, context);
   configCommand = new ConfigCommand();
-  authCommand = new AuthCommand(gitHubAuthService);
+  authCommand = new AuthCommand(gitHubAuthService, dashboardProvider);
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
       "stackcode.dashboard",
@@ -168,6 +169,7 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("stackcode.webview.git.start", () =>
       gitCommand.startBranch(),
     ),
+export function deactivate() {
     vscode.commands.registerCommand("stackcode.webview.commit", () =>
       commitCommand.execute(),
     ),

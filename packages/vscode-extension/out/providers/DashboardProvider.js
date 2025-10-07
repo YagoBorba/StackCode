@@ -45,11 +45,38 @@ class DashboardProvider {
         if (this._progressManager) {
             this._progressManager.registerWebviewProvider(this);
         }
-        // Initialize remote services
         if (authService && gitMonitor) {
             this._remoteStatsService = new GitHubRemoteStatsService_1.GitHubRemoteStatsService(authService, gitMonitor);
             this._authFlowManager = new AuthFlowManager_1.AuthFlowManager(authService, context);
         }
+    }
+    /**
+     * Refresh dashboard stats and issues after auth state changes
+     */
+    async refreshAuthState() {
+        await this.updateProjectStats();
+        if (!this._authService?.isAuthenticated) {
+            // Limpa issues no frontend
+            this.sendMessage({
+                type: "updateIssues",
+                payload: {
+                    issues: [],
+                    error: "Not authenticated with GitHub",
+                    needsAuth: true,
+                },
+            });
+            // Limpa atividade recente no frontend
+            this.sendMessage({
+                type: "updateStats",
+                payload: {
+                    recentActivity: null,
+                    error: "Not authenticated with GitHub",
+                    needsAuth: true,
+                },
+            });
+            return;
+        }
+        await this.updateIssues();
     }
     resolveWebviewView(webviewView) {
         this._view = webviewView;
@@ -117,11 +144,10 @@ class DashboardProvider {
                     }
                     case "expandSidebar":
                     case "expandFull":
-                        // Esses comandos são tratados no frontend (App.tsx)
+                        // Frontend-only commands
                         return;
                     case "resizePanel":
-                        // Modo de visualização controlado apenas no frontend
-                        // Não executar comandos externos que podem causar comportamento inesperado
+                        // Frontend-only commands
                         return;
                     default:
                         if (DashboardProvider.DEBUG) {
@@ -179,9 +205,6 @@ class DashboardProvider {
             vscode.commands.executeCommand("workbench.view.extension.stackcode");
         }
     }
-    /**
-     * Handle GitHub authentication from webview
-     */
     async handleGitHubConnect() {
         if (!this._authFlowManager) {
             vscode.window.showErrorMessage("Authentication service not available");
@@ -300,6 +323,7 @@ class DashboardProvider {
                     contributors: 0,
                     linesOfCode: 0,
                     workspaceName: workspaceFolders?.[0]?.name || "(No Workspace)",
+                    workspacePath: workspaceFolders?.[0]?.uri.fsPath || "",
                     mode: "production",
                     needsAuth: true,
                     error: "GitHub authentication required to view statistics",
@@ -317,19 +341,16 @@ class DashboardProvider {
             this.sendMessage({
                 type: "updateStats",
                 payload: {
-                    // Basic info
                     workspaceName: workspaceFolders?.[0]?.name || remoteStats.repository.name,
                     workspacePath: workspaceFolders?.[0]?.uri.fsPath || "",
                     mode: "production",
                     needsAuth: false,
-                    // GitHub stats
                     files: 0,
                     branches: remoteStats.branches.total,
                     commits: remoteStats.commits.total,
                     issues: remoteStats.stats.openIssues,
                     contributors: remoteStats.contributors.total,
                     linesOfCode: 0,
-                    // Additional GitHub data
                     stars: remoteStats.stats.stars,
                     forks: remoteStats.stats.forks,
                     watchers: remoteStats.stats.watchers,
@@ -406,18 +427,16 @@ class DashboardProvider {
             return `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval'; img-src ${webview.cspSource} https: data:; connect-src ${webview.cspSource};">
-    ${cssUris.map((uri) => `<link href="${uri}" rel="stylesheet">`).join("\n    ")}
-    <title>StackCode Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval'; img-src ${webview.cspSource} https: data:; connect-src ${webview.cspSource};">
+  ${cssUris.map((uri) => `<link href="${uri}" rel="stylesheet">`).join("\n  ")}
+  <title>StackCode Dashboard</title>
 </head>
 <body>
-    <div id="loading" style="padding: 20px; color: #fff; background: #1e1e1e;">
-        ⏳ Carregando StackCode Dashboard...
-    </div>
-    <div id="root"></div>
-    <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
+  <div id="loading" style="padding: 20px; color: #fff; background: #1e1e1e;">⏳ Carregando StackCode Dashboard...</div>
+  <div id="root"></div>
+  <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
 </body>
 </html>`;
         }
@@ -425,54 +444,30 @@ class DashboardProvider {
             return `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StackCode Dashboard</title>
-    <style>
-        body { 
-            margin: 0; 
-            padding: 20px; 
-            background: var(--vscode-editor-background, #1e293b); 
-            color: var(--vscode-editor-foreground, white); 
-            font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-            font-size: var(--vscode-font-size, 13px);
-        }
-        .container {
-            max-width: 100%;
-            padding: 16px;
-        }
-        .error-message {
-            background: var(--vscode-inputValidation-errorBackground, #f14c4c20);
-            border: 1px solid var(--vscode-inputValidation-errorBorder, #f14c4c);
-            border-radius: 4px;
-            padding: 12px;
-            margin-bottom: 16px;
-        }
-        .status {
-            background: var(--vscode-badge-background, #007acc);
-            color: var(--vscode-badge-foreground, white);
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            display: inline-block;
-            margin-bottom: 16px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StackCode Dashboard</title>
+  <style>
+    body { margin: 0; padding: 20px; background: var(--vscode-editor-background, #1e293b); color: var(--vscode-editor-foreground, white); font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif); font-size: var(--vscode-font-size, 13px); }
+    .container { max-width: 100%; padding: 16px; }
+    .error-message { background: var(--vscode-inputValidation-errorBackground, #f14c4c20); border: 1px solid var(--vscode-inputValidation-errorBorder, #f14c4c); border-radius: 4px; padding: 12px; margin-bottom: 16px; }
+    .status { background: var(--vscode-badge-background, #007acc); color: var(--vscode-badge-foreground, white); padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; margin-bottom: 16px; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="status">Development Mode</div>
-        <h2>🏗️ StackCode Dashboard</h2>
-        <div class="error-message">
-            <strong>Build Required:</strong> The webview-ui needs to be compiled first.
-            <br><br>
-            Run: <code>npm run build:ui</code>
-            <br><br>
-            Error: ${error instanceof Error ? error.message : "Manifest not found"}
-        </div>
-        <p>Extension Status: ✅ Active</p>
-        <p>Workspace: ${vscode.workspace.workspaceFolders?.[0]?.name || "None"}</p>
+  <div class="container">
+    <div class="status">Development Mode</div>
+    <h2>🏗️ StackCode Dashboard</h2>
+    <div class="error-message">
+      <strong>Build Required:</strong> The webview-ui needs to be compiled first.
+      <br><br>
+      Run: <code>npm run build:ui</code>
+      <br><br>
+      Error: ${error instanceof Error ? error.message : "Manifest not found"}
     </div>
+    <p>Extension Status: ✅ Active</p>
+    <p>Workspace: ${vscode.workspace.workspaceFolders?.[0]?.name || "None"}</p>
+  </div>
 </body>
 </html>`;
         }

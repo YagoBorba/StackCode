@@ -67,6 +67,12 @@ describe("CommitCommand Integration Tests", () => {
   let mockAuthService: jest.Mocked<GitHubAuthService>;
   let mockGitMonitor: jest.Mocked<GitMonitor>;
   let mockProgressManager: jest.Mocked<ProgressManager>;
+  const mockExtensionContext = {
+    subscriptions: [],
+    workspaceState: { get: jest.fn(), update: jest.fn() },
+    globalState: { get: jest.fn(), update: jest.fn() },
+    secrets: { get: jest.fn(), store: jest.fn(), delete: jest.fn() },
+  } as unknown as vscode.ExtensionContext;
 
   beforeEach(() => {
     mockAuthService = {
@@ -93,6 +99,7 @@ describe("CommitCommand Integration Tests", () => {
       mockAuthService,
       mockGitMonitor,
       mockProgressManager,
+      mockExtensionContext,
     );
 
     (vscode.window.showQuickPick as jest.Mock).mockClear();

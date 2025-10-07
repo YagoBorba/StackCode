@@ -89,7 +89,7 @@ async function activate(context) {
     validateCommand = new ValidateCommand_1.ValidateCommand();
     releaseCommand = new ReleaseCommand_1.ReleaseCommand(gitHubAuthService, progressManager, context);
     configCommand = new ConfigCommand_1.ConfigCommand();
-    authCommand = new AuthCommand_1.AuthCommand(gitHubAuthService);
+    authCommand = new AuthCommand_1.AuthCommand(gitHubAuthService, dashboardProvider);
     context.subscriptions.push(vscode.window.registerWebviewViewProvider("stackcode.dashboard", dashboardProvider), vscode.window.registerTreeDataProvider("stackcode.projectView", projectViewProvider));
     const commands = [
         vscode.commands.registerCommand("stackcode.init", () => initCommand.execute()),

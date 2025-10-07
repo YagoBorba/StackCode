@@ -288,25 +288,36 @@ const Dashboard: React.FC<DashboardProps> = ({
           <strong>Info:</strong> O tamanho da barra lateral do VS Code é ajustado manualmente pelo usuário. Para alterar a largura, arraste a divisória do painel lateral.
         </div>
       </div>
+
+
       {stats.needsAuth && (
         <div className="w-full px-4 sm:px-6 py-6">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 sm:p-8 text-center">
-            <Shield className="w-16 h-16 mx-auto mb-4 text-white" />
-            <h2 className="text-2xl font-bold mb-2">GitHub Authentication Required</h2>
-            <p className="text-blue-100 mb-6">
-              Connect your GitHub account to access repository statistics, issues, and more.
+          <div className="bg-gradient-to-br from-blue-700 via-purple-700 to-blue-900 border-2 border-blue-800 rounded-2xl p-8 text-center shadow-xl flex flex-col items-center justify-center">
+            <Shield className="w-16 h-16 mb-4 text-white drop-shadow-lg" />
+            <h2 className="text-3xl font-extrabold mb-2 text-white">Conecte ao GitHub</h2>
+            <p className="text-blue-100 mb-6 text-base max-w-md mx-auto">
+              Para liberar estatísticas, issues e recursos avançados, conecte sua conta do GitHub.
             </p>
             <button
               onClick={() => vscode?.postMessage({ type: 'connectGitHub' })}
-              className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+              className="bg-white text-blue-700 px-8 py-3 rounded-xl font-bold text-lg shadow hover:bg-blue-50 transition-colors"
             >
-              Connect to GitHub
+              <span className="inline-flex items-center gap-2">
+                <Shield className="w-5 h-5 text-blue-700" />
+                Conectar ao GitHub
+              </span>
             </button>
+            <div className="mt-6 text-xs text-blue-200 opacity-80">Suas credenciais são protegidas pelo VS Code.</div>
           </div>
         </div>
       )}
 
+      {/* Espaçamento extra entre o card de login e os cards abaixo */}
+      {stats.needsAuth && <div className="h-8" />}
+
   <div className="w-full px-4 sm:px-6 py-4 sm:py-6 space-y-8" style={{maxWidth: 'var(--stackcode-main-max-width)', margin: '0 auto'}}>
+
+
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
           {[
             {
@@ -314,55 +325,67 @@ const Dashboard: React.FC<DashboardProps> = ({
               value: stats.stars ?? 0,
               icon: <Star className="w-5 h-5" />,
               color: "text-yellow-400",
+              needsAuth: true,
             },
             {
               label: "Forks",
               value: stats.forks ?? 0,
               icon: <Package className="w-5 h-5" />,
               color: "text-emerald-400",
+              needsAuth: true,
             },
             {
               label: "Watchers",
               value: stats.watchers ?? 0,
               icon: <Activity className="w-5 h-5" />,
               color: "text-cyan-400",
+              needsAuth: true,
             },
             {
               label: "Branches",
               value: stats.branches,
               icon: <GitBranch className="w-5 h-5" />,
               color: "text-green-400",
+              needsAuth: true,
             },
             {
               label: "Commits",
               value: stats.commits,
               icon: <GitCommit className="w-5 h-5" />,
               color: "text-purple-400",
+              needsAuth: true,
             },
             {
               label: "Issues",
               value: stats.issues,
               icon: <Shield className="w-5 h-5" />,
               color: "text-red-400",
+              needsAuth: true,
             },
-          ].map((stat, index) => (
-            <div
-              key={index}
-              className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4 hover:bg-slate-800/70 transition-all duration-300 hover:scale-105"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div className={`${stat.color}`}>{stat.icon}</div>
-                <TrendingUp className="w-4 h-4 text-green-400" />
+          ].map((stat, index) => {
+            const isBlurred = stats.needsAuth && stat.needsAuth;
+            return (
+              <div
+                key={index}
+                className={`bg-slate-800/50 border border-slate-700 rounded-xl p-4 relative transition-all duration-300 hover:scale-105 ${isBlurred ? 'card-blur pointer-events-none' : 'backdrop-blur-sm hover:bg-slate-800/70'}`}
+                style={isBlurred ? { filter: 'blur(3px)', opacity: 0.7 } : {}}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className={`${stat.color}`}>{stat.icon}</div>
+                  <TrendingUp className="w-4 h-4 text-green-400" />
+                </div>
+                <div className="text-2xl font-bold animate-number">
+                  {isBlurred ? 0 : stat.value}
+                </div>
+                <div className="text-sm text-slate-400">{stat.label}</div>
               </div>
-              <div className="text-2xl font-bold animate-number">
-                {stat.value}
-              </div>
-              <div className="text-sm text-slate-400">{stat.label}</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+
           <div className="lg:col-span-2">
             <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-6">
@@ -391,40 +414,47 @@ const Dashboard: React.FC<DashboardProps> = ({
             </div>
           </div>
 
-          {issues && onRefreshIssues && onLogin && (
-            <IssuesPanel
-              issuesState={issues}
-              onRefresh={onRefreshIssues}
-              onLogin={onLogin}
-              vscode={vscode}
-            />
-          )}
 
-          <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <Activity className="w-6 h-6 text-green-400" />
-              <h2 className="text-xl font-semibold" style={{ color: '#ffffff' }}>Recent Activity</h2>
-            </div>
-            <div className="space-y-4 max-h-80 overflow-y-auto">
-              {activities.map((activity) => (
-                <div
-                  key={activity.id}
-                  className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-700/30 transition-colors duration-200"
-                >
-                  <div className="flex-shrink-0 w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center text-slate-300">
-                    {activity.icon}
+
+          <div className={stats.needsAuth ? 'card-blur' : ''} style={stats.needsAuth ? { filter: 'blur(3px)', opacity: 0.7 } : {}}>
+            {issues && onRefreshIssues && onLogin && (
+              <IssuesPanel
+                issuesState={issues}
+                onRefresh={onRefreshIssues}
+                onLogin={onLogin}
+                vscode={vscode}
+              />
+            )}
+          </div>
+
+
+          <div className={`relative ${stats.needsAuth ? 'card-blur' : ''}`} style={stats.needsAuth ? { filter: 'blur(3px)', opacity: 0.7 } : {}}>
+            <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <Activity className="w-6 h-6 text-green-400" />
+                <h2 className="text-xl font-semibold" style={{ color: '#ffffff' }}>Recent Activity</h2>
+              </div>
+              <div className="space-y-4 max-h-80 overflow-y-auto">
+                {activities.map((activity) => (
+                  <div
+                    key={activity.id}
+                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-700/30 transition-colors duration-200"
+                  >
+                    <div className="flex-shrink-0 w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center text-slate-300">
+                      {activity.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-sm">{activity.title}</h4>
+                      <p className="text-xs text-slate-400 mt-1">
+                        {activity.description}
+                      </p>
+                      <span className="text-xs text-slate-500 mt-2 block">
+                        {activity.timestamp}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-sm">{activity.title}</h4>
-                    <p className="text-xs text-slate-400 mt-1">
-                      {activity.description}
-                    </p>
-                    <span className="text-xs text-slate-500 mt-2 block">
-                      {activity.timestamp}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>

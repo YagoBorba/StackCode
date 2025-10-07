@@ -16,17 +16,7 @@ import type {
   WebviewProgressCompleteMessage,
 } from "../types/progress-events";
 
-/**
- * Provides the StackCode dashboard webview interface.
- * Manages project statistics, GitHub issues, and integrates with core workflows.
- * Implements WebviewProgressListener to receive and display progress updates.
- */
-export class DashboardProvider
-  implements
-    vscode.WebviewViewProvider,
-    vscode.Disposable,
-    WebviewProgressListener
-{
+export class DashboardProvider implements vscode.WebviewViewProvider, vscode.Disposable, WebviewProgressListener {
   public static readonly viewType = "stackcode.dashboard";
   private _view?: vscode.WebviewView;
   private readonly _extensionUri: vscode.Uri;
@@ -53,14 +43,39 @@ export class DashboardProvider
       this._progressManager.registerWebviewProvider(this);
     }
 
-    // Initialize remote services
     if (authService && gitMonitor) {
-      this._remoteStatsService = new GitHubRemoteStatsService(
-        authService,
-        gitMonitor,
-      );
+      this._remoteStatsService = new GitHubRemoteStatsService(authService, gitMonitor);
       this._authFlowManager = new AuthFlowManager(authService, context);
     }
+  }
+
+  /**
+   * Refresh dashboard stats and issues after auth state changes
+   */
+  public async refreshAuthState(): Promise<void> {
+    await this.updateProjectStats();
+    if (!this._authService?.isAuthenticated) {
+      // Limpa issues no frontend
+      this.sendMessage({
+        type: "updateIssues",
+        payload: {
+          issues: [],
+          error: "Not authenticated with GitHub",
+          needsAuth: true,
+        },
+      });
+      // Limpa atividade recente no frontend
+      this.sendMessage({
+        type: "updateStats",
+        payload: {
+          recentActivity: null,
+          error: "Not authenticated with GitHub",
+          needsAuth: true,
+        },
+      });
+      return;
+    }
+    await this.updateIssues();
   }
 
   public resolveWebviewView(webviewView: vscode.WebviewView) {
@@ -132,11 +147,10 @@ export class DashboardProvider
             }
             case "expandSidebar":
             case "expandFull":
-              // Esses comandos são tratados no frontend (App.tsx)
+              // Frontend-only commands
               return;
             case "resizePanel":
-              // Modo de visualização controlado apenas no frontend
-              // Não executar comandos externos que podem causar comportamento inesperado
+              // Frontend-only commands
               return;
             default:
               if (DashboardProvider.DEBUG) {
@@ -172,7 +186,7 @@ export class DashboardProvider
           console.log("[DashboardProvider] Auto-refresh error:", e);
         }
       }
-  }, 20_000); // 20s
+    }, 20_000); // 20s
 
     this._disposables.push({ dispose: () => clearInterval(interval) });
   }
@@ -205,14 +219,9 @@ export class DashboardProvider
     }
   }
 
-  /**
-   * Handle GitHub authentication from webview
-   */
   private async handleGitHubConnect() {
     if (!this._authFlowManager) {
-      vscode.window.showErrorMessage(
-        "Authentication service not available",
-      );
+      vscode.window.showErrorMessage("Authentication service not available");
       return;
     }
 
@@ -340,12 +349,12 @@ export class DashboardProvider
     }
   }
 
-  private async updateProjectStats() {
+  private async updateProjectStats(): Promise<void> {
     if (!this._view) {
       return;
     }
 
-  const workspaceFolders = vscode.workspace.workspaceFolders;
+    const workspaceFolders = vscode.workspace.workspaceFolders;
 
     // Check if authenticated
     if (!this._authService?.isAuthenticated) {
@@ -359,6 +368,7 @@ export class DashboardProvider
           contributors: 0,
           linesOfCode: 0,
           workspaceName: workspaceFolders?.[0]?.name || "(No Workspace)",
+          workspacePath: workspaceFolders?.[0]?.uri.fsPath || "",
           mode: "production",
           needsAuth: true,
           error: "GitHub authentication required to view statistics",
@@ -376,24 +386,22 @@ export class DashboardProvider
       const remoteStats = await this._remoteStatsService.fetchRemoteStats();
 
       // Transform to dashboard format
-    this.sendMessage({
+      this.sendMessage({
         type: "updateStats",
         payload: {
-          // Basic info
-      workspaceName: workspaceFolders?.[0]?.name || remoteStats.repository.name,
-      workspacePath: workspaceFolders?.[0]?.uri.fsPath || "",
+          workspaceName:
+            workspaceFolders?.[0]?.name || remoteStats.repository.name,
+          workspacePath: workspaceFolders?.[0]?.uri.fsPath || "",
           mode: "production",
           needsAuth: false,
 
-          // GitHub stats
-          files: 0, // Can be calculated from size
+          files: 0, // Not available from GitHub API
           branches: remoteStats.branches.total,
           commits: remoteStats.commits.total,
           issues: remoteStats.stats.openIssues,
           contributors: remoteStats.contributors.total,
-          linesOfCode: 0, // Not available from GitHub API
+          linesOfCode: 0, // Not available
 
-          // Additional GitHub data
           stars: remoteStats.stats.stars,
           forks: remoteStats.stats.forks,
           watchers: remoteStats.stats.watchers,
@@ -488,72 +496,46 @@ export class DashboardProvider
       return `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval'; img-src ${webview.cspSource} https: data:; connect-src ${webview.cspSource};">
-    ${cssUris.map((uri: vscode.Uri) => `<link href="${uri}" rel="stylesheet">`).join("\n    ")}
-    <title>StackCode Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval'; img-src ${webview.cspSource} https: data:; connect-src ${webview.cspSource};">
+  ${cssUris.map((uri: vscode.Uri) => `<link href="${uri}" rel="stylesheet">`).join("\n  ")}
+  <title>StackCode Dashboard</title>
 </head>
 <body>
-    <div id="loading" style="padding: 20px; color: #fff; background: #1e1e1e;">
-        ⏳ Carregando StackCode Dashboard...
-    </div>
-    <div id="root"></div>
-    <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
+  <div id="loading" style="padding: 20px; color: #fff; background: #1e1e1e;">⏳ Carregando StackCode Dashboard...</div>
+  <div id="root"></div>
+  <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
 </body>
 </html>`;
     } catch (error) {
       return `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StackCode Dashboard</title>
-    <style>
-        body { 
-            margin: 0; 
-            padding: 20px; 
-            background: var(--vscode-editor-background, #1e293b); 
-            color: var(--vscode-editor-foreground, white); 
-            font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-            font-size: var(--vscode-font-size, 13px);
-        }
-        .container {
-            max-width: 100%;
-            padding: 16px;
-        }
-        .error-message {
-            background: var(--vscode-inputValidation-errorBackground, #f14c4c20);
-            border: 1px solid var(--vscode-inputValidation-errorBorder, #f14c4c);
-            border-radius: 4px;
-            padding: 12px;
-            margin-bottom: 16px;
-        }
-        .status {
-            background: var(--vscode-badge-background, #007acc);
-            color: var(--vscode-badge-foreground, white);
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            display: inline-block;
-            margin-bottom: 16px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StackCode Dashboard</title>
+  <style>
+    body { margin: 0; padding: 20px; background: var(--vscode-editor-background, #1e293b); color: var(--vscode-editor-foreground, white); font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif); font-size: var(--vscode-font-size, 13px); }
+    .container { max-width: 100%; padding: 16px; }
+    .error-message { background: var(--vscode-inputValidation-errorBackground, #f14c4c20); border: 1px solid var(--vscode-inputValidation-errorBorder, #f14c4c); border-radius: 4px; padding: 12px; margin-bottom: 16px; }
+    .status { background: var(--vscode-badge-background, #007acc); color: var(--vscode-badge-foreground, white); padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; margin-bottom: 16px; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="status">Development Mode</div>
-        <h2>🏗️ StackCode Dashboard</h2>
-        <div class="error-message">
-            <strong>Build Required:</strong> The webview-ui needs to be compiled first.
-            <br><br>
-            Run: <code>npm run build:ui</code>
-            <br><br>
-            Error: ${error instanceof Error ? error.message : "Manifest not found"}
-        </div>
-        <p>Extension Status: ✅ Active</p>
-        <p>Workspace: ${vscode.workspace.workspaceFolders?.[0]?.name || "None"}</p>
+  <div class="container">
+    <div class="status">Development Mode</div>
+    <h2>🏗️ StackCode Dashboard</h2>
+    <div class="error-message">
+      <strong>Build Required:</strong> The webview-ui needs to be compiled first.
+      <br><br>
+      Run: <code>npm run build:ui</code>
+      <br><br>
+      Error: ${error instanceof Error ? error.message : "Manifest not found"}
     </div>
+    <p>Extension Status: ✅ Active</p>
+    <p>Workspace: ${vscode.workspace.workspaceFolders?.[0]?.name || "None"}</p>
+  </div>
 </body>
 </html>`;
     }
@@ -578,8 +560,7 @@ export class DashboardProvider
  */
 function getNonce(): string {
   let text = "";
-  const possible =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   for (let i = 0; i < 32; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
   }

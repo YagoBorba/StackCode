@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "../utils/i18n";
 
-interface GitHubIssue {
+// Removed interface GitHubIssue
   id: number;
   number: number;
   title: string;
@@ -107,30 +107,16 @@ export default function IssuesPanel({
     );
   }
 
+  // needsAuth tem prioridade sobre erro
   if (needsAuth) {
     return (
-      <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700 p-6">
+      <div className="bg-slate-800/50 card-blur rounded-2xl border border-slate-700 p-6" style={{ filter: 'blur(3px)', opacity: 0.7, minHeight: 80 }}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 text-yellow-400" />
-            Repository Issues
+            <AlertCircle className="w-5 h-5 text-blue-400" />
+            {t("github.ui.repository_issues")}
+            <span className="text-sm text-slate-400 font-normal">(0)</span>
           </h3>
-        </div>
-        <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-          <AlertCircle className="w-5 h-5 text-green-400" />
-          {t("github.ui.repository_issues")}
-        </h3>
-        <div className="text-center py-8">
-          <LogIn className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-          <p className="text-slate-400">
-            {t("github.ui.login_to_view_issues")}
-          </p>
-          <button
-            onClick={onLogin}
-            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-          >
-            {t("github.ui.login_github")}
-          </button>
         </div>
       </div>
     );

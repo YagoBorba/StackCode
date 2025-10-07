@@ -49,6 +49,12 @@ describe("ReleaseCommand Integration Tests", () => {
   let releaseCommand: ReleaseCommand;
   let mockAuthService: jest.Mocked<GitHubAuthService>;
   let mockProgressManager: jest.Mocked<ProgressManager>;
+  const mockExtensionContext = {
+    subscriptions: [],
+    workspaceState: { get: jest.fn(), update: jest.fn() },
+    globalState: { get: jest.fn(), update: jest.fn() },
+    secrets: { get: jest.fn(), store: jest.fn(), delete: jest.fn() },
+  } as unknown as vscode.ExtensionContext;
 
   beforeEach(() => {
     mockAuthService = {
@@ -66,7 +72,11 @@ describe("ReleaseCommand Integration Tests", () => {
       clearVSCodeProgressReporter: jest.fn(),
     } as any;
 
-    releaseCommand = new ReleaseCommand(mockAuthService, mockProgressManager);
+    releaseCommand = new ReleaseCommand(
+      mockAuthService,
+      mockProgressManager,
+      mockExtensionContext,
+    );
 
     jest.clearAllMocks();
   });
