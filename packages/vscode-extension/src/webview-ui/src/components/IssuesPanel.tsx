@@ -5,11 +5,10 @@ import {
   Clock,
   Tag,
   RefreshCw,
-  LogIn,
 } from "lucide-react";
 import { useTranslation } from "../utils/i18n";
 
-// Removed interface GitHubIssue
+interface GitHubIssue {
   id: number;
   number: number;
   title: string;
@@ -45,7 +44,6 @@ interface IssuesState {
 interface IssuesPanelProps {
   issuesState: IssuesState;
   onRefresh: () => void;
-  onLogin: () => void;
   vscode?: VsCodeApi;
 }
 
@@ -56,7 +54,6 @@ interface VsCodeApi {
 export default function IssuesPanel({
   issuesState,
   onRefresh,
-  onLogin,
   vscode,
 }: IssuesPanelProps) {
   const { issues, loading, error, needsAuth } = issuesState;

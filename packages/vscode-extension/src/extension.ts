@@ -12,7 +12,6 @@ import { ReleaseCommand } from "./commands/ReleaseCommand";
 import { ConfigCommand } from "./commands/ConfigCommand";
 import { AuthCommand } from "./commands/AuthCommand";
 import { TestGitHubDetectionCommand } from "./commands/TestGitHubDetectionCommand";
-export async function activate(context: vscode.ExtensionContext) {
 import { TestRemoteStatsCommand } from "./commands/TestRemoteStatsCommand";
 import { DashboardProvider } from "./providers/DashboardProvider";
 import { AuthFlowManager } from "./services/AuthFlowManager";
@@ -41,10 +40,6 @@ let authFlowManager: AuthFlowManager;
 let gitHubRemoteStatsService: GitHubRemoteStatsService;
 let testRemoteStatsCommand: TestRemoteStatsCommand;
 
-/**
- * Activates the StackCode VS Code extension.
- * Initializes all services, monitors, providers, and registers commands.
- */
 export async function activate(context: vscode.ExtensionContext) {
   console.log("🚀 [StackCode] Extension activating...");
 
@@ -169,7 +164,6 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("stackcode.webview.git.start", () =>
       gitCommand.startBranch(),
     ),
-export function deactivate() {
     vscode.commands.registerCommand("stackcode.webview.commit", () =>
       commitCommand.execute(),
     ),
@@ -199,10 +193,6 @@ export function deactivate() {
   proactiveManager.showWelcomeMessage();
   console.log("✅ [StackCode] Extension activated successfully");
 }
-
-/**
- * Deactivates the extension and cleans up resources.
- */
 
 export function deactivate() {
   if (progressManager) {
