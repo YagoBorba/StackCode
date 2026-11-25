@@ -10,6 +10,7 @@ import { BaseCommand } from "./BaseCommand";
 import { GitHubAuthService } from "../services/GitHubAuthService";
 import { GitMonitor } from "../monitors/GitMonitor";
 import { ProgressManager } from "../services/ProgressManager";
+import { AuthFlowManager } from "../services/AuthFlowManager";
 
 interface CommitTypeQuickPickItem extends vscode.QuickPickItem {
   value: string;
@@ -18,22 +19,27 @@ interface CommitTypeQuickPickItem extends vscode.QuickPickItem {
 /**
  * Handles Conventional Commit workflow in VS Code.
  * Prompts for commit details, links GitHub issues, and integrates progress feedback.
+ * 
+ * Requires GitHub authentication to link issues.
  */
 export class CommitCommand extends BaseCommand {
   private readonly authService: GitHubAuthService;
   private readonly gitMonitor: GitMonitor;
   private readonly progressManager: ProgressManager;
+  private readonly authFlowManager: AuthFlowManager;
   private outputChannel?: vscode.OutputChannel;
 
   constructor(
     authService: GitHubAuthService,
     gitMonitor: GitMonitor,
     progressManager: ProgressManager,
+    context: vscode.ExtensionContext,
   ) {
     super();
     this.authService = authService;
     this.gitMonitor = gitMonitor;
     this.progressManager = progressManager;
+    this.authFlowManager = new AuthFlowManager(authService, context);
   }
 
   public async execute(): Promise<void> {
@@ -42,6 +48,30 @@ export class CommitCommand extends BaseCommand {
       if (!workspaceFolder) {
         await this.showError(t("vscode.common.no_workspace_folder"));
         return;
+      }
+
+      // Ensure authenticated for commit workflow
+      const authResult = await this.authFlowManager.ensureAuthenticated(
+        "To create commits with issue linking, StackCode needs GitHub access.\n\n" +
+          "This allows:\n" +
+          "• 📝 Link commits to GitHub issues\n" +
+          "• ✅ Auto-close issues with keywords\n" +
+          "• 📊 Track commit activity",
+      );
+
+      if (!authResult.authenticated) {
+        // User can still commit without auth, but won't have issue linking
+        const continueWithoutAuth = await vscode.window.showWarningMessage(
+          "⚠️ Continue without GitHub?\n\n" +
+            "You can still create commits, but issue linking won't be available.",
+          { modal: true },
+          "Continue",
+          "Cancel",
+        );
+
+        if (continueWithoutAuth !== "Continue") {
+          return;
+        }
       }
 
       const commitType = await this.selectCommitType();

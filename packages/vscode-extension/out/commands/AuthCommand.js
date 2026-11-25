@@ -34,9 +34,10 @@ const BaseCommand_1 = require("./BaseCommand");
  * - stackcode.auth.logout: Removes authentication
  */
 class AuthCommand extends BaseCommand_1.BaseCommand {
-    constructor(authService) {
+    constructor(authService, dashboardProvider) {
         super();
         this._authService = authService;
+        this._dashboardProvider = dashboardProvider;
     }
     /**
      * Abstract method implementation - shows authentication status
@@ -83,6 +84,9 @@ class AuthCommand extends BaseCommand_1.BaseCommand {
             const result = await vscode.window.showWarningMessage(`Are you sure you want to logout from GitHub (${userInfo?.username})?`, "Yes, logout", "Cancel");
             if (result === "Yes, logout") {
                 await this._authService.logout();
+                if (this._dashboardProvider && typeof this._dashboardProvider.refreshAuthState === "function") {
+                    await this._dashboardProvider.refreshAuthState();
+                }
             }
         }
         catch (error) {

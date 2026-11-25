@@ -112,6 +112,12 @@
         "title": "Logout from GitHub",
         "category": "StackCode",
         "icon": "$(sign-out)"
+      },
+      {
+        "command": "stackcode.test.stats",
+        "title": "Test Project Statistics",
+        "category": "StackCode",
+        "icon": "$(graph)"
       }
     ],
     "menus": {

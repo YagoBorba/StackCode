@@ -179,7 +179,6 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-20">
       <div className="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl w-full max-w-2xl mx-4">
-        {/* Header */}
         <div className="flex items-center gap-3 p-4 border-b border-slate-700">
           <Search className="w-5 h-5 text-slate-400" />
           <input
@@ -198,7 +197,6 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({
           </div>
         </div>
 
-        {/* Commands List */}
         <div className="max-h-96 overflow-y-auto">
           {filteredCommands.length === 0 ? (
             <div className="p-8 text-center text-slate-400">

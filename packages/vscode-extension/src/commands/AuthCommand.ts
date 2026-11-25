@@ -2,19 +2,14 @@ import * as vscode from "vscode";
 import { BaseCommand } from "./BaseCommand";
 import { GitHubAuthService } from "../services/GitHubAuthService";
 
-/**
- * AuthCommand - Manages GitHub authentication commands
- *
- * Available commands:
- * - stackcode.auth.login: Inicia processo de login
- * - stackcode.auth.logout: Removes authentication
- */
 export class AuthCommand extends BaseCommand {
   private _authService: GitHubAuthService;
+  private _dashboardProvider: import("../providers/DashboardProvider").DashboardProvider;
 
-  constructor(authService: GitHubAuthService) {
+  constructor(authService: GitHubAuthService, dashboardProvider: import("../providers/DashboardProvider").DashboardProvider) {
     super();
     this._authService = authService;
+    this._dashboardProvider = dashboardProvider;
   }
 
   /**
@@ -78,6 +73,9 @@ export class AuthCommand extends BaseCommand {
 
       if (result === "Yes, logout") {
         await this._authService.logout();
+        if (this._dashboardProvider && typeof this._dashboardProvider.refreshAuthState === "function") {
+          await this._dashboardProvider.refreshAuthState();
+        }
       }
     } catch (error) {
       console.error("[AuthCommand] Logout failed:", error);

@@ -180,7 +180,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({ onCommand }) => {
     return (
       <div key={item.id} className="select-none">
         <div
-          className={`flex items-center gap-2 py-1 px-2 rounded-md cursor-pointer hover:bg-slate-700/50 transition-colors duration-200 group ${
+          className={`flex items-center gap-2 py-1 px-3 rounded-md cursor-pointer hover:bg-slate-700/50 transition-colors duration-200 group ${
             level > 0 ? "ml-4" : ""
           }`}
           onClick={() => {
@@ -207,11 +207,11 @@ const ProjectView: React.FC<ProjectViewProps> = ({ onCommand }) => {
           <div className="flex-shrink-0">{item.icon}</div>
 
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium text-slate-200 truncate">
+            <div className="text-sm font-medium text-slate-200 whitespace-normal break-words">
               {item.label}
             </div>
             {item.description && (
-              <div className="text-xs text-slate-400 truncate">
+              <div className="text-xs text-slate-400 whitespace-normal break-words">
                 {item.description}
               </div>
             )}
@@ -234,7 +234,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({ onCommand }) => {
   };
 
   return (
-    <div className="bg-slate-900 text-white h-full overflow-auto">
+  <div className="bg-slate-900 text-white h-full overflow-hidden flex flex-col">
       <div className="p-4">
         <div className="flex items-center gap-2 mb-4 pb-2 border-b border-slate-700">
           <Rocket className="w-5 h-5 text-blue-400" />

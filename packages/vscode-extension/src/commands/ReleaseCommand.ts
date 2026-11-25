@@ -13,23 +13,29 @@ import { t } from "@stackcode/i18n";
 import { BaseCommand } from "./BaseCommand";
 import { GitHubAuthService } from "../services/GitHubAuthService";
 import { ProgressManager } from "../services/ProgressManager";
+import { AuthFlowManager } from "../services/AuthFlowManager";
 
 /**
  * Handles monorepo release workflow in VS Code.
  * Supports strategy detection, version management, and GitHub release creation.
+ * 
+ * Requires GitHub authentication to create releases.
  */
 export class ReleaseCommand extends BaseCommand {
   private readonly authService: GitHubAuthService;
   private readonly progressManager: ProgressManager;
+  private readonly authFlowManager: AuthFlowManager;
   private outputChannel?: vscode.OutputChannel;
 
   constructor(
     authService: GitHubAuthService,
     progressManager: ProgressManager,
+    context: vscode.ExtensionContext,
   ) {
     super();
     this.authService = authService;
     this.progressManager = progressManager;
+    this.authFlowManager = new AuthFlowManager(authService, context);
   }
 
   public async execute(): Promise<void> {
@@ -37,6 +43,22 @@ export class ReleaseCommand extends BaseCommand {
       const workspaceFolder = this.getCurrentWorkspaceFolder();
       if (!workspaceFolder) {
         await this.showError(t("vscode.common.no_workspace_folder"));
+        return;
+      }
+
+      // Ensure authenticated BEFORE asking to proceed
+      const authResult = await this.authFlowManager.ensureAuthenticated(
+        "To create releases, StackCode needs GitHub access.\n\n" +
+          "This allows:\n" +
+          "• 🏷️ Create GitHub releases\n" +
+          "• 📝 Generate release notes\n" +
+          "• 📦 Publish to GitHub",
+      );
+
+      if (!authResult.authenticated) {
+        vscode.window.showWarningMessage(
+          "❌ Release creation requires GitHub authentication.",
+        );
         return;
       }
 
