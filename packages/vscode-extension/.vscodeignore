@@ -1,29 +1,19 @@
+# The extension ships as a bundle (dist/extension.js) with the webview,
+# templates and locales next to it; sources and dependencies stay out.
 .vscode/**
 .vscode-test/**
 src/**
-.gitignore
-.yarnrc
-vsc-extension-quickstart.md
-tsconfig.json
-tsconfig.tsbuildinfo
-.eslintrc.json
+out/**
+coverage/**
+node_modules/**
 **/*.map
 **/*.ts
-node_modules/**
-.DS_Store
-.nyc_output
-coverage/**
-test/**
+**/tsconfig*.json
+*.tsbuildinfo
+esbuild.mjs
+jest.config.json
+.eslintrc.json
+.gitignore
+.env
 **/*.test.*
 **/*.spec.*
-.env
-../
-../../**
-**/tsconfig.*
-**/.tsbuildinfo
-
-# Adicione essas linhas
-dist/
-node_modules/
-src/webview-ui/
-!dist/webview-ui/

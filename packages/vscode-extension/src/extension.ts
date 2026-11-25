@@ -11,11 +11,10 @@ import { ValidateCommand } from "./commands/ValidateCommand";
 import { ReleaseCommand } from "./commands/ReleaseCommand";
 import { ConfigCommand } from "./commands/ConfigCommand";
 import { AuthCommand } from "./commands/AuthCommand";
-import { TestGitHubDetectionCommand } from "./commands/TestGitHubDetectionCommand";
 import { DashboardProvider } from "./providers/DashboardProvider";
 import { ProjectViewProvider } from "./providers/ProjectViewProvider";
 import { GitHubAuthService } from "./services/GitHubAuthService";
-import { GitHubIssuesService } from "./services/GitHubIssuesService";
+import { ProgressManager } from "./services/ProgressManager";
 
 let proactiveManager: ProactiveNotificationManager;
 let gitMonitor: GitMonitor;
@@ -24,9 +23,7 @@ let configManager: ConfigurationManager;
 let dashboardProvider: DashboardProvider;
 let projectViewProvider: ProjectViewProvider;
 let gitHubAuthService: GitHubAuthService;
-let gitHubIssuesService: GitHubIssuesService;
-
-// Command instances
+let progressManager: ProgressManager;
 let initCommand: InitCommand;
 let generateCommand: GenerateCommand;
 let gitCommand: GitCommand;
@@ -37,50 +34,39 @@ let configCommand: ConfigCommand;
 let authCommand: AuthCommand;
 
 export async function activate(context: vscode.ExtensionContext) {
-  console.log("🚀 [StackCode] Extension activation started!");
-  console.log("🚀 [StackCode] Extension is now active!");
-  console.log("🚀 [StackCode] Extension activation started...");
-  console.log(
-    "🚀 [StackCode] Workspace folders:",
-    vscode.workspace.workspaceFolders?.length || 0,
-  );
-  console.log("🚀 [StackCode] Extension path:", context.extensionPath);
+  console.log("🚀 [StackCode] Extension activating...");
 
-  // Initialize configuration manager
   configManager = new ConfigurationManager();
-
-  // Initialize GitHub authentication service
   gitHubAuthService = new GitHubAuthService(context);
-
-  // Initialize notification manager
+  progressManager = new ProgressManager();
   proactiveManager = new ProactiveNotificationManager(configManager);
-
-  // Initialize monitors FIRST (dependencies for other services)
   gitMonitor = new GitMonitor(proactiveManager, configManager);
   fileMonitor = new FileMonitor(proactiveManager, configManager);
 
-  // Initialize GitHub issues service (depends on gitMonitor)
-  gitHubIssuesService = new GitHubIssuesService(gitHubAuthService, gitMonitor);
-
-  // Initialize providers (after services are ready)
   dashboardProvider = new DashboardProvider(
     context,
-    gitHubIssuesService,
     gitHubAuthService,
+    gitMonitor,
+    progressManager,
   );
   projectViewProvider = new ProjectViewProvider(context.workspaceState);
-
-  // Initialize commands
   initCommand = new InitCommand();
   generateCommand = new GenerateCommand();
   gitCommand = new GitCommand();
-  commitCommand = new CommitCommand();
+  commitCommand = new CommitCommand(
+    gitHubAuthService,
+    gitMonitor,
+    progressManager,
+    context,
+  );
   validateCommand = new ValidateCommand();
-  releaseCommand = new ReleaseCommand();
+  releaseCommand = new ReleaseCommand(
+    gitHubAuthService,
+    progressManager,
+    context,
+  );
   configCommand = new ConfigCommand();
-  authCommand = new AuthCommand(gitHubAuthService);
-
-  // Register webview providers
+  authCommand = new AuthCommand(gitHubAuthService, dashboardProvider);
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
       "stackcode.dashboard",
@@ -92,11 +78,12 @@ export async function activate(context: vscode.ExtensionContext) {
     ),
   );
 
-  // Register all commands
   const commands = [
-    // Core functionality commands
     vscode.commands.registerCommand("stackcode.init", () =>
       initCommand.execute(),
+    ),
+    vscode.commands.registerCommand("stackcode.validate.commit", () =>
+      validateCommand.validateCommitMessage(),
     ),
     vscode.commands.registerCommand("stackcode.generate.readme", () =>
       generateCommand.generateReadme(),
@@ -125,29 +112,12 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("stackcode.dashboard", () =>
       dashboardProvider.show(),
     ),
-    vscode.commands.registerCommand("stackcode.auth.login", () => {
-      console.log("🔐 [StackCode] AUTH LOGIN command executed!");
-      vscode.window.showInformationMessage(
-        "🔐 StackCode: Executando login GitHub...",
-      );
-      return authCommand.executeLogin();
-    }),
-    vscode.commands.registerCommand("stackcode.auth.logout", () => {
-      console.log("🔓 [StackCode] AUTH LOGOUT command executed!");
-      vscode.window.showInformationMessage(
-        "🔓 StackCode: Executando logout GitHub...",
-      );
-      return authCommand.executeLogout();
-    }),
-
-    // Test commands (development only)
-    vscode.commands.registerCommand("stackcode.test.github.detection", () => {
-      console.log("🧪 [StackCode] TEST GITHUB DETECTION command executed!");
-      const testCommand = new TestGitHubDetectionCommand();
-      return testCommand.execute();
-    }),
-
-    // Legacy commands for backward compatibility
+    vscode.commands.registerCommand("stackcode.auth.login", () =>
+      authCommand.executeLogin(),
+    ),
+    vscode.commands.registerCommand("stackcode.auth.logout", () =>
+      authCommand.executeLogout(),
+    ),
     vscode.commands.registerCommand("stackcode.createBranch", () =>
       gitCommand.startBranch(),
     ),
@@ -157,17 +127,10 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("stackcode.checkBestPractices", () =>
       validateCommand.execute(),
     ),
-
-    // Project view commands
     vscode.commands.registerCommand("stackcode.projectView.refresh", () =>
       projectViewProvider.refresh(),
     ),
-
-    // Webview commands
-    vscode.commands.registerCommand("webviewReady", () => {
-      console.log("[StackCode] Webview is ready!");
-      // Pode enviar dados iniciais aqui se necessário
-    }),
+    vscode.commands.registerCommand("webviewReady", () => {}),
     vscode.commands.registerCommand("stackcode.webview.init", () =>
       initCommand.execute(),
     ),
@@ -189,7 +152,6 @@ export async function activate(context: vscode.ExtensionContext) {
     ),
   ];
 
-  // Add all to context subscriptions for cleanup
   context.subscriptions.push(
     ...commands,
     gitMonitor,
@@ -197,33 +159,25 @@ export async function activate(context: vscode.ExtensionContext) {
     proactiveManager,
     dashboardProvider,
     gitHubAuthService,
+    progressManager,
   );
 
-  console.log("📋 [StackCode] Commands registered:", commands.length);
-  console.log("🔐 [StackCode] Auth commands should be available now");
-  console.log(
-    "🎯 [StackCode] Available commands: stackcode.auth.login, stackcode.auth.logout, stackcode.dashboard",
-  );
-
-  // Initialize GitHub authentication
   await gitHubAuthService.initializeFromStorage();
-
-  // Start monitoring
   gitMonitor.startMonitoring();
   fileMonitor.startMonitoring();
 
-  // Auto-open dashboard if configured
   if (configManager.dashboardAutoOpen) {
-    setTimeout(() => {
-      dashboardProvider.show();
-    }, 1000);
+    setTimeout(() => dashboardProvider.show(), 1000);
   }
 
-  // Show welcome message
   proactiveManager.showWelcomeMessage();
+  console.log("✅ [StackCode] Extension activated successfully");
 }
 
 export function deactivate() {
+  if (progressManager) {
+    progressManager.dispose();
+  }
   if (gitMonitor) {
     gitMonitor.dispose();
   }

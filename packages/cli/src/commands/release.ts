@@ -1,68 +1,78 @@
+/**
+ * @fileoverview Release command for CLI.
+ * Handles version bumping, changelog generation, and GitHub release creation.
+ */
+
 import type { CommandModule } from "yargs";
-import path from "path";
-import fs from "fs/promises";
-import semver from "semver";
-import Configstore from "configstore";
 import { t } from "@stackcode/i18n";
 import * as ui from "./ui.js";
 import {
-  MonorepoInfo,
-  detectVersioningStrategy,
-  findChangedPackages,
-  determinePackageBumps,
-  updatePackageVersion,
-  updateAllVersions,
-  generateChangelog,
-  getRecommendedBump,
-  performReleaseCommit,
+  runReleaseWorkflow,
+  type ReleaseWorkflowResult,
+  type ReleaseWorkflowHooks,
+  type ReleaseWorkflowStep,
+  type ReleaseWorkflowProgress,
+  type ReleaseWorkflowGitHubInfo,
   createGitHubRelease,
   getCommandOutput,
   getErrorMessage,
 } from "@stackcode/core";
+import {
+  createCLIAuthFacade,
+  getCurrentRepository,
+  type CLIAuthFacade,
+} from "../services/githubAuth.js";
 
-const config = new Configstore("@stackcode/cli", { github_token: "" });
-
+/**
+ * Handles GitHub release creation after a successful version release.
+ *
+ * @param params - Release parameters including tag name and notes
+ * @param authManager - CLI authentication facade for token management
+ */
 async function handleGitHubReleaseCreation(
-  tagName: string,
-  releaseNotes: string,
+  params: {
+    tagName: string;
+    releaseNotes: string;
+    cwd: string;
+    githubInfo?: ReleaseWorkflowGitHubInfo;
+  },
+  authManager: CLIAuthFacade,
 ) {
   const shouldCreateRelease = await ui.promptToCreateGitHubRelease();
   if (!shouldCreateRelease) return;
 
-  let token = config.get("github_token");
+  const token = await resolveGitHubToken(authManager);
   if (!token) {
-    token = await ui.promptForToken();
-    if (await ui.promptToSaveToken()) {
-      config.set("github_token", token);
-    }
+    ui.log.warning(t("github.auth.not_authenticated"));
+    return;
   }
 
   try {
-    const remoteUrl = await getCommandOutput(
-      "git",
-      ["remote", "get-url", "origin"],
-      { cwd: process.cwd() },
-    );
-    const match = remoteUrl.match(/github\.com[/:]([\w-]+\/[\w-.]+)/);
-    if (!match)
-      throw new Error("Could not parse GitHub owner/repo from remote URL.");
+    const repository =
+      params.githubInfo ??
+      getCurrentRepository({ cwd: params.cwd }) ??
+      (await fallbackResolveRepository(params.cwd));
 
-    const [owner, repo] = match[1].replace(".git", "").split("/");
-
-    if (typeof token !== "string" || !token) {
-      throw new Error(
-        "Invalid GitHub token. Please run 'stackcode config' to set it.",
-      );
+    if (!repository) {
+      throw new Error("Could not detect GitHub repository");
     }
 
-    await createGitHubRelease({ owner, repo, tagName, releaseNotes, token });
+    const { owner, repo } = repository;
+
+    await createGitHubRelease({
+      owner,
+      repo,
+      tagName: params.tagName,
+      releaseNotes: params.releaseNotes,
+      token,
+    });
   } catch (error: unknown) {
     ui.log.error(`\n${t("common.error_generic")}`);
     const errorMessage = getErrorMessage(error);
     ui.log.gray(errorMessage);
 
     if (errorMessage.toLowerCase().includes("bad credentials")) {
-      config.delete("github_token");
+      await authManager.removeToken();
       ui.log.warning(
         "Your saved GitHub token was invalid and has been cleared.",
       );
@@ -70,85 +80,68 @@ async function handleGitHubReleaseCreation(
   }
 }
 
-async function handleLockedRelease(monorepoInfo: MonorepoInfo) {
-  const bumpType = await getRecommendedBump(monorepoInfo.rootDir);
-  const currentVersion = monorepoInfo.rootVersion || "0.0.0";
-  const newVersion = semver.inc(currentVersion, bumpType as semver.ReleaseType);
-  if (!newVersion) {
-    ui.log.error(t("release.error_calculating_version"));
-    return;
+/**
+ * Resolves a valid GitHub token for API calls.
+ * Checks stored token first, then prompts for new one if needed.
+ *
+ * @param authManager - CLI authentication facade
+ * @returns Valid GitHub token or null if unavailable
+ */
+async function resolveGitHubToken(
+  authManager: CLIAuthFacade,
+): Promise<string | null> {
+  const storedToken = await authManager.getToken();
+  if (storedToken) {
+    const isValid = await authManager.validateToken(storedToken);
+    if (isValid) {
+      return storedToken;
+    }
+    await authManager.removeToken();
+    ui.log.warning(t("github.auth.token_invalid"));
   }
 
-  const confirm = await ui.promptForLockedRelease(currentVersion, newVersion);
-  if (!confirm) {
-    ui.log.warning(t("common.operation_cancelled"));
-    return;
+  const token = (await ui.promptForToken()).trim();
+  if (!token) {
+    return null;
   }
 
-  ui.log.step(t("release.step_updating_versions"));
-  await updateAllVersions(monorepoInfo, newVersion);
+  const isValid = await authManager.validateToken(token);
+  if (!isValid) {
+    ui.log.error(`❌ ${t("github.auth.token_invalid_error")}`);
+    return null;
+  }
 
-  ui.log.step(t("release.step_generating_changelog"));
-  const changelog = await generateChangelog(monorepoInfo);
-  const changelogPath = path.join(monorepoInfo.rootDir, "CHANGELOG.md");
-  const existing = await fs.readFile(changelogPath, "utf-8").catch(() => "");
-  await fs.writeFile(changelogPath, `${changelog}\n${existing}`);
+  const shouldPersist = await ui.promptToSaveToken();
+  if (shouldPersist) {
+    await authManager.saveToken(token);
+  }
 
-  ui.log.success(`\n${t("release.success_ready_to_commit")}`);
-  ui.log.warning(`  ${t("release.next_steps_commit")}`);
-  await handleGitHubReleaseCreation(`v${newVersion}`, changelog);
+  return token;
 }
 
-async function handleIndependentRelease(monorepoInfo: MonorepoInfo) {
-  const changedPackages = await findChangedPackages(
-    monorepoInfo.packages,
-    monorepoInfo.rootDir,
-  );
-  if (changedPackages.length === 0) {
-    ui.log.success(t("release.independent_mode_no_changes"));
-    return;
+/**
+ * Falls back to parsing git remote URL to determine GitHub repository.
+ *
+ * @param cwd - Current working directory
+ * @returns GitHub repository info or null if not found
+ */
+async function fallbackResolveRepository(
+  cwd: string,
+): Promise<ReleaseWorkflowGitHubInfo | null> {
+  try {
+    const remoteUrl = (
+      await getCommandOutput("git", ["remote", "get-url", "origin"], { cwd })
+    ).trim();
+    const match = remoteUrl.match(/github\.com[/:]([\w-]+\/[\w-.]+)/);
+    if (!match) {
+      return null;
+    }
+    const [owner, repoWithSuffix] = match[1].split("/");
+    const repo = repoWithSuffix.replace(/\.git$/, "");
+    return { owner, repo, remoteUrl };
+  } catch {
+    return null;
   }
-
-  const packagesToUpdate = await determinePackageBumps(changedPackages);
-  if (packagesToUpdate.length === 0) {
-    ui.log.warning(t("release.independent_mode_no_bumps"));
-    return;
-  }
-
-  ui.displayIndependentReleasePlan(packagesToUpdate);
-
-  const confirm = await ui.promptForIndependentRelease();
-  if (!confirm) {
-    ui.log.warning(t("common.operation_cancelled"));
-    return;
-  }
-
-  const allChangelogs: { header: string; content: string }[] = [];
-  for (const pkgInfo of packagesToUpdate) {
-    await updatePackageVersion(pkgInfo);
-    const changelogContent = await generateChangelog(monorepoInfo, pkgInfo);
-    const changelogPath = path.join(pkgInfo.pkg.path, "CHANGELOG.md");
-    const existing = await fs.readFile(changelogPath, "utf-8").catch(() => "");
-    await fs.writeFile(changelogPath, `${changelogContent}\n${existing}`);
-    allChangelogs.push({
-      header: `### 🎉 Release for ${pkgInfo.pkg.name}@${pkgInfo.newVersion}`,
-      content: changelogContent,
-    });
-  }
-
-  await performReleaseCommit(packagesToUpdate, monorepoInfo.rootDir);
-  ui.log.success(`\n${t("release.independent_success")}`);
-
-  const combinedNotes = allChangelogs
-    .map((c) => `${c.header}\n\n${c.content}`)
-    .join("\n\n");
-  const primaryPackage =
-    packagesToUpdate.find((p) => p.pkg.name === "@stackcode/cli") ||
-    packagesToUpdate[0];
-  const tagName = `${primaryPackage.pkg.name.split("/")[1] || primaryPackage.pkg.name}@${primaryPackage.newVersion}`;
-  await handleGitHubReleaseCreation(tagName, combinedNotes);
-
-  ui.log.warning(`  ${t("release.next_steps_push")}`);
 }
 
 export const getReleaseCommand = (): CommandModule => ({
@@ -157,21 +150,47 @@ export const getReleaseCommand = (): CommandModule => ({
   builder: {},
   handler: async () => {
     try {
+      const cwd = process.cwd();
+      const authManager = createCLIAuthFacade();
       ui.log.step(t("release.start"));
-      const monorepoInfo = await detectVersioningStrategy(process.cwd());
 
-      if (monorepoInfo.strategy === "unknown") {
-        throw new Error(t("release.error_structure"));
+      const releaseHooks: ReleaseWorkflowHooks = {
+        onProgress: async (progress: ReleaseWorkflowProgress) => {
+          await handleProgress(progress);
+        },
+        confirmLockedRelease: ({ currentVersion, newVersion }) =>
+          ui.promptForLockedRelease(currentVersion, newVersion),
+        displayIndependentPlan: (plan) => {
+          ui.displayIndependentReleasePlan(plan);
+        },
+        confirmIndependentRelease: () => ui.promptForIndependentRelease(),
+      };
+
+      const result = await runReleaseWorkflow({ cwd }, releaseHooks);
+
+      if (result.strategy !== "unknown") {
+        ui.log.info(
+          t("release.detected_strategy", { strategy: result.strategy }),
+        );
       }
 
-      ui.log.info(
-        t("release.detected_strategy", { strategy: monorepoInfo.strategy }),
-      );
+      if (result.status === "cancelled") {
+        await handleCancelledRelease(result);
+        return;
+      }
 
-      if (monorepoInfo.strategy === "locked") {
-        await handleLockedRelease(monorepoInfo);
-      } else if (monorepoInfo.strategy === "independent") {
-        await handleIndependentRelease(monorepoInfo);
+      await handlePreparedRelease(result);
+
+      if (result.tagName && result.releaseNotes) {
+        await handleGitHubReleaseCreation(
+          {
+            tagName: result.tagName,
+            releaseNotes: result.releaseNotes,
+            cwd,
+            githubInfo: result.github,
+          },
+          authManager,
+        );
       }
     } catch (error: unknown) {
       ui.log.error(`\n${t("common.error_unexpected")}`);
@@ -180,3 +199,59 @@ export const getReleaseCommand = (): CommandModule => ({
     }
   },
 });
+
+async function handleProgress(progress: ReleaseWorkflowProgress) {
+  const messages: Partial<Record<ReleaseWorkflowStep, () => void>> = {
+    lockedUpdatingVersions: () =>
+      ui.log.step(t("release.step_updating_versions")),
+    lockedGeneratingChangelog: () =>
+      ui.log.step(t("release.step_generating_changelog")),
+    independentFindingChanges: () =>
+      ui.log.info(t("release.independent_mode_start")),
+    independentUpdatingPackages: () =>
+      ui.log.step(t("release.step_updating_version")),
+    independentCommitting: () =>
+      ui.log.step(t("release.step_committing_and_tagging")),
+  };
+
+  const handler = messages[progress.step];
+  if (handler) handler();
+}
+
+async function handleCancelledRelease(result: ReleaseWorkflowResult) {
+  switch (result.reason) {
+    case "invalid-structure":
+      ui.log.error(t("release.error_structure"));
+      process.exit(1);
+      break;
+    case "no-changes":
+      ui.log.success(t("release.independent_mode_no_changes"));
+      break;
+    case "no-bumps":
+      ui.log.warning(t("release.independent_mode_no_bumps"));
+      break;
+    case "cancelled-by-user":
+      ui.log.warning(t("common.operation_cancelled"));
+      break;
+    case "error":
+    default:
+      ui.log.error(`\n${t("common.error_generic")}`);
+      if (result.error) {
+        ui.log.gray(result.error);
+      }
+      process.exit(1);
+  }
+}
+
+async function handlePreparedRelease(result: ReleaseWorkflowResult) {
+  if (result.strategy === "locked") {
+    ui.log.success(`\n${t("release.success_ready_to_commit")}`);
+    ui.log.warning(`  ${t("release.next_steps_commit")}`);
+    return;
+  }
+
+  if (result.strategy === "independent") {
+    ui.log.success(`\n${t("release.independent_success")}`);
+    ui.log.warning(`  ${t("release.next_steps_push")}`);
+  }
+}

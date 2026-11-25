@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { BaseCommand } from "./BaseCommand";
-import { ProgressCallback } from "../types";
 import { t } from "@stackcode/i18n";
+import { runGitStartWorkflow, runGitFinishWorkflow } from "@stackcode/core";
 
 export class GitCommand extends BaseCommand {
   async execute(): Promise<void> {
@@ -71,7 +71,7 @@ export class GitCommand extends BaseCommand {
         return;
       }
 
-      vscode.window.withProgress(
+      await vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
           title: t("vscode.git.creating_branch", {
@@ -79,25 +79,52 @@ export class GitCommand extends BaseCommand {
           }),
           cancellable: false,
         },
-        async (progress: ProgressCallback) => {
-          progress.report({
-            increment: 0,
-            message: t("vscode.git.switching_to_develop"),
-          });
+        async (
+          progress: vscode.Progress<{ message?: string; increment?: number }>,
+        ) => {
+          const result = await runGitStartWorkflow(
+            {
+              cwd: workspaceFolder.uri.fsPath,
+              branchName,
+              branchType: branchType.label,
+            },
+            {
+              onProgress: (
+                step: import("@stackcode/core").GitStartWorkflowProgress,
+              ) => {
+                switch (step.step) {
+                  case "switchingBase":
+                    progress.report({
+                      increment: 10,
+                      message: t("vscode.git.switching_to_develop"),
+                    });
+                    break;
+                  case "pullingBase":
+                    progress.report({
+                      increment: 50,
+                      message: t("vscode.git.pulling_latest_changes"),
+                    });
+                    break;
+                  case "creatingBranch":
+                    progress.report({
+                      increment: 80,
+                      message: t("vscode.git.creating_new_branch"),
+                    });
+                    break;
+                  case "completed":
+                    progress.report({
+                      increment: 100,
+                      message: t("vscode.git.branch_created_successfully"),
+                    });
+                    break;
+                }
+              },
+            },
+          );
 
-          const command = `npx @stackcode/cli git start ${branchName} --type=${branchType.label}`;
-
-          progress.report({
-            increment: 50,
-            message: t("vscode.git.creating_new_branch"),
-          });
-
-          await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
-
-          progress.report({
-            increment: 100,
-            message: t("vscode.git.branch_created_successfully"),
-          });
+          if (result.status !== "created") {
+            throw new Error(result.error ?? t("vscode.common.unknown_error"));
+          }
         },
       );
 
@@ -132,8 +159,8 @@ export class GitCommand extends BaseCommand {
           if (repo && repo.state.HEAD) {
             currentBranch = repo.state.HEAD.name || "current branch";
           }
-        } catch {
-          // Git API unavailable - use generic message
+        } catch (error) {
+          console.warn("Git API unavailable:", error);
         }
       }
 
@@ -145,8 +172,7 @@ export class GitCommand extends BaseCommand {
       if (!confirm) {
         return;
       }
-
-      vscode.window.withProgress(
+      await vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
           title: t("vscode.git.finishing_branch", {
@@ -154,25 +180,49 @@ export class GitCommand extends BaseCommand {
           }),
           cancellable: false,
         },
-        async (progress: ProgressCallback) => {
-          progress.report({
-            increment: 0,
-            message: t("vscode.git.pushing_branch"),
-          });
+        async (
+          progress: vscode.Progress<{ message?: string; increment?: number }>,
+        ) => {
+          const result = await runGitFinishWorkflow(
+            { cwd: workspaceFolder.uri.fsPath },
+            {
+              onProgress: (
+                step: import("@stackcode/core").GitFinishWorkflowProgress,
+              ) => {
+                switch (step.step) {
+                  case "pushing":
+                    progress.report({
+                      increment: 30,
+                      message: t("vscode.git.pushing_branch"),
+                    });
+                    break;
+                  case "computingPrUrl":
+                    progress.report({
+                      increment: 70,
+                      message: t("vscode.git.opening_pr"),
+                    });
+                    break;
+                  case "completed":
+                    progress.report({
+                      increment: 100,
+                      message: t("vscode.git.branch_finished_successfully"),
+                    });
+                    break;
+                }
+              },
+            },
+          );
 
-          const command = `npx @stackcode/cli git finish`;
+          if (result.status !== "pushed" || !result.prUrl || !result.branch) {
+            const errorMessage =
+              result.error === "not-on-branch"
+                ? t("vscode.git.branch_name_required")
+                : (result.error ?? t("vscode.common.unknown_error"));
+            throw new Error(errorMessage);
+          }
 
-          progress.report({
-            increment: 50,
-            message: t("vscode.git.opening_pr"),
-          });
-
-          await this.runTerminalCommand(command, workspaceFolder.uri.fsPath);
-
-          progress.report({
-            increment: 100,
-            message: t("vscode.git.branch_finished_successfully"),
-          });
+          await vscode.env.openExternal(vscode.Uri.parse(result.prUrl));
+          currentBranch = result.branch;
         },
       );
 

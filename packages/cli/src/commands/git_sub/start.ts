@@ -1,6 +1,6 @@
 import type { CommandModule, ArgumentsCamelCase } from "yargs";
 import chalk from "chalk";
-import { runCommand, getErrorMessage } from "@stackcode/core";
+import { getErrorMessage, runGitStartWorkflow } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
 import inquirer from "inquirer";
 
@@ -18,18 +18,24 @@ export async function createBranch(branchName: string, branchType: string) {
     console.log(
       chalk.blue(t("git.info_creating_branch", { branchName: fullBranchName })),
     );
-    await runCommand("git", ["checkout", "develop"], { cwd: process.cwd() });
-    await runCommand("git", ["pull", "origin", "develop"], {
+
+    const result = await runGitStartWorkflow({
       cwd: process.cwd(),
+      branchName,
+      branchType,
     });
-    await runCommand("git", ["checkout", "-b", fullBranchName], {
-      cwd: process.cwd(),
-    });
-    console.log(
-      chalk.green(
-        t("git.success_branch_created", { branchName: fullBranchName }),
-      ),
-    );
+
+    if (result.status === "created") {
+      console.log(
+        chalk.green(
+          t("git.success_branch_created", {
+            branchName: result.fullBranchName ?? fullBranchName,
+          }),
+        ),
+      );
+    } else {
+      throw new Error(result.error ?? "Failed to create branch");
+    }
   } catch (error: unknown) {
     console.error(
       chalk.red(t("git.error_branch_exists", { branchName: fullBranchName })),

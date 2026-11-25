@@ -1,15 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import inquirer from "inquirer";
 import fs from "fs/promises";
+import path from "path";
 import {
-  generateGitignoreContent,
-  generateReadmeContent,
+  runGenerateWorkflow,
+  type GenerateWorkflowResult,
+  type GenerateWorkflowOptions,
+  type GenerateWorkflowHooks,
 } from "@stackcode/core";
 import { getGenerateCommand } from "../../src/commands/generate";
+import * as ui from "../../src/commands/ui.js";
 
 vi.mock("@stackcode/core", () => ({
-  generateReadmeContent: vi.fn(),
-  generateGitignoreContent: vi.fn(),
+  runGenerateWorkflow: vi.fn(),
 }));
 
 vi.mock("inquirer");
@@ -17,12 +20,14 @@ vi.mock("inquirer");
 vi.mock("fs/promises");
 
 vi.mock("@stackcode/i18n", () => ({ t: (key: string) => key }));
+vi.mock("../../src/educational-mode.js", () => ({
+  showEducationalMessage: vi.fn(),
+}));
 
 const mockedInquirer = vi.mocked(inquirer);
 const mockedFs = vi.mocked(fs);
 const mockedCore = {
-  generateReadmeContent: vi.mocked(generateReadmeContent),
-  generateGitignoreContent: vi.mocked(generateGitignoreContent),
+  runGenerateWorkflow: vi.mocked(runGenerateWorkflow),
 };
 
 describe("Generate Command", () => {
@@ -31,34 +36,58 @@ describe("Generate Command", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(console, "log").mockImplementation(() => {});
+    mockedCore.runGenerateWorkflow.mockResolvedValue({
+      status: "completed",
+      files: [],
+      warnings: [],
+    });
+    mockedFs.readFile.mockResolvedValue('{ "stack": "node-ts" }');
   });
 
   describe("Non-Interactive Mode", () => {
     it("should generate a README.md when specified as an argument", async () => {
-      // Arrange
-      const mockContent = "# Mocked README";
-      mockedCore.generateReadmeContent.mockResolvedValue(mockContent);
-      mockedFs.access.mockRejectedValue(new Error("File not found"));
+      const workflowResult: GenerateWorkflowResult = {
+        status: "completed",
+        files: [
+          {
+            fileType: "readme",
+            filePath: path.join(process.cwd(), "README.md"),
+            status: "created",
+          },
+        ],
+        warnings: [],
+      };
+      mockedCore.runGenerateWorkflow.mockResolvedValueOnce(workflowResult);
       const argv = { filetype: "readme", _: [], $0: "stc" };
 
       // Act
       await handler(argv);
 
       // Assert
-      expect(mockedCore.generateReadmeContent).toHaveBeenCalledOnce();
-      expect(mockedFs.writeFile).toHaveBeenCalledOnce();
-      expect(mockedFs.writeFile).toHaveBeenCalledWith(
-        expect.stringContaining("README.md"),
-        mockContent,
+      expect(mockedCore.runGenerateWorkflow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          files: ["readme"],
+        }),
+        expect.any(Object),
       );
-      expect(console.log).toHaveBeenCalledWith("generate.success.readme");
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining("generate.success.readme"),
+      );
     });
 
     it("should generate a .gitignore when specified as an argument", async () => {
-      // Arrange
-      const mockContent = "node_modules/";
-      mockedCore.generateGitignoreContent.mockResolvedValue(mockContent);
-      mockedFs.access.mockRejectedValue(new Error("File not found"));
+      const workflowResult: GenerateWorkflowResult = {
+        status: "completed",
+        files: [
+          {
+            fileType: "gitignore",
+            filePath: path.join(process.cwd(), ".gitignore"),
+            status: "created",
+          },
+        ],
+        warnings: [],
+      };
+      mockedCore.runGenerateWorkflow.mockResolvedValueOnce(workflowResult);
       mockedFs.readFile.mockResolvedValue('{ "stack": "node-ts" }');
       const argv = { filetype: "gitignore", _: [], $0: "stc" };
 
@@ -66,14 +95,16 @@ describe("Generate Command", () => {
       await handler(argv);
 
       // Assert
-      expect(mockedCore.generateGitignoreContent).toHaveBeenCalledWith([
-        "node-ts",
-      ]);
-      expect(mockedFs.writeFile).toHaveBeenCalledWith(
-        expect.stringContaining(".gitignore"),
-        mockContent,
+      expect(mockedCore.runGenerateWorkflow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          files: ["gitignore"],
+          gitignoreTechnologies: ["node-ts"],
+        }),
+        expect.any(Object),
       );
-      expect(console.log).toHaveBeenCalledWith("generate.success.gitignore");
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining("generate.success.gitignore"),
+      );
     });
   });
 
@@ -83,23 +114,34 @@ describe("Generate Command", () => {
       mockedInquirer.prompt.mockResolvedValue({
         filesToGenerate: ["readme", "gitignore"],
       });
-      mockedCore.generateReadmeContent.mockResolvedValue("# README");
-      mockedCore.generateGitignoreContent.mockResolvedValue("node_modules");
-      mockedFs.access.mockRejectedValue(new Error("File not found"));
+      const workflowResult: GenerateWorkflowResult = {
+        status: "completed",
+        files: [
+          {
+            fileType: "readme",
+            filePath: path.join(process.cwd(), "README.md"),
+            status: "created",
+          },
+          {
+            fileType: "gitignore",
+            filePath: path.join(process.cwd(), ".gitignore"),
+            status: "created",
+          },
+        ],
+        warnings: [],
+      };
+      mockedCore.runGenerateWorkflow.mockResolvedValueOnce(workflowResult);
       const argv = { _: [], $0: "stc" };
 
       // Act
       await handler(argv);
 
       // Assert
-      expect(mockedFs.writeFile).toHaveBeenCalledTimes(2);
-      expect(mockedFs.writeFile).toHaveBeenCalledWith(
-        expect.stringContaining("README.md"),
-        "# README",
-      );
-      expect(mockedFs.writeFile).toHaveBeenCalledWith(
-        expect.stringContaining(".gitignore"),
-        "node_modules",
+      expect(mockedCore.runGenerateWorkflow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          files: expect.arrayContaining(["readme", "gitignore"]),
+        }),
+        expect.any(Object),
       );
     });
 
@@ -112,40 +154,77 @@ describe("Generate Command", () => {
       await handler(argv);
 
       // Assert
-      expect(mockedFs.writeFile).not.toHaveBeenCalled();
-      expect(console.log).toHaveBeenCalledWith("common.operation_cancelled");
+      expect(mockedCore.runGenerateWorkflow).not.toHaveBeenCalled();
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining("common.operation_cancelled"),
+      );
     });
   });
 
   describe("File Overwriting Logic", () => {
     it("should prompt for overwrite if file exists and proceed if confirmed", async () => {
-      // Arrange
-      mockedFs.access.mockResolvedValue(undefined);
-      mockedInquirer.prompt.mockResolvedValue({ confirm: true });
-      mockedCore.generateReadmeContent.mockResolvedValue("# Overwritten");
+      mockedCore.runGenerateWorkflow.mockImplementationOnce(
+        async (
+          options: GenerateWorkflowOptions,
+          hooks?: GenerateWorkflowHooks,
+        ) => {
+          const promptSpy = vi.spyOn(ui, "promptForConfirmation");
+          mockedInquirer.prompt.mockResolvedValueOnce({ confirm: true });
+          const decision = await hooks?.shouldOverwriteFile?.({
+            fileType: "readme",
+            filePath: path.join(process.cwd(), "README.md"),
+          });
+          expect(promptSpy).toHaveBeenCalled();
+          expect(decision).toBe(true);
+          return {
+            status: "completed",
+            files: [
+              {
+                fileType: "readme",
+                filePath: path.join(process.cwd(), "README.md"),
+                status: "overwritten",
+              },
+            ],
+            warnings: [],
+          };
+        },
+      );
       const argv = { filetype: "readme", _: [], $0: "stc" };
 
       // Act
       await handler(argv);
 
       // Assert
-      expect(mockedInquirer.prompt).toHaveBeenCalledOnce();
-      expect(mockedFs.writeFile).toHaveBeenCalledOnce();
+      expect(mockedCore.runGenerateWorkflow).toHaveBeenCalled();
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining("generate.success.readme"),
+      );
     });
 
     it("should cancel if file exists and user denies overwrite", async () => {
-      // Arrange
-      mockedFs.access.mockResolvedValue(undefined);
-      mockedInquirer.prompt.mockResolvedValue({ confirm: false });
+      const workflowResult: GenerateWorkflowResult = {
+        status: "cancelled",
+        files: [
+          {
+            fileType: "readme",
+            filePath: path.join(process.cwd(), "README.md"),
+            status: "skipped",
+            reason: "overwrite-declined",
+          },
+        ],
+        warnings: [],
+      };
+      mockedCore.runGenerateWorkflow.mockResolvedValueOnce(workflowResult);
       const argv = { filetype: "readme", _: [], $0: "stc" };
 
       // Act
       await handler(argv);
 
       // Assert
-      expect(mockedInquirer.prompt).toHaveBeenCalledOnce();
-      expect(mockedFs.writeFile).not.toHaveBeenCalled();
-      expect(console.log).toHaveBeenCalledWith("common.operation_cancelled");
+      expect(mockedCore.runGenerateWorkflow).toHaveBeenCalled();
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining("common.operation_cancelled"),
+      );
     });
   });
 });

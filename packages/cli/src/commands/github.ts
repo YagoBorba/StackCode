@@ -1,11 +1,17 @@
+/**
+ * @fileoverview GitHub integration commands for CLI.
+ * Provides authentication management and issue listing functionality.
+ */
+
 import { CommandModule } from "yargs";
-import { getErrorMessage } from "@stackcode/core";
-import { fetchRepositoryIssues } from "@stackcode/core";
-import { Octokit } from "@octokit/rest";
+import { fetchRepositoryIssues, getErrorMessage } from "@stackcode/core";
 import { t, initI18n } from "@stackcode/i18n";
-import fs from "fs";
-import os from "os";
-import path from "path";
+import {
+  createCLIAuthFacade,
+  getCurrentRepository,
+  type AuthenticatedOctokit,
+  type CLIAuthFacade,
+} from "../services/githubAuth.js";
 
 interface AuthArgs {
   token?: string;
@@ -23,104 +29,9 @@ interface IssuesArgs {
 }
 
 /**
- * Gerenciamento de token de autenticação GitHub no CLI
- */
-class CLIAuthManager {
-  private tokenPath: string;
-
-  constructor() {
-    const configDir = path.join(os.homedir(), ".stackcode");
-    if (!fs.existsSync(configDir)) {
-      fs.mkdirSync(configDir, { recursive: true });
-    }
-    this.tokenPath = path.join(configDir, "github_token");
-  }
-
-  saveToken(token: string): void {
-    fs.writeFileSync(this.tokenPath, token, { mode: 0o600 });
-  }
-
-  getToken(): string | null {
-    try {
-      if (fs.existsSync(this.tokenPath)) {
-        return fs.readFileSync(this.tokenPath, "utf-8").trim();
-      }
-    } catch (error) {
-      console.error(t("github.auth.error_reading_token"), error);
-    }
-    return null;
-  }
-
-  removeToken(): void {
-    try {
-      if (fs.existsSync(this.tokenPath)) {
-        fs.unlinkSync(this.tokenPath);
-      }
-    } catch (error) {
-      console.error(t("github.auth.error_removing_token"), error);
-    }
-  }
-
-  async validateToken(token: string): Promise<boolean> {
-    try {
-      const octokit = new Octokit({ auth: token });
-      await octokit.users.getAuthenticated();
-      return true;
-    } catch {
-      return false;
-    }
-  }
-}
-
-/**
- * Detecta repositório GitHub atual baseado no git remote
- */
-function getCurrentRepository(): { owner: string; repo: string } | null {
-  try {
-    const cwd = process.cwd();
-    console.log(`🔍 Detectando repositório em: ${cwd}`);
-
-    const remoteUrl = fs
-      .readFileSync(".git/config", "utf8")
-      .split("\n")
-      .find((line: string) => line.includes("url = "))
-      ?.split("url = ")[1]
-      ?.trim();
-
-    if (!remoteUrl) {
-      console.log(`❌ Não foi possível encontrar URL remota no .git/config`);
-      return null;
-    }
-
-    console.log(`🔗 URL remota encontrada: ${remoteUrl}`);
-
-    const patterns = [
-      /^https:\/\/github\.com\/([^/]+)\/([^/]+)(?:\.git)?$/,
-      /^git@github\.com:([^/]+)\/([^/]+)(?:\.git)?$/,
-      /^ssh:\/\/git@github\.com\/([^/]+)\/([^/]+)(?:\.git)?$/,
-    ];
-
-    for (const pattern of patterns) {
-      const match = remoteUrl.match(pattern);
-      if (match) {
-        const result = { owner: match[1], repo: match[2] };
-        console.log(`✅ Repositório detectado: ${result.owner}/${result.repo}`);
-        return result;
-      }
-    }
-
-    console.log(`❌ URL não corresponde aos padrões GitHub conhecidos`);
-    return null;
-  } catch (error) {
-    console.log(
-      `❌ Erro ao detectar repositório: ${error instanceof Error ? error.message : String(error)}`,
-    );
-    return null;
-  }
-}
-
-/**
- * Comando para autenticação GitHub
+ * Creates the GitHub authentication command module.
+ *
+ * @returns Command module for managing GitHub authentication
  */
 function getAuthCommand(): CommandModule<Record<string, unknown>, AuthArgs> {
   return {
@@ -155,17 +66,17 @@ function getAuthCommand(): CommandModule<Record<string, unknown>, AuthArgs> {
     async handler(args: AuthArgs) {
       await initI18n();
 
-      const authManager = new CLIAuthManager();
+      const authManager = createCLIAuthFacade();
 
       try {
         if (args.logout) {
-          authManager.removeToken();
+          await authManager.removeToken();
           console.log(`✅ ${t("github.auth.authentication_removed")}`);
           return;
         }
 
         if (args.status) {
-          const token = authManager.getToken();
+          const token = await authManager.getToken();
           if (!token) {
             console.log(`❌ ${t("github.auth.not_authenticated")}`);
             console.log(t("github.auth.run_login"));
@@ -189,7 +100,7 @@ function getAuthCommand(): CommandModule<Record<string, unknown>, AuthArgs> {
             process.exit(1);
           }
 
-          authManager.saveToken(args.token);
+          await authManager.saveToken(args.token);
           console.log(`✅ ${t("github.auth.token_saved")}`);
           return;
         }
@@ -221,7 +132,9 @@ function getAuthCommand(): CommandModule<Record<string, unknown>, AuthArgs> {
 }
 
 /**
- * Comando para listar issues
+ * Creates the GitHub issues listing command module.
+ *
+ * @returns Command module for listing and filtering repository issues
  */
 function getIssuesCommand(): CommandModule<
   Record<string, unknown>,
@@ -273,7 +186,7 @@ function getIssuesCommand(): CommandModule<
     async handler(args: IssuesArgs) {
       await initI18n();
 
-      const authManager = new CLIAuthManager();
+      const authManager = createCLIAuthFacade();
 
       try {
         if (
@@ -287,7 +200,7 @@ function getIssuesCommand(): CommandModule<
           return;
         }
 
-        const token = authManager.getToken();
+        const token = await authManager.getToken();
         if (!token) {
           console.error(`❌ ${t("github.auth.not_authenticated")}`);
           console.error(t("github.auth.run_login"));
@@ -303,7 +216,7 @@ function getIssuesCommand(): CommandModule<
           }
           [owner, repo] = parts;
         } else {
-          const currentRepo = getCurrentRepository();
+          const currentRepo = getCurrentRepository({ verbose: true });
           if (!currentRepo) {
             console.error(`❌ ${t("github.issues.no_repository_detected")}`);
             console.error(t("github.issues.run_from_git_repo"));
@@ -314,7 +227,19 @@ function getIssuesCommand(): CommandModule<
 
         console.log(`📋 ${t("github.issues.fetching")} ${owner}/${repo}...`);
 
-        const octokit = new Octokit({ auth: token });
+        let octokit: AuthenticatedOctokit;
+        try {
+          octokit = await authManager.getClient();
+        } catch (error) {
+          console.error(`❌ ${t("github.auth.token_invalid")}`);
+          await authManager.removeToken();
+          console.error(t("github.auth.run_login"));
+          if (error instanceof Error) {
+            console.error(error.message);
+          }
+          process.exit(1);
+          return;
+        }
         const issues = await fetchRepositoryIssues(octokit, {
           owner,
           repo,
@@ -385,18 +310,18 @@ export function getGitHubCommand(): CommandModule {
  * Menu interativo para issues do GitHub
  */
 async function showInteractiveIssuesMenu(
-  authManager: CLIAuthManager,
+  authManager: CLIAuthFacade,
 ): Promise<void> {
   const inquirer = await import("inquirer");
 
-  const token = authManager.getToken();
+  const token = await authManager.getToken();
   if (!token) {
     console.error(`❌ ${t("github.auth.not_authenticated")}`);
     console.error(t("github.auth.run_login"));
     process.exit(1);
   }
 
-  const currentRepo = getCurrentRepository();
+  const currentRepo = getCurrentRepository({ verbose: true });
 
   const choices = [
     {
@@ -468,7 +393,7 @@ async function showInteractiveIssuesMenu(
  * Handle repositório específico
  */
 async function handleSpecificRepository(
-  authManager: CLIAuthManager,
+  authManager: CLIAuthFacade,
 ): Promise<void> {
   const inquirer = await import("inquirer");
 
@@ -498,7 +423,7 @@ async function handleSpecificRepository(
  * Handle filtro por labels
  */
 async function handleLabelFilter(
-  authManager: CLIAuthManager,
+  authManager: CLIAuthFacade,
   repository: { owner: string; repo: string },
 ): Promise<void> {
   const inquirer = await import("inquirer");
@@ -521,7 +446,7 @@ async function handleLabelFilter(
  * Busca e exibe issues com opções de paginação
  */
 async function fetchAndDisplayIssues(
-  authManager: CLIAuthManager,
+  authManager: CLIAuthFacade,
   repository: { owner: string; repo: string },
   options: {
     state?: string;
@@ -535,8 +460,25 @@ async function fetchAndDisplayIssues(
   );
 
   try {
-    const token = authManager.getToken()!;
-    const octokit = new Octokit({ auth: token });
+    const token = await authManager.getToken();
+    if (!token) {
+      console.error(`❌ ${t("github.auth.not_authenticated")}`);
+      console.error(t("github.auth.run_login"));
+      return;
+    }
+
+    let octokit: AuthenticatedOctokit;
+    try {
+      octokit = await authManager.getClient();
+    } catch (clientError) {
+      console.error(`❌ ${t("github.auth.token_invalid")}`);
+      if (clientError instanceof Error) {
+        console.error(clientError.message);
+      }
+      await authManager.removeToken();
+      console.error(t("github.auth.run_login"));
+      return;
+    }
 
     const issues = await fetchRepositoryIssues(octokit, {
       owner: repository.owner,
@@ -604,4 +546,4 @@ async function fetchAndDisplayIssues(
   }
 }
 
-export { CLIAuthManager, getCurrentRepository, fetchRepositoryIssues };
+export { createCLIAuthFacade, getCurrentRepository, fetchRepositoryIssues };

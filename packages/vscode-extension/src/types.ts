@@ -1,5 +1,3 @@
-import * as vscode from "vscode";
-
 export interface BranchType {
   label: string;
   description: string;
@@ -27,8 +25,3 @@ export interface BestPracticesIssue {
   message: string;
   action?: () => Promise<void>;
 }
-
-export type ProgressCallback = vscode.Progress<{
-  increment?: number;
-  message?: string;
-}>;

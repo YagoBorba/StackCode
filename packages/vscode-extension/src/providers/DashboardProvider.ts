@@ -1,31 +1,91 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
-import { GitHubIssuesService } from "../services/GitHubIssuesService";
+import { runIssuesWorkflow, clearRepositoryCache } from "@stackcode/core";
 import { GitHubAuthService } from "../services/GitHubAuthService";
+import { GitMonitor } from "../monitors/GitMonitor";
+import { GitHubRemoteStatsService } from "../services/GitHubRemoteStatsService";
+import { AuthFlowManager } from "../services/AuthFlowManager";
+import { LocalRepositoryStatsService } from "../services/LocalRepositoryStatsService";
+import {
+  ProgressManager,
+  WebviewProgressListener,
+} from "../services/ProgressManager";
+import type {
+  WebviewProgressMessage,
+  WebviewProgressStateMessage,
+  WebviewProgressCompleteMessage,
+} from "../types/progress-events";
 
-/**
- * Provides the StackCode dashboard webview interface.
- * Manages project statistics, GitHub issues, and integration with various services.
- */
 export class DashboardProvider
-  implements vscode.WebviewViewProvider, vscode.Disposable
+  implements
+    vscode.WebviewViewProvider,
+    vscode.Disposable,
+    WebviewProgressListener
 {
   public static readonly viewType = "stackcode.dashboard";
   private _view?: vscode.WebviewView;
   private readonly _extensionUri: vscode.Uri;
   private _disposables: vscode.Disposable[] = [];
-  private _issuesService?: GitHubIssuesService;
   private _authService?: GitHubAuthService;
+  private _gitMonitor?: GitMonitor;
+  private _progressManager?: ProgressManager;
+  private _remoteStatsService?: GitHubRemoteStatsService;
+  private _authFlowManager?: AuthFlowManager;
+  private readonly _localStatsService = new LocalRepositoryStatsService();
+  private static readonly DEBUG = false;
 
   constructor(
     context: vscode.ExtensionContext,
-    issuesService?: GitHubIssuesService,
     authService?: GitHubAuthService,
+    gitMonitor?: GitMonitor,
+    progressManager?: ProgressManager,
   ) {
     this._extensionUri = context.extensionUri;
-    this._issuesService = issuesService;
     this._authService = authService;
+    this._gitMonitor = gitMonitor;
+    this._progressManager = progressManager;
+
+    if (this._progressManager) {
+      this._progressManager.registerWebviewProvider(this);
+    }
+
+    if (authService && gitMonitor) {
+      this._remoteStatsService = new GitHubRemoteStatsService(
+        authService,
+        gitMonitor,
+      );
+      this._authFlowManager = new AuthFlowManager(authService, context);
+    }
+  }
+
+  /**
+   * Refresh dashboard stats and issues after auth state changes
+   */
+  public async refreshAuthState(): Promise<void> {
+    await this.updateProjectStats();
+    if (!this._authService?.isAuthenticated) {
+      // Limpa issues no frontend
+      this.sendMessage({
+        type: "updateIssues",
+        payload: {
+          issues: [],
+          error: "Not authenticated with GitHub",
+          needsAuth: true,
+        },
+      });
+      // Limpa atividade recente no frontend
+      this.sendMessage({
+        type: "updateStats",
+        payload: {
+          recentActivity: null,
+          error: "Not authenticated with GitHub",
+          needsAuth: true,
+        },
+      });
+      return;
+    }
+    await this.updateIssues();
   }
 
   public resolveWebviewView(webviewView: vscode.WebviewView) {
@@ -40,41 +100,92 @@ export class DashboardProvider
 
     webviewView.webview.onDidReceiveMessage(
       async (data: { type: string; payload?: unknown }) => {
-        console.log(`[StackCode] Received command from webview: ${data.type}`);
-
         try {
+          if (DashboardProvider.DEBUG) {
+            console.log(
+              "[DashboardProvider] Received message from webview:",
+              data.type,
+            );
+          }
           switch (data.type) {
             case "webviewReady":
-              console.log(
-                "[StackCode] Webview reported ready, sending initial data",
-              );
+              if (DashboardProvider.DEBUG) {
+                console.log(
+                  "[DashboardProvider] Webview ready, updating stats...",
+                );
+              }
               this.updateProjectStats();
+              this.updateCurrentBranch();
               if (this._authService?.isAuthenticated) {
+                if (DashboardProvider.DEBUG) {
+                  console.log(
+                    "[DashboardProvider] Authenticated, updating issues...",
+                  );
+                }
                 await this.updateIssues();
               }
               return;
-
             case "refreshStats":
+              if (DashboardProvider.DEBUG) {
+                console.log("[DashboardProvider] Refreshing stats...");
+              }
               this.updateProjectStats();
               return;
-
+            case "connectGitHub":
+              if (DashboardProvider.DEBUG) {
+                console.log("[DashboardProvider] Connect GitHub requested");
+              }
+              await this.handleGitHubConnect();
+              return;
             case "fetchIssues":
+              if (DashboardProvider.DEBUG) {
+                console.log("[DashboardProvider] Fetching issues...");
+              }
               await this.updateIssues();
               return;
-
             case "refreshIssues":
+              if (DashboardProvider.DEBUG) {
+                console.log("[DashboardProvider] Refreshing issues...");
+              }
               await this.updateIssues(true);
               return;
-
+            case "openExternal": {
+              const payload = data.payload as
+                | { url?: string }
+                | string
+                | undefined;
+              const url = typeof payload === "string" ? payload : payload?.url;
+              if (url) {
+                try {
+                  await vscode.env.openExternal(vscode.Uri.parse(url));
+                } catch (error) {
+                  console.error(
+                    "[DashboardProvider] Failed to open URL:",
+                    url,
+                    error,
+                  );
+                  vscode.window.showErrorMessage(`Failed to open URL: ${url}`);
+                }
+              }
+              return;
+            }
+            case "expandSidebar":
+            case "expandFull":
+              // Frontend-only commands
+              return;
+            case "resizePanel":
+              // Frontend-only commands
+              return;
             default:
-              // Executar comando normal do VS Code
+              if (DashboardProvider.DEBUG) {
+                console.log(
+                  "[DashboardProvider] Executing command:",
+                  data.type,
+                );
+              }
               await vscode.commands.executeCommand(data.type, data.payload);
           }
         } catch (error) {
-          console.error(
-            `[StackCode] Error executing command ${data.type}:`,
-            error,
-          );
           this.sendMessage({
             type: "commandError",
             payload: {
@@ -88,13 +199,48 @@ export class DashboardProvider
       this._disposables,
     );
 
-    // WebviewView doesn't have onDidBecomeVisible, so we'll update stats immediately
     this.updateProjectStats();
+
+    // Auto-refresh: periodically refresh stats and issues
+    const interval = setInterval(() => {
+      try {
+        this.updateProjectStats();
+        if (this._authService?.isAuthenticated) {
+          this.updateIssues();
+        }
+      } catch (e) {
+        if (DashboardProvider.DEBUG) {
+          console.log("[DashboardProvider] Auto-refresh error:", e);
+        }
+      }
+    }, 20_000); // 20s
+
+    this._disposables.push({ dispose: () => clearInterval(interval) });
   }
 
-  public sendMessage(message: { type: string; payload?: unknown }) {
+  public sendMessage(
+    message:
+      | { type: string; payload?: unknown }
+      | WebviewProgressMessage
+      | WebviewProgressStateMessage
+      | WebviewProgressCompleteMessage,
+  ) {
     if (this._view) {
+      if (DashboardProvider.DEBUG) {
+        const m = message as { type?: string };
+        console.log(
+          "[DashboardProvider] Sending message to webview:",
+          m.type,
+          message,
+        );
+      }
       this._view.webview.postMessage(message);
+    } else {
+      if (DashboardProvider.DEBUG) {
+        console.log(
+          "[DashboardProvider] Cannot send message, no view available",
+        );
+      }
     }
   }
 
@@ -102,19 +248,38 @@ export class DashboardProvider
     if (this._view) {
       this._view.show?.(true);
     } else {
-      // If view is not created yet, trigger the creation by executing the show command
       vscode.commands.executeCommand("workbench.view.extension.stackcode");
+    }
+  }
+
+  private async handleGitHubConnect() {
+    if (!this._authFlowManager) {
+      vscode.window.showErrorMessage("Authentication service not available");
+      return;
+    }
+
+    const result = await this._authFlowManager.ensureAuthenticated(
+      "To view project statistics and manage issues, StackCode needs to connect with GitHub.\n\n" +
+        "This allows access to:\n" +
+        "• 📊 Repository statistics (stars, forks, commits)\n" +
+        "• 👥 Contributors and activity data\n" +
+        "• 📝 Issues and pull requests\n" +
+        "• 💻 Language breakdown",
+    );
+
+    if (result.authenticated) {
+      // Refresh stats and issues after authentication
+      await this.updateProjectStats();
+      await this.updateIssues();
     }
   }
 
   private async updateIssues(forceRefresh = false): Promise<void> {
     try {
-      if (!this._issuesService || !this._authService) {
-        console.warn("[DashboardProvider] Issues service not available");
+      if (!this._authService || !this._gitMonitor) {
         return;
       }
 
-      // Verificar se está autenticado
       if (!this._authService.isAuthenticated) {
         this.sendMessage({
           type: "updateIssues",
@@ -127,25 +292,81 @@ export class DashboardProvider
         return;
       }
 
-      console.log("[DashboardProvider] Fetching GitHub issues...");
+      const repository = await this._gitMonitor.getCurrentGitHubRepository();
+      if (!repository) {
+        this.sendMessage({
+          type: "updateIssues",
+          payload: {
+            issues: [],
+            error: "No GitHub repository detected",
+            needsAuth: false,
+          },
+        });
+        return;
+      }
 
-      const issues = forceRefresh
-        ? await this._issuesService.refreshIssues()
-        : await this._issuesService.fetchCurrentRepositoryIssues();
+      if (forceRefresh) {
+        clearRepositoryCache({
+          owner: repository.owner,
+          repo: repository.repo,
+          fullName: repository.fullName,
+        });
+      }
+
+      const client = await this._authService.getAuthenticatedClient();
+
+      if (this._progressManager) {
+        this._progressManager.startWorkflow("issues");
+      }
+
+      const result = await runIssuesWorkflow(
+        {
+          client,
+          repository: {
+            owner: repository.owner,
+            repo: repository.repo,
+            fullName: repository.fullName,
+          },
+          enableCache: !forceRefresh,
+        },
+        {
+          onProgress: this._progressManager
+            ? this._progressManager.createProgressHook("issues")
+            : undefined,
+        },
+      );
+
+      if (result.status === "error") {
+        if (this._progressManager) {
+          this._progressManager.failWorkflow(
+            "issues",
+            result.error || "Failed to fetch issues",
+          );
+        }
+        throw new Error(result.error || "Failed to fetch issues");
+      }
+
+      if (this._progressManager) {
+        this._progressManager.completeWorkflow(
+          "issues",
+          `Fetched ${result.issues.length} issues`,
+        );
+      }
 
       this.sendMessage({
         type: "updateIssues",
         payload: {
-          issues,
-          timestamp: new Date().toISOString(),
+          issues: result.issues,
+          timestamp: result.timestamp,
         },
       });
-
-      console.log(
-        `[DashboardProvider] Sent ${issues.length} issues to webview`,
-      );
     } catch (error) {
-      console.error("[DashboardProvider] Failed to fetch issues:", error);
+      if (this._progressManager) {
+        this._progressManager.failWorkflow(
+          "issues",
+          error instanceof Error ? error.message : "Failed to fetch issues",
+        );
+      }
 
       this.sendMessage({
         type: "updateIssues",
@@ -161,69 +382,93 @@ export class DashboardProvider
     }
   }
 
-  private async updateProjectStats() {
+  /**
+   * Sends the dashboard statistics. Local Git data is always available;
+   * GitHub data (stars, forks, watchers, open issues) is added when the
+   * user is signed in.
+   */
+  private async updateProjectStats(): Promise<void> {
     if (!this._view) {
-      console.log("[StackCode] No view available for stats update");
       return;
     }
 
-    const workspaceFolders = vscode.workspace.workspaceFolders;
-    console.log(
-      "[StackCode] Workspace folders:",
-      workspaceFolders?.length || 0,
-    );
-    console.log("[StackCode] Workspace name:", vscode.workspace.name);
-    console.log(
-      "[StackCode] Workspace file:",
-      vscode.workspace.workspaceFile?.toString(),
-    );
+    const folder = vscode.workspace.workspaceFolders?.[0];
+    const local = folder
+      ? await this._localStatsService
+          .collect(folder.uri.fsPath)
+          .catch(() => null)
+      : null;
+    const isAuthenticated = Boolean(this._authService?.isAuthenticated);
 
-    if (!workspaceFolders || workspaceFolders.length === 0) {
-      console.log(
-        "[StackCode] No workspace folders found, using alternative detection",
-      );
+    const payload: Record<string, unknown> = {
+      workspaceName: folder?.name ?? "(No Workspace)",
+      workspacePath: folder?.uri.fsPath ?? "",
+      mode: "production",
+      isGitRepository: local !== null,
+      currentBranch: local?.currentBranch ?? null,
+      files: local?.trackedFiles ?? 0,
+      branches: local?.branches ?? 0,
+      commits: local?.commits ?? 0,
+      contributors: local?.contributors ?? 0,
+      issues: 0,
+      recentCommits: local?.recentCommits ?? [],
+      recentActivity: {
+        thisWeek: local?.commitsThisWeek ?? 0,
+        thisMonth: local?.commitsThisMonth ?? 0,
+        lastCommit: local?.lastCommitDate ?? undefined,
+      },
+      needsAuth: !isAuthenticated,
+    };
 
-      // Fallback: usar informações do contexto da extensão
-      const extensionWorkspace = path.dirname(
-        path.dirname(path.dirname(this._extensionUri.fsPath)),
-      );
-      console.log("[StackCode] Extension workspace path:", extensionWorkspace);
-
-      this.sendMessage({
-        type: "updateStats",
-        payload: {
-          files: 0,
-          workspaceName: "StackCode (Debug)",
-          workspacePath: extensionWorkspace,
-          mode: "development",
-        },
-      });
-      return;
+    if (isAuthenticated && this._remoteStatsService) {
+      try {
+        const remote = await this._remoteStatsService.fetchRemoteStats();
+        Object.assign(payload, {
+          stars: remote.stats.stars,
+          forks: remote.stats.forks,
+          watchers: remote.stats.watchers,
+          issues: remote.stats.openIssues,
+          defaultBranch: remote.branches.default,
+          isPrivate: remote.repository.isPrivate,
+          languages: remote.languages,
+          topContributors: remote.contributors.topContributors,
+        });
+        (payload.recentActivity as Record<string, unknown>).lastPush =
+          remote.timestamps.pushedAt;
+      } catch (error) {
+        if (DashboardProvider.DEBUG) {
+          console.error(
+            "[DashboardProvider] Failed to fetch remote stats:",
+            error,
+          );
+        }
+        payload.remoteError =
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch statistics from GitHub";
+      }
     }
 
+    this.sendMessage({ type: "updateStats", payload });
+  }
+
+  private async updateCurrentBranch() {
     try {
-      const files = await vscode.workspace.findFiles(
-        "**/*",
-        "**/node_modules/**",
-        1000,
-      );
-      console.log("[StackCode] Found files:", files.length);
+      const git = vscode.extensions.getExtension("vscode.git")?.exports;
+      if (git) {
+        const gitAPI = git.getAPI(1);
+        const repo = gitAPI.repositories[0];
 
-      this.sendMessage({
-        type: "updateStats",
-        payload: {
-          files: files.length,
-          workspaceName: workspaceFolders[0].name,
-          workspacePath: workspaceFolders[0].uri.fsPath,
-          mode: "production",
-        },
-      });
-    } catch (e) {
-      console.error("[StackCode] Error fetching project stats:", e);
-      this.sendMessage({
-        type: "updateStats",
-        payload: { files: 0, error: "Failed to scan files" },
-      });
+        if (repo && repo.state.HEAD) {
+          const currentBranch = repo.state.HEAD.name || "main";
+          this.sendMessage({
+            type: "updateBranch",
+            payload: { branch: currentBranch },
+          });
+        }
+      }
+    } catch (error) {
+      console.error("[DashboardProvider] Failed to get current branch:", error);
     }
   }
 
@@ -235,19 +480,12 @@ export class DashboardProvider
       "webview-ui",
     );
 
-    // Lê o manifest.json do Vite
     const manifestPath = path.join(buildPath.fsPath, ".vite", "manifest.json");
-
-    console.log("[StackCode] Build path:", buildPath.fsPath);
-    console.log("[StackCode] Manifest path:", manifestPath);
-    console.log("[StackCode] Manifest exists:", fs.existsSync(manifestPath));
 
     try {
       const manifestContent = fs.readFileSync(manifestPath, "utf-8");
       const manifest = JSON.parse(manifestContent);
-      console.log("[StackCode] Manifest content:", manifest);
 
-      // Pega os arquivos do manifest do Vite
       const indexEntry = manifest["index.html"];
       const scriptFile = indexEntry.file;
       const cssFiles = indexEntry.css || [];
@@ -259,112 +497,59 @@ export class DashboardProvider
         webview.asWebviewUri(vscode.Uri.joinPath(buildPath, cssFile)),
       );
 
-      console.log("[StackCode] Script URI:", scriptUri.toString());
-      console.log(
-        "[StackCode] CSS URIs:",
-        cssUris.map((uri: vscode.Uri) => uri.toString()),
-      );
-
       return `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval'; img-src ${webview.cspSource} https: data:; connect-src ${webview.cspSource};">
-    ${cssUris.map((uri: vscode.Uri) => `<link href="${uri}" rel="stylesheet">`).join("\n    ")}
-    <title>StackCode Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval'; img-src ${webview.cspSource} https: data:; connect-src ${webview.cspSource};">
+  ${cssUris.map((uri: vscode.Uri) => `<link href="${uri}" rel="stylesheet">`).join("\n  ")}
+  <title>StackCode Dashboard</title>
 </head>
 <body>
-    <div id="loading" style="padding: 20px; color: #fff; background: #1e1e1e;">
-        ⏳ Carregando StackCode Dashboard...
-    </div>
-    <div id="root"></div>
-    <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
-    <script nonce="${nonce}">
-        console.log('[StackCode Webview] HTML loaded, waiting for React...');
-        console.log('[StackCode Webview] Script URI:', '${scriptUri}');
-        console.log('[StackCode Webview] CSS loaded:', ${cssUris.length});
-        
-        // Debug: verificar se o root está sendo populado
-        setTimeout(() => {
-            const root = document.getElementById('root');
-            const loading = document.getElementById('loading');
-            if (root && root.innerHTML.trim() !== '') {
-                console.log('[StackCode Webview] React carregou com sucesso!');
-                if (loading) loading.style.display = 'none';
-            } else {
-                console.error('[StackCode Webview] React não carregou! Root está vazio.');
-                if (loading) {
-                    loading.innerHTML = '❌ Erro: React não carregou. Verifique o console.';
-                    loading.style.background = '#f14c4c20';
-                    loading.style.border = '1px solid #f14c4c';
-                }
-            }
-        }, 2000);
-    </script>
+  <div id="loading" style="padding: 20px; color: #fff; background: #1e1e1e;">⏳ Carregando StackCode Dashboard...</div>
+  <div id="root"></div>
+  <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
 </body>
 </html>`;
     } catch (error) {
-      console.error("[StackCode] Error reading manifest:", error);
-      // Fallback melhorado para desenvolvimento
       return `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StackCode Dashboard</title>
-    <style>
-        body { 
-            margin: 0; 
-            padding: 20px; 
-            background: var(--vscode-editor-background, #1e293b); 
-            color: var(--vscode-editor-foreground, white); 
-            font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
-            font-size: var(--vscode-font-size, 13px);
-        }
-        .container {
-            max-width: 100%;
-            padding: 16px;
-        }
-        .error-message {
-            background: var(--vscode-inputValidation-errorBackground, #f14c4c20);
-            border: 1px solid var(--vscode-inputValidation-errorBorder, #f14c4c);
-            border-radius: 4px;
-            padding: 12px;
-            margin-bottom: 16px;
-        }
-        .status {
-            background: var(--vscode-badge-background, #007acc);
-            color: var(--vscode-badge-foreground, white);
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            display: inline-block;
-            margin-bottom: 16px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StackCode Dashboard</title>
+  <style>
+    body { margin: 0; padding: 20px; background: var(--vscode-editor-background, #1e293b); color: var(--vscode-editor-foreground, white); font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif); font-size: var(--vscode-font-size, 13px); }
+    .container { max-width: 100%; padding: 16px; }
+    .error-message { background: var(--vscode-inputValidation-errorBackground, #f14c4c20); border: 1px solid var(--vscode-inputValidation-errorBorder, #f14c4c); border-radius: 4px; padding: 12px; margin-bottom: 16px; }
+    .status { background: var(--vscode-badge-background, #007acc); color: var(--vscode-badge-foreground, white); padding: 4px 8px; border-radius: 12px; font-size: 11px; display: inline-block; margin-bottom: 16px; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="status">Development Mode</div>
-        <h2>🏗️ StackCode Dashboard</h2>
-        <div class="error-message">
-            <strong>Build Required:</strong> O webview-ui precisa ser compilado primeiro.
-            <br><br>
-            Execute: <code>npm run build:ui</code>
-            <br><br>
-            Erro: ${error instanceof Error ? error.message : "Manifest não encontrado"}
-        </div>
-        <p>Status da extensão: ✅ Ativa</p>
-        <p>Workspace: ${vscode.workspace.workspaceFolders?.[0]?.name || "Nenhum"}</p>
+  <div class="container">
+    <div class="status">Development Mode</div>
+    <h2>🏗️ StackCode Dashboard</h2>
+    <div class="error-message">
+      <strong>Build Required:</strong> The webview-ui needs to be compiled first.
+      <br><br>
+      Run: <code>npm run build:ui</code>
+      <br><br>
+      Error: ${error instanceof Error ? error.message : "Manifest not found"}
     </div>
+    <p>Extension Status: ✅ Active</p>
+    <p>Workspace: ${vscode.workspace.workspaceFolders?.[0]?.name || "None"}</p>
+  </div>
 </body>
 </html>`;
     }
   }
 
-  // CORREÇÃO: Adicionando o método dispose para conformidade.
   public dispose() {
+    if (this._progressManager) {
+      this._progressManager.unregisterWebviewProvider(this);
+    }
+
     while (this._disposables.length) {
       const x = this._disposables.pop();
       if (x) {
@@ -374,7 +559,10 @@ export class DashboardProvider
   }
 }
 
-function getNonce() {
+/**
+ * Generates a cryptographically random nonce for CSP.
+ */
+function getNonce(): string {
   let text = "";
   const possible =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

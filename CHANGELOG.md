@@ -1,3 +1,13 @@
+## 2.1.0 (2026-11-25)
+
+- ✨ feat: warn before committing directly on main, master or develop, in the CLI (`stc commit`) and in VS Code, with a suggestion to start a branch (closes [#30](https://github.com/YagoBorba/StackCode/issues/30))
+- ✨ feat(vscode-extension): the dashboard shows real repository data (commits, branches, contributors, tracked files, recent commits), adding stars, forks, watchers and open issues when signed in to GitHub (closes [#58](https://github.com/YagoBorba/StackCode/issues/58))
+- 📦 build(vscode-extension): the extension is bundled with esbuild, so the VSIX works when installed; CI starts VS Code with the bundle and checks every command
+- ✨ feat(core): `getCurrentBranch`, `isProtectedBranch` and `DEFAULT_PROTECTED_BRANCHES`
+- 🌐 feat(i18n): protected branch messages in English, Portuguese and Spanish
+- 🔧 ci: the pipeline runs on Node 22 and can be started manually
+- 🧹 chore: build output, packaged extensions and editor chat mode files are no longer tracked
+
 ## (2025-09-27)
 
 - ✨ :sparkles: Implement comprehensive stack generator with 8 technology stacks ([38a7f39](https://github.com/YagoBorba/StackCode/commit/38a7f39)), closes [#29](https://github.com/YagoBorba/StackCode/issues/29) [#34](https://github.com/YagoBorba/StackCode/issues/34)

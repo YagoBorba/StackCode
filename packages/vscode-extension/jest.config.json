@@ -4,12 +4,20 @@
   "rootDir": ".",
   "testMatch": ["<rootDir>/src/test/**/*.test.ts"],
   "testPathIgnorePatterns": ["/node_modules/", "/out/", "../../"],
-  "collectCoverageFrom": ["src/**/*.ts", "!src/test/**"],
+  "collectCoverageFrom": [
+    "src/**/*.ts",
+    "!src/test/**",
+    "!src/webview-ui/**",
+    "!src/**/*.d.ts"
+  ],
   "moduleFileExtensions": ["ts", "js", "json"],
   "transform": {
     "^.+\\.ts$": "ts-jest"
   },
+  "transformIgnorePatterns": ["node_modules/(?!(@stackcode)/)"],
   "moduleNameMapper": {
-    "^vscode$": "<rootDir>/src/test/__mocks__/vscode.ts"
+    "^vscode$": "<rootDir>/src/test/__mocks__/vscode.ts",
+    "^@stackcode/core$": "<rootDir>/src/test/__mocks__/core-workflows.ts",
+    "^@stackcode/i18n$": "<rootDir>/src/test/__mocks__/i18n.ts"
   }
 }

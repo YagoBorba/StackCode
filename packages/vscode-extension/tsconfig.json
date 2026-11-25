@@ -17,5 +17,12 @@
     "composite": false
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "out", "dist", "**/*.test.ts", "src/webview-ui"]
+  "exclude": [
+    "node_modules",
+    "out",
+    "dist",
+    "**/*.test.ts",
+    "src/test/__mocks__",
+    "src/webview-ui"
+  ]
 }
