@@ -9,8 +9,9 @@ import {
   FolderOpen,
   Book,
   Shield,
-  TrendingUp,
   Activity,
+  Users,
+  FileText,
 } from "lucide-react";
 import IssuesPanel from "./IssuesPanel";
 import ProgressIndicator from "./ProgressIndicator";
@@ -69,7 +70,11 @@ interface ProjectStats {
   commits: number;
   issues: number;
   contributors: number;
-  linesOfCode: number;
+  linesOfCode?: number;
+  isGitRepository?: boolean;
+  currentBranch?: string | null;
+  recentCommits?: RecentCommit[];
+  remoteError?: string;
   stars?: number;
   forks?: number;
   watchers?: number;
@@ -80,8 +85,16 @@ interface ProjectStats {
   recentActivity?: {
     thisWeek?: number;
     thisMonth?: number;
+    lastCommit?: string;
     lastPush?: string;
   };
+}
+
+interface RecentCommit {
+  hash: string;
+  subject: string;
+  author: string;
+  date: string;
 }
 
 interface ActivityItem {
@@ -106,57 +119,23 @@ const Dashboard: React.FC<DashboardProps> = ({
     commits: 0,
     issues: 0,
     contributors: 0,
-    linesOfCode: 0,
     needsAuth: false,
   };
 
   const [activities, setActivities] = useState<ActivityItem[]>([]);
 
   useEffect(() => {
-    const items: ActivityItem[] = [];
-    if (stats?.commits) {
-      items.push({
-        id: "commit-week",
+    setActivities(
+      (stats.recentCommits ?? []).map((commit) => ({
+        id: commit.hash,
         type: "commit",
-        title: `${stats.commits} commits (approx)`,
-        description: "Total commits on repository",
-        timestamp: new Date().toISOString(),
+        title: commit.subject,
+        description: `${commit.author} · ${commit.hash}`,
+        timestamp: new Date(commit.date).toLocaleString(),
         icon: <GitCommit className="w-5 h-5" />,
-      });
-    }
-    if (stats?.recentActivity?.thisWeek !== undefined) {
-      items.push({
-        id: "week-commits",
-        type: "commit",
-        title: `${stats.recentActivity.thisWeek} commits this week`,
-        description: "Recent weekly activity",
-        timestamp: new Date().toISOString(),
-        icon: <Activity className="w-5 h-5" />,
-      });
-    }
-    if (stats?.recentActivity?.thisMonth !== undefined) {
-      items.push({
-        id: "month-commits",
-        type: "commit",
-        title: `${stats.recentActivity.thisMonth} commits this month`,
-        description: "Recent monthly activity",
-        timestamp: new Date().toISOString(),
-        icon: <Activity className="w-5 h-5" />,
-      });
-    }
-  const lastPush = stats?.recentActivity?.lastPush;
-    if (lastPush) {
-      items.push({
-        id: "last-push",
-        type: "commit",
-        title: "Last push",
-        description: new Date(lastPush).toLocaleString(),
-        timestamp: lastPush,
-        icon: <Activity className="w-5 h-5" />,
-      });
-    }
-    setActivities(items);
-  }, [stats]);
+      })),
+    );
+  }, [stats.recentCommits]);
 
   const sendMessage = (type: string) => {
     if (vscode) {
@@ -270,8 +249,8 @@ const Dashboard: React.FC<DashboardProps> = ({
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative z-10 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Rocket className="w-12 h-12" style={{ color: '#ffffff' }} />
-            <h1 className="text-4xl font-bold" style={{ color: '#ffffff' }}>
+            <Rocket className="w-12 h-12" style={{ color: "#ffffff" }} />
+            <h1 className="text-4xl font-bold" style={{ color: "#ffffff" }}>
               StackCode
             </h1>
           </div>
@@ -283,43 +262,72 @@ const Dashboard: React.FC<DashboardProps> = ({
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
       </div>
 
-      <div className="w-full max-w-2xl mx-auto mb-4">
-        <div className="bg-blue-900/60 border border-blue-700 rounded-xl p-3 text-center text-blue-200 text-xs">
-          <strong>Info:</strong> O tamanho da barra lateral do VS Code é ajustado manualmente pelo usuário. Para alterar a largura, arraste a divisória do painel lateral.
-        </div>
-      </div>
-
-
       {stats.needsAuth && (
         <div className="w-full px-4 sm:px-6 py-6">
           <div className="bg-gradient-to-br from-blue-700 via-purple-700 to-blue-900 border-2 border-blue-800 rounded-2xl p-8 text-center shadow-xl flex flex-col items-center justify-center">
             <Shield className="w-16 h-16 mb-4 text-white drop-shadow-lg" />
-            <h2 className="text-3xl font-extrabold mb-2 text-white">Conecte ao GitHub</h2>
+            <h2 className="text-3xl font-extrabold mb-2 text-white">
+              Connect to GitHub
+            </h2>
             <p className="text-blue-100 mb-6 text-base max-w-md mx-auto">
-              Para liberar estatísticas, issues e recursos avançados, conecte sua conta do GitHub.
+              Local Git statistics are always shown. Connect your GitHub account
+              to add stars, forks, watchers and open issues.
             </p>
             <button
-              onClick={() => vscode?.postMessage({ type: 'connectGitHub' })}
+              onClick={() => vscode?.postMessage({ type: "connectGitHub" })}
               className="bg-white text-blue-700 px-8 py-3 rounded-xl font-bold text-lg shadow hover:bg-blue-50 transition-colors"
             >
               <span className="inline-flex items-center gap-2">
                 <Shield className="w-5 h-5 text-blue-700" />
-                Conectar ao GitHub
+                Connect to GitHub
               </span>
             </button>
-            <div className="mt-6 text-xs text-blue-200 opacity-80">Suas credenciais são protegidas pelo VS Code.</div>
+            <div className="mt-6 text-xs text-blue-200 opacity-80">
+              Your credentials are stored by VS Code.
+            </div>
           </div>
         </div>
       )}
 
-      {/* Espaçamento extra entre o card de login e os cards abaixo */}
       {stats.needsAuth && <div className="h-8" />}
 
-  <div className="w-full px-4 sm:px-6 py-4 sm:py-6 space-y-8" style={{maxWidth: 'var(--stackcode-main-max-width)', margin: '0 auto'}}>
-
-
+      <div
+        className="w-full px-4 sm:px-6 py-4 sm:py-6 space-y-8"
+        style={{
+          maxWidth: "var(--stackcode-main-max-width)",
+          margin: "0 auto",
+        }}
+      >
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
           {[
+            {
+              label: "Commits",
+              value: stats.commits,
+              icon: <GitCommit className="w-5 h-5" />,
+              color: "text-purple-400",
+              needsAuth: false,
+            },
+            {
+              label: "Branches",
+              value: stats.branches,
+              icon: <GitBranch className="w-5 h-5" />,
+              color: "text-green-400",
+              needsAuth: false,
+            },
+            {
+              label: "Contributors",
+              value: stats.contributors,
+              icon: <Users className="w-5 h-5" />,
+              color: "text-blue-400",
+              needsAuth: false,
+            },
+            {
+              label: "Tracked files",
+              value: stats.files,
+              icon: <FileText className="w-5 h-5" />,
+              color: "text-slate-300",
+              needsAuth: false,
+            },
             {
               label: "Stars",
               value: stats.stars ?? 0,
@@ -335,28 +343,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               needsAuth: true,
             },
             {
-              label: "Watchers",
-              value: stats.watchers ?? 0,
-              icon: <Activity className="w-5 h-5" />,
-              color: "text-cyan-400",
-              needsAuth: true,
-            },
-            {
-              label: "Branches",
-              value: stats.branches,
-              icon: <GitBranch className="w-5 h-5" />,
-              color: "text-green-400",
-              needsAuth: true,
-            },
-            {
-              label: "Commits",
-              value: stats.commits,
-              icon: <GitCommit className="w-5 h-5" />,
-              color: "text-purple-400",
-              needsAuth: true,
-            },
-            {
-              label: "Issues",
+              label: "Open issues",
               value: stats.issues,
               icon: <Shield className="w-5 h-5" />,
               color: "text-red-400",
@@ -367,12 +354,11 @@ const Dashboard: React.FC<DashboardProps> = ({
             return (
               <div
                 key={index}
-                className={`bg-slate-800/50 border border-slate-700 rounded-xl p-4 relative transition-all duration-300 hover:scale-105 ${isBlurred ? 'card-blur pointer-events-none' : 'backdrop-blur-sm hover:bg-slate-800/70'}`}
-                style={isBlurred ? { filter: 'blur(3px)', opacity: 0.7 } : {}}
+                className={`bg-slate-800/50 border border-slate-700 rounded-xl p-4 relative transition-all duration-300 hover:scale-105 ${isBlurred ? "card-blur pointer-events-none" : "backdrop-blur-sm hover:bg-slate-800/70"}`}
+                style={isBlurred ? { filter: "blur(3px)", opacity: 0.7 } : {}}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className={`${stat.color}`}>{stat.icon}</div>
-                  <TrendingUp className="w-4 h-4 text-green-400" />
                 </div>
                 <div className="text-2xl font-bold animate-number">
                   {isBlurred ? 0 : stat.value}
@@ -383,14 +369,17 @@ const Dashboard: React.FC<DashboardProps> = ({
           })}
         </div>
 
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-
           <div className="lg:col-span-2">
             <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-6">
                 <Zap className="w-6 h-6 text-yellow-400" />
-                <h2 className="text-2xl font-semibold" style={{ color: '#ffffff' }}>Quick Actions</h2>
+                <h2
+                  className="text-2xl font-semibold"
+                  style={{ color: "#ffffff" }}
+                >
+                  Quick Actions
+                </h2>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {quickActions.map((action) => (
@@ -400,7 +389,9 @@ const Dashboard: React.FC<DashboardProps> = ({
                     className="quick-action-button group relative overflow-hidden rounded-xl p-4 transition-all duration-300 hover:scale-105 hover:shadow-lg"
                   >
                     <div className="relative z-10">
-                      <div className={`flex items-center justify-center mb-3 ${action.iconColor}`}>
+                      <div
+                        className={`flex items-center justify-center mb-3 ${action.iconColor}`}
+                      >
                         {action.icon}
                       </div>
                       <h3 className="font-semibold text-sm mb-1">
@@ -414,9 +405,10 @@ const Dashboard: React.FC<DashboardProps> = ({
             </div>
           </div>
 
-
-
-          <div className={stats.needsAuth ? 'card-blur' : ''} style={stats.needsAuth ? { filter: 'blur(3px)', opacity: 0.7 } : {}}>
+          <div
+            className={stats.needsAuth ? "card-blur" : ""}
+            style={stats.needsAuth ? { filter: "blur(3px)", opacity: 0.7 } : {}}
+          >
             {issues && onRefreshIssues && onLogin && (
               <IssuesPanel
                 issuesState={issues}
@@ -427,14 +419,25 @@ const Dashboard: React.FC<DashboardProps> = ({
             )}
           </div>
 
-
-          <div className={`relative ${stats.needsAuth ? 'card-blur' : ''}`} style={stats.needsAuth ? { filter: 'blur(3px)', opacity: 0.7 } : {}}>
+          <div className="relative">
             <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-6">
                 <Activity className="w-6 h-6 text-green-400" />
-                <h2 className="text-xl font-semibold" style={{ color: '#ffffff' }}>Recent Activity</h2>
+                <h2
+                  className="text-xl font-semibold"
+                  style={{ color: "#ffffff" }}
+                >
+                  Recent Activity
+                </h2>
               </div>
               <div className="space-y-4 max-h-80 overflow-y-auto">
+                {activities.length === 0 && (
+                  <p className="text-sm text-slate-400">
+                    {stats.isGitRepository === false
+                      ? "Open a folder with a Git repository to see its recent commits."
+                      : "No commits yet."}
+                  </p>
+                )}
                 {activities.map((activity) => (
                   <div
                     key={activity.id}
@@ -462,7 +465,9 @@ const Dashboard: React.FC<DashboardProps> = ({
         <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-700 rounded-2xl p-6">
           <div className="flex items-center gap-3 mb-6">
             <Star className="w-6 h-6 text-yellow-400" />
-            <h2 className="text-2xl font-semibold" style={{ color: '#ffffff' }}>Pro Tips</h2>
+            <h2 className="text-2xl font-semibold" style={{ color: "#ffffff" }}>
+              Pro Tips
+            </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {tips.map((tip, index) => (

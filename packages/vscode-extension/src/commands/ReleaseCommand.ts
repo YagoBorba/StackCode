@@ -18,7 +18,7 @@ import { AuthFlowManager } from "../services/AuthFlowManager";
 /**
  * Handles monorepo release workflow in VS Code.
  * Supports strategy detection, version management, and GitHub release creation.
- * 
+ *
  * Requires GitHub authentication to create releases.
  */
 export class ReleaseCommand extends BaseCommand {

@@ -14,5 +14,6 @@ if (loadingEl && loadingEl.parentElement) {
   try {
     loadingEl.parentElement.removeChild(loadingEl);
   } catch {
+    // The loading element may already be gone.
   }
 }

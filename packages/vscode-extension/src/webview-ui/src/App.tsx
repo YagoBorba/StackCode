@@ -74,7 +74,6 @@ const initialStats = {
   commits: 0,
   issues: 0,
   contributors: 0,
-  linesOfCode: 0,
   needsAuth: false,
 };
 
@@ -126,7 +125,7 @@ function App() {
 
   const [hideSidebarHint, setHideSidebarHint] = useState<boolean>(() => {
     try {
-      return localStorage.getItem('stackcode_hideSidebarHint') === 'true';
+      return localStorage.getItem("stackcode_hideSidebarHint") === "true";
     } catch {
       return false;
     }
@@ -151,8 +150,8 @@ function App() {
       setNotifications((prev) => [hint, ...prev]);
     };
 
-  const initialTimer = setTimeout(showHint, 20000);
-  const interval = setInterval(showHint, 10 * 60 * 1000);
+    const initialTimer = setTimeout(showHint, 20000);
+    const interval = setInterval(showHint, 10 * 60 * 1000);
 
     return () => {
       clearTimeout(initialTimer);
@@ -232,12 +231,16 @@ function App() {
   };
 
   const handleNotificationAction = (action: string) => {
-    if (action === 'ui.sidebarHint.ok') {
+    if (action === "ui.sidebarHint.ok") {
       return;
     }
-    if (action === 'ui.sidebarHint.never') {
+    if (action === "ui.sidebarHint.never") {
       setHideSidebarHint(true);
-  try { localStorage.setItem('stackcode_hideSidebarHint', 'true'); } catch {}
+      try {
+        localStorage.setItem("stackcode_hideSidebarHint", "true");
+      } catch {
+        // Storage can be unavailable in the webview; the hint is hidden for this session anyway.
+      }
       return;
     }
     handleCommand(action);
@@ -255,20 +258,34 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen h-screen flex flex-col bg-slate-900 text-white overflow-hidden" style={{height: '100vh'}}>
+    <div
+      className="min-h-screen h-screen flex flex-col bg-slate-900 text-white overflow-hidden"
+      style={{ height: "100vh" }}
+    >
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden h-full">
         {/* Sidebar - Project View */}
-        <div className={`border-r border-slate-700 flex-shrink-0 h-full overflow-hidden flex flex-col ${
-          viewMode === "sidebar" ? "w-full" : ""
-        } ${viewMode === "compact" ? "hidden" : ""}`} style={{ width: viewMode === 'sidebar' ? '100%' : 'var(--stackcode-sidebar-width)' }}>
+        <div
+          className={`border-r border-slate-700 flex-shrink-0 h-full overflow-hidden flex flex-col ${
+            viewMode === "sidebar" ? "w-full" : ""
+          } ${viewMode === "compact" ? "hidden" : ""}`}
+          style={{
+            width:
+              viewMode === "sidebar"
+                ? "100%"
+                : "var(--stackcode-sidebar-width)",
+          }}
+        >
           <ProjectView onCommand={handleCommand} />
         </div>
 
         {/* Main Panel - Dashboard */}
-        <div className={`flex-1 overflow-y-auto overflow-x-hidden w-0 h-full ${
-          viewMode === "sidebar" ? "hidden" : ""}`}>
-            {currentView === "dashboard" ? (
+        <div
+          className={`flex-1 overflow-y-auto overflow-x-hidden w-0 h-full ${
+            viewMode === "sidebar" ? "hidden" : ""
+          }`}
+        >
+          {currentView === "dashboard" ? (
             <Dashboard
               vscode={vscode}
               currentBranch={currentBranch}

@@ -19,7 +19,7 @@ interface CommitTypeQuickPickItem extends vscode.QuickPickItem {
 /**
  * Handles Conventional Commit workflow in VS Code.
  * Prompts for commit details, links GitHub issues, and integrates progress feedback.
- * 
+ *
  * Requires GitHub authentication to link issues.
  */
 export class CommitCommand extends BaseCommand {

@@ -70,7 +70,7 @@ export interface GitHubRemoteStats {
 
 /**
  * GitHub Remote Statistics Service
- * 
+ *
  * Fetches ALL data from GitHub API (remote), not from local Git.
  * Requires GitHub authentication.
  */
@@ -210,7 +210,10 @@ export class GitHubRemoteStatsService {
   private async fetchLanguages(client: Octokit, owner: string, repo: string) {
     const { data } = await client.repos.listLanguages({ owner, repo });
 
-    const total = Object.values(data).reduce((sum: number, bytes) => sum + (bytes as number), 0);
+    const total = Object.values(data).reduce(
+      (sum: number, bytes) => sum + (bytes as number),
+      0,
+    );
 
     return Object.entries(data).map(([name, bytes]) => ({
       name,
@@ -242,8 +245,7 @@ export class GitHubRemoteStatsService {
 
       const thisWeek = commits.filter(
         (c) =>
-          c.commit.author?.date &&
-          new Date(c.commit.author.date) > oneWeekAgo,
+          c.commit.author?.date && new Date(c.commit.author.date) > oneWeekAgo,
       ).length;
 
       const thisMonth = commits.length;
@@ -256,7 +258,7 @@ export class GitHubRemoteStatsService {
         thisWeek,
         thisMonth,
       };
-    } catch (error) {
+    } catch {
       return {
         total: 0,
         thisWeek: 0,

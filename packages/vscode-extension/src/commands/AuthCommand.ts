@@ -6,7 +6,10 @@ export class AuthCommand extends BaseCommand {
   private _authService: GitHubAuthService;
   private _dashboardProvider: import("../providers/DashboardProvider").DashboardProvider;
 
-  constructor(authService: GitHubAuthService, dashboardProvider: import("../providers/DashboardProvider").DashboardProvider) {
+  constructor(
+    authService: GitHubAuthService,
+    dashboardProvider: import("../providers/DashboardProvider").DashboardProvider,
+  ) {
     super();
     this._authService = authService;
     this._dashboardProvider = dashboardProvider;
@@ -73,7 +76,10 @@ export class AuthCommand extends BaseCommand {
 
       if (result === "Yes, logout") {
         await this._authService.logout();
-        if (this._dashboardProvider && typeof this._dashboardProvider.refreshAuthState === "function") {
+        if (
+          this._dashboardProvider &&
+          typeof this._dashboardProvider.refreshAuthState === "function"
+        ) {
           await this._dashboardProvider.refreshAuthState();
         }
       }

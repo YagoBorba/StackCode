@@ -6,6 +6,7 @@ import { GitHubAuthService } from "../services/GitHubAuthService";
 import { GitMonitor } from "../monitors/GitMonitor";
 import { GitHubRemoteStatsService } from "../services/GitHubRemoteStatsService";
 import { AuthFlowManager } from "../services/AuthFlowManager";
+import { LocalRepositoryStatsService } from "../services/LocalRepositoryStatsService";
 import {
   ProgressManager,
   WebviewProgressListener,
@@ -16,7 +17,12 @@ import type {
   WebviewProgressCompleteMessage,
 } from "../types/progress-events";
 
-export class DashboardProvider implements vscode.WebviewViewProvider, vscode.Disposable, WebviewProgressListener {
+export class DashboardProvider
+  implements
+    vscode.WebviewViewProvider,
+    vscode.Disposable,
+    WebviewProgressListener
+{
   public static readonly viewType = "stackcode.dashboard";
   private _view?: vscode.WebviewView;
   private readonly _extensionUri: vscode.Uri;
@@ -26,6 +32,7 @@ export class DashboardProvider implements vscode.WebviewViewProvider, vscode.Dis
   private _progressManager?: ProgressManager;
   private _remoteStatsService?: GitHubRemoteStatsService;
   private _authFlowManager?: AuthFlowManager;
+  private readonly _localStatsService = new LocalRepositoryStatsService();
   private static readonly DEBUG = false;
 
   constructor(
@@ -44,7 +51,10 @@ export class DashboardProvider implements vscode.WebviewViewProvider, vscode.Dis
     }
 
     if (authService && gitMonitor) {
-      this._remoteStatsService = new GitHubRemoteStatsService(authService, gitMonitor);
+      this._remoteStatsService = new GitHubRemoteStatsService(
+        authService,
+        gitMonitor,
+      );
       this._authFlowManager = new AuthFlowManager(authService, context);
     }
   }
@@ -92,18 +102,25 @@ export class DashboardProvider implements vscode.WebviewViewProvider, vscode.Dis
       async (data: { type: string; payload?: unknown }) => {
         try {
           if (DashboardProvider.DEBUG) {
-            console.log("[DashboardProvider] Received message from webview:", data.type);
+            console.log(
+              "[DashboardProvider] Received message from webview:",
+              data.type,
+            );
           }
           switch (data.type) {
             case "webviewReady":
               if (DashboardProvider.DEBUG) {
-                console.log("[DashboardProvider] Webview ready, updating stats...");
+                console.log(
+                  "[DashboardProvider] Webview ready, updating stats...",
+                );
               }
               this.updateProjectStats();
               this.updateCurrentBranch();
               if (this._authService?.isAuthenticated) {
                 if (DashboardProvider.DEBUG) {
-                  console.log("[DashboardProvider] Authenticated, updating issues...");
+                  console.log(
+                    "[DashboardProvider] Authenticated, updating issues...",
+                  );
                 }
                 await this.updateIssues();
               }
@@ -133,13 +150,20 @@ export class DashboardProvider implements vscode.WebviewViewProvider, vscode.Dis
               await this.updateIssues(true);
               return;
             case "openExternal": {
-              const payload = data.payload as { url?: string } | string | undefined;
+              const payload = data.payload as
+                | { url?: string }
+                | string
+                | undefined;
               const url = typeof payload === "string" ? payload : payload?.url;
               if (url) {
                 try {
                   await vscode.env.openExternal(vscode.Uri.parse(url));
                 } catch (error) {
-                  console.error("[DashboardProvider] Failed to open URL:", url, error);
+                  console.error(
+                    "[DashboardProvider] Failed to open URL:",
+                    url,
+                    error,
+                  );
                   vscode.window.showErrorMessage(`Failed to open URL: ${url}`);
                 }
               }
@@ -154,7 +178,10 @@ export class DashboardProvider implements vscode.WebviewViewProvider, vscode.Dis
               return;
             default:
               if (DashboardProvider.DEBUG) {
-                console.log("[DashboardProvider] Executing command:", data.type);
+                console.log(
+                  "[DashboardProvider] Executing command:",
+                  data.type,
+                );
               }
               await vscode.commands.executeCommand(data.type, data.payload);
           }
@@ -201,12 +228,18 @@ export class DashboardProvider implements vscode.WebviewViewProvider, vscode.Dis
     if (this._view) {
       if (DashboardProvider.DEBUG) {
         const m = message as { type?: string };
-        console.log("[DashboardProvider] Sending message to webview:", m.type, message);
+        console.log(
+          "[DashboardProvider] Sending message to webview:",
+          m.type,
+          message,
+        );
       }
       this._view.webview.postMessage(message);
     } else {
       if (DashboardProvider.DEBUG) {
-        console.log("[DashboardProvider] Cannot send message, no view available");
+        console.log(
+          "[DashboardProvider] Cannot send message, no view available",
+        );
       }
     }
   }
@@ -349,103 +382,74 @@ export class DashboardProvider implements vscode.WebviewViewProvider, vscode.Dis
     }
   }
 
+  /**
+   * Sends the dashboard statistics. Local Git data is always available;
+   * GitHub data (stars, forks, watchers, open issues) is added when the
+   * user is signed in.
+   */
   private async updateProjectStats(): Promise<void> {
     if (!this._view) {
       return;
     }
 
-    const workspaceFolders = vscode.workspace.workspaceFolders;
+    const folder = vscode.workspace.workspaceFolders?.[0];
+    const local = folder
+      ? await this._localStatsService
+          .collect(folder.uri.fsPath)
+          .catch(() => null)
+      : null;
+    const isAuthenticated = Boolean(this._authService?.isAuthenticated);
 
-    // Check if authenticated
-    if (!this._authService?.isAuthenticated) {
-      this.sendMessage({
-        type: "updateStats",
-        payload: {
-          files: 0,
-          branches: 0,
-          commits: 0,
-          issues: 0,
-          contributors: 0,
-          linesOfCode: 0,
-          workspaceName: workspaceFolders?.[0]?.name || "(No Workspace)",
-          workspacePath: workspaceFolders?.[0]?.uri.fsPath || "",
-          mode: "production",
-          needsAuth: true,
-          error: "GitHub authentication required to view statistics",
-        },
-      });
-      return;
+    const payload: Record<string, unknown> = {
+      workspaceName: folder?.name ?? "(No Workspace)",
+      workspacePath: folder?.uri.fsPath ?? "",
+      mode: "production",
+      isGitRepository: local !== null,
+      currentBranch: local?.currentBranch ?? null,
+      files: local?.trackedFiles ?? 0,
+      branches: local?.branches ?? 0,
+      commits: local?.commits ?? 0,
+      contributors: local?.contributors ?? 0,
+      issues: 0,
+      recentCommits: local?.recentCommits ?? [],
+      recentActivity: {
+        thisWeek: local?.commitsThisWeek ?? 0,
+        thisMonth: local?.commitsThisMonth ?? 0,
+        lastCommit: local?.lastCommitDate ?? undefined,
+      },
+      needsAuth: !isAuthenticated,
+    };
+
+    if (isAuthenticated && this._remoteStatsService) {
+      try {
+        const remote = await this._remoteStatsService.fetchRemoteStats();
+        Object.assign(payload, {
+          stars: remote.stats.stars,
+          forks: remote.stats.forks,
+          watchers: remote.stats.watchers,
+          issues: remote.stats.openIssues,
+          defaultBranch: remote.branches.default,
+          isPrivate: remote.repository.isPrivate,
+          languages: remote.languages,
+          topContributors: remote.contributors.topContributors,
+        });
+        (payload.recentActivity as Record<string, unknown>).lastPush =
+          remote.timestamps.pushedAt;
+      } catch (error) {
+        if (DashboardProvider.DEBUG) {
+          console.error(
+            "[DashboardProvider] Failed to fetch remote stats:",
+            error,
+          );
+        }
+        payload.remoteError =
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch statistics from GitHub";
+      }
     }
 
-    // Fetch remote statistics from GitHub
-    try {
-      if (!this._remoteStatsService) {
-        throw new Error("Remote stats service not initialized");
-      }
-
-      const remoteStats = await this._remoteStatsService.fetchRemoteStats();
-
-      // Transform to dashboard format
-      this.sendMessage({
-        type: "updateStats",
-        payload: {
-          workspaceName:
-            workspaceFolders?.[0]?.name || remoteStats.repository.name,
-          workspacePath: workspaceFolders?.[0]?.uri.fsPath || "",
-          mode: "production",
-          needsAuth: false,
-
-          files: 0, // Not available from GitHub API
-          branches: remoteStats.branches.total,
-          commits: remoteStats.commits.total,
-          issues: remoteStats.stats.openIssues,
-          contributors: remoteStats.contributors.total,
-          linesOfCode: 0, // Not available
-
-          stars: remoteStats.stats.stars,
-          forks: remoteStats.stats.forks,
-          watchers: remoteStats.stats.watchers,
-          defaultBranch: remoteStats.branches.default,
-          isPrivate: remoteStats.repository.isPrivate,
-          languages: remoteStats.languages,
-          topContributors: remoteStats.contributors.topContributors,
-          recentActivity: {
-            thisWeek: remoteStats.commits.thisWeek,
-            thisMonth: remoteStats.commits.thisMonth,
-            lastPush: remoteStats.timestamps.pushedAt,
-          },
-        },
-      });
-    } catch (error) {
-      if (DashboardProvider.DEBUG) {
-        console.error("[DashboardProvider] Failed to fetch remote stats:", error);
-      }
-
-      const isAuthError =
-        error instanceof Error &&
-        (error.message.includes("authentication") ||
-          error.message.includes("No GitHub repository"));
-
-      this.sendMessage({
-        type: "updateStats",
-        payload: {
-          files: 0,
-          branches: 0,
-          commits: 0,
-          issues: 0,
-          contributors: 0,
-          linesOfCode: 0,
-          workspaceName: workspaceFolders?.[0]?.name || "(No Workspace)",
-          workspacePath: workspaceFolders?.[0]?.uri.fsPath || "",
-          mode: "production",
-          needsAuth: isAuthError,
-          error:
-            error instanceof Error
-              ? error.message
-              : "Failed to fetch statistics from GitHub",
-        },
-      });
-    }
+    this.sendMessage({ type: "updateStats", payload });
   }
 
   private async updateCurrentBranch() {
@@ -560,7 +564,8 @@ export class DashboardProvider implements vscode.WebviewViewProvider, vscode.Dis
  */
 function getNonce(): string {
   let text = "";
-  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const possible =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   for (let i = 0; i < 32; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
   }

@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  GitBranch,
-  CheckCircle,
-  AlertTriangle,
-  Clock,
-} from "lucide-react";
+import { GitBranch, CheckCircle, AlertTriangle, Clock } from "lucide-react";
 
 interface StatusBarProps {
   currentBranch?: string;

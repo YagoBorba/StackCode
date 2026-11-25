@@ -547,11 +547,21 @@
   }
 
   .bg-gradient-to-br {
-    background-image: linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-via, transparent), var(--tw-gradient-to));
+    background-image: linear-gradient(
+      to bottom right,
+      var(--tw-gradient-from),
+      var(--tw-gradient-via, transparent),
+      var(--tw-gradient-to)
+    );
   }
-  
+
   .bg-gradient-to-r {
-    background-image: linear-gradient(to right, var(--tw-gradient-from), var(--tw-gradient-via, transparent), var(--tw-gradient-to));
+    background-image: linear-gradient(
+      to right,
+      var(--tw-gradient-from),
+      var(--tw-gradient-via, transparent),
+      var(--tw-gradient-to)
+    );
   }
 
   .quick-action-button {
@@ -559,42 +569,42 @@
     border: 1px solid rgba(90, 92, 98, 0.4) !important;
     color: #d4d4d8 !important;
   }
-  
+
   .quick-action-button:hover {
     background-color: rgba(80, 82, 88, 0.75) !important;
     border-color: rgba(110, 112, 118, 0.5) !important;
   }
-  
+
   .quick-action-button * {
     color: #d4d4d8 !important;
   }
-  
+
   .quick-action-button h3 {
     color: #e4e4e7 !important;
     font-weight: 600;
   }
-  
+
   .quick-action-button p {
     color: #b4b4b8 !important;
   }
-  
+
   .notification-action-btn {
     background-color: rgba(70, 72, 78, 0.6) !important;
     color: #d4d4d8 !important;
     border: 1px solid rgba(90, 92, 98, 0.4) !important;
   }
-  
+
   .notification-action-btn:hover {
     background-color: rgba(80, 82, 88, 0.75) !important;
     border-color: rgba(110, 112, 118, 0.5) !important;
     color: #e4e4e7 !important;
   }
-  
+
   .notification-action-btn.bg-blue-600,
   .notification-action-btn.bg-blue-700 {
     background-color: rgba(75, 77, 83, 0.65) !important;
   }
-  
+
   .notification-action-btn.bg-blue-600:hover,
   .notification-action-btn.bg-blue-700:hover {
     background-color: rgba(85, 87, 93, 0.8) !important;
@@ -605,7 +615,7 @@
     color: #d4d4d8 !important;
     border: 1px solid rgba(90, 92, 98, 0.3) !important;
   }
-  
+
   button:not(.notification-action-btn):not(.quick-action-button):hover {
     background-color: rgba(80, 82, 88, 0.65) !important;
     border-color: rgba(110, 112, 118, 0.4) !important;
@@ -654,4 +664,3 @@
     }
   }
 }
-

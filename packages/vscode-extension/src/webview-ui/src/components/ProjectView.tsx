@@ -234,7 +234,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({ onCommand }) => {
   };
 
   return (
-  <div className="bg-slate-900 text-white h-full overflow-hidden flex flex-col">
+    <div className="bg-slate-900 text-white h-full overflow-hidden flex flex-col">
       <div className="p-4">
         <div className="flex items-center gap-2 mb-4 pb-2 border-b border-slate-700">
           <Rocket className="w-5 h-5 text-blue-400" />
