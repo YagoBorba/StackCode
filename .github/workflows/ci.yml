@@ -45,3 +45,35 @@ jobs:
 
       - name: Run ${{ matrix.check-name }}
         run: npm run ${{ matrix.check-command }}
+
+  vscode-extension:
+    name: VS Code extension (package and smoke test)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build packages
+        run: npm run build
+
+      - name: Run the extension in VS Code
+        run: xvfb-run -a npm run test:smoke -w stackcode-vscode
+
+      - name: Package the extension
+        run: npm run package -w stackcode-vscode
+
+      - name: Upload the VSIX
+        uses: actions/upload-artifact@v4
+        with:
+          name: stackcode-vscode
+          path: packages/vscode-extension/*.vsix
