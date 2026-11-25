@@ -114,7 +114,12 @@
       "test": "test:     Adding missing tests or correcting existing tests",
       "chore": "chore:    Changes to the build process or auxiliary tools",
       "revert": "revert:   Reverts a previous commit"
-    }
+    },
+    "protected_branch_warning": "You are about to commit directly on \"{branch}\".",
+    "protected_branch_suggestion": "In GitFlow, \"{branch}\" receives changes through pull requests. Start a branch with \"stc git start\" and commit there.",
+    "protected_branch_confirm": "Commit on \"{branch}\" anyway?",
+    "protected_branch_continue": "Commit anyway",
+    "protected_branch_new_branch": "Start a new branch"
   },
   "config": {
     "command_description": "Manage StackCode global and local configuration.",

@@ -114,7 +114,12 @@
       "test": "test:     Agregando tests faltantes o corrigiendo tests existentes",
       "chore": "chore:    Cambios en el proceso de build o herramientas auxiliares",
       "revert": "revert:   Revierte un commit previo"
-    }
+    },
+    "protected_branch_warning": "Estás a punto de hacer commit directamente en \"{branch}\".",
+    "protected_branch_suggestion": "En GitFlow, \"{branch}\" recibe cambios mediante pull requests. Crea una rama con \"stc git start\" y haz el commit allí.",
+    "protected_branch_confirm": "¿Hacer el commit en \"{branch}\" de todos modos?",
+    "protected_branch_continue": "Hacer commit de todos modos",
+    "protected_branch_new_branch": "Crear una nueva rama"
   },
   "config": {
     "command_description": "Gestionar configuración global y local de StackCode.",

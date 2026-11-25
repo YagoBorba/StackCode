@@ -5,6 +5,10 @@ import * as ui from "../../src/commands/ui";
 
 vi.mock("@stackcode/core", () => ({
   getCommandOutput: vi.fn(),
+  getCurrentBranch: vi.fn(),
+  isProtectedBranch: vi.fn((branch: string | null) =>
+    ["main", "master", "develop"].includes(branch ?? ""),
+  ),
   runCommitWorkflow: vi.fn(),
   getErrorMessage: vi.fn((error: unknown) =>
     error instanceof Error ? error.message : String(error ?? "error"),
@@ -17,6 +21,7 @@ describe("Commit Command Handler", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(core.getCurrentBranch).mockResolvedValue("feature/login");
     vi.spyOn(console, "log").mockImplementation(() => {});
     vi.spyOn(console, "error").mockImplementation(() => {});
   });
@@ -89,5 +94,67 @@ describe("Commit Command Handler", () => {
         affectedIssues: "closes #42",
       }),
     );
+  });
+
+  describe("on a protected branch", () => {
+    beforeEach(() => {
+      vi.mocked(core.getCommandOutput).mockResolvedValue("M  src/index.ts");
+      vi.mocked(core.getCurrentBranch).mockResolvedValue("develop");
+      vi.mocked(ui.promptForCommitAnswers).mockResolvedValue({
+        type: "fix",
+        scope: "",
+        shortDescription: "handle empty config",
+        longDescription: "",
+        breakingChanges: "",
+        affectedIssues: "",
+      });
+      vi.mocked(core.runCommitWorkflow).mockResolvedValue({
+        status: "committed",
+        message: "fix: handle empty config",
+      });
+    });
+
+    it("warns and stops when the user does not confirm", async () => {
+      vi.mocked(ui.promptForConfirmation).mockResolvedValue(false);
+
+      await handler({ _: [], $0: "stc" });
+
+      expect(ui.log.warning).toHaveBeenCalled();
+      expect(ui.promptForConfirmation).toHaveBeenCalledWith(
+        expect.any(String),
+        false,
+      );
+      expect(ui.promptForCommitAnswers).not.toHaveBeenCalled();
+      expect(core.runCommitWorkflow).not.toHaveBeenCalled();
+    });
+
+    it("commits when the user confirms", async () => {
+      vi.mocked(ui.promptForConfirmation).mockResolvedValue(true);
+
+      await handler({ _: [], $0: "stc" });
+
+      expect(core.runCommitWorkflow).toHaveBeenCalled();
+    });
+  });
+
+  it("does not ask for confirmation on a feature branch", async () => {
+    vi.mocked(core.getCommandOutput).mockResolvedValue("M  src/index.ts");
+    vi.mocked(ui.promptForCommitAnswers).mockResolvedValue({
+      type: "feat",
+      scope: "",
+      shortDescription: "add login",
+      longDescription: "",
+      breakingChanges: "",
+      affectedIssues: "",
+    });
+    vi.mocked(core.runCommitWorkflow).mockResolvedValue({
+      status: "committed",
+      message: "feat: add login",
+    });
+
+    await handler({ _: [], $0: "stc" });
+
+    expect(ui.promptForConfirmation).not.toHaveBeenCalled();
+    expect(core.runCommitWorkflow).toHaveBeenCalled();
   });
 });

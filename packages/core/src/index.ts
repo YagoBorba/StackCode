@@ -19,6 +19,11 @@ export {
 } from "./generators.js";
 export { scaffoldProject, setupHusky } from "./scaffold.js";
 export { validateCommitMessage } from "./validator.js";
+export {
+  DEFAULT_PROTECTED_BRANCHES,
+  getCurrentBranch,
+  isProtectedBranch,
+} from "./branches.js";
 
 export * from "./github.js";
 export * from "./types.js";

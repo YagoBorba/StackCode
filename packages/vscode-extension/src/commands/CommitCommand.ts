@@ -1,5 +1,7 @@
 import * as vscode from "vscode";
 import {
+  getCurrentBranch,
+  isProtectedBranch,
   runCommitWorkflow,
   runIssuesWorkflow,
   type CommitWorkflowStep,
@@ -47,6 +49,10 @@ export class CommitCommand extends BaseCommand {
       const workspaceFolder = this.getCurrentWorkspaceFolder();
       if (!workspaceFolder) {
         await this.showError(t("vscode.common.no_workspace_folder"));
+        return;
+      }
+
+      if (!(await this.confirmBranch(workspaceFolder.uri.fsPath))) {
         return;
       }
 
@@ -414,6 +420,49 @@ export class CommitCommand extends BaseCommand {
         vscode.window.createOutputChannel("StackCode Commit");
     }
     return this.outputChannel;
+  }
+
+  /**
+   * Warns before committing directly on main, master or develop and offers
+   * to start a new branch instead. Returns true when the commit should go on.
+   */
+  private async confirmBranch(cwd: string): Promise<boolean> {
+    const branch = await getCurrentBranch(cwd);
+    if (!branch || !isProtectedBranch(branch)) {
+      return true;
+    }
+
+    const startBranch = this.translate(
+      "commit.protected_branch_new_branch",
+      "Start a new branch",
+    );
+    const commitAnyway = this.translate(
+      "commit.protected_branch_continue",
+      "Commit anyway",
+    );
+    const choice = await vscode.window.showWarningMessage(
+      this.translate(
+        "commit.protected_branch_warning",
+        'You are about to commit directly on "{branch}".',
+        { branch },
+      ),
+      {
+        modal: true,
+        detail: this.translate(
+          "commit.protected_branch_suggestion",
+          'In GitFlow, "{branch}" receives changes through pull requests. Start a branch and commit there.',
+          { branch },
+        ),
+      },
+      startBranch,
+      commitAnyway,
+    );
+
+    if (choice === startBranch) {
+      await vscode.commands.executeCommand("stackcode.git.start");
+      return false;
+    }
+    return choice === commitAnyway;
   }
 
   /**

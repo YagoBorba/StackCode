@@ -1,7 +1,9 @@
 import type { CommandModule, ArgumentsCamelCase } from "yargs";
 import {
   getCommandOutput,
+  getCurrentBranch,
   getErrorMessage,
+  isProtectedBranch,
   runCommitWorkflow,
 } from "@stackcode/core";
 import { t } from "@stackcode/i18n";
@@ -28,6 +30,19 @@ export const getCommitCommand = (): CommandModule<object, CommitArgs> => ({
       if (!statusOutput) {
         ui.log.warning(t("commit.error_no_changes_staged"));
         return;
+      }
+
+      const branch = await getCurrentBranch(process.cwd());
+      if (branch && isProtectedBranch(branch)) {
+        ui.log.warning(t("commit.protected_branch_warning", { branch }));
+        ui.log.info(t("commit.protected_branch_suggestion", { branch }));
+        const proceed = await ui.promptForConfirmation(
+          t("commit.protected_branch_confirm", { branch }),
+          false,
+        );
+        if (!proceed) {
+          return;
+        }
       }
 
       const answers = await ui.promptForCommitAnswers();

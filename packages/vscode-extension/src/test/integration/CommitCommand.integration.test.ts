@@ -10,7 +10,7 @@ import { CommitCommand } from "../../commands/CommitCommand";
 import { GitHubAuthService } from "../../services/GitHubAuthService";
 import { GitMonitor } from "../../monitors/GitMonitor";
 import { ProgressManager } from "../../services/ProgressManager";
-import { runCommitWorkflow } from "@stackcode/core";
+import { getCurrentBranch, runCommitWorkflow } from "@stackcode/core";
 
 jest.mock("vscode", () => {
   const mockQuickPick = {
@@ -27,8 +27,12 @@ jest.mock("vscode", () => {
       showInputBox: jest.fn(),
       showInformationMessage: jest.fn(),
       showErrorMessage: jest.fn(),
+      showWarningMessage: jest.fn(),
       withProgress: jest.fn((_, callback) => callback({ report: jest.fn() })),
       createQuickPick: jest.fn(() => mockQuickPick),
+    },
+    commands: {
+      executeCommand: jest.fn(),
     },
     workspace: {
       workspaceFolders: [
@@ -56,6 +60,10 @@ jest.mock("vscode", () => {
 
 jest.mock("@stackcode/core", () => ({
   runCommitWorkflow: jest.fn(),
+  getCurrentBranch: jest.fn(),
+  isProtectedBranch: jest.fn((branch: string | null) =>
+    ["main", "master", "develop"].includes(branch ?? ""),
+  ),
 }));
 
 jest.mock("@stackcode/i18n", () => ({
@@ -107,6 +115,9 @@ describe("CommitCommand Integration Tests", () => {
     (vscode.window.showInformationMessage as jest.Mock).mockClear();
     (vscode.window.showErrorMessage as jest.Mock).mockClear();
     (runCommitWorkflow as jest.Mock).mockClear();
+    (vscode.window.showWarningMessage as jest.Mock).mockReset();
+    (vscode.commands.executeCommand as jest.Mock).mockClear();
+    (getCurrentBranch as jest.Mock).mockResolvedValue("feature/test");
   });
 
   describe("execute()", () => {
@@ -263,6 +274,64 @@ describe("CommitCommand Integration Tests", () => {
       expect(
         mockProgressManager.clearVSCodeProgressReporter,
       ).toHaveBeenCalled();
+    });
+  });
+
+  describe("on a protected branch", () => {
+    beforeEach(() => {
+      (getCurrentBranch as jest.Mock).mockResolvedValue("develop");
+    });
+
+    it("starts a new branch instead of committing when asked", async () => {
+      (vscode.window.showWarningMessage as jest.Mock).mockResolvedValueOnce(
+        "commit.protected_branch_new_branch",
+      );
+
+      await commitCommand.execute();
+
+      expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
+        "stackcode.git.start",
+      );
+      expect(vscode.window.showQuickPick).not.toHaveBeenCalled();
+      expect(runCommitWorkflow).not.toHaveBeenCalled();
+    });
+
+    it("stops when the warning is dismissed", async () => {
+      (vscode.window.showWarningMessage as jest.Mock).mockResolvedValueOnce(
+        undefined,
+      );
+
+      await commitCommand.execute();
+
+      expect(vscode.window.showQuickPick).not.toHaveBeenCalled();
+      expect(runCommitWorkflow).not.toHaveBeenCalled();
+    });
+
+    it("commits when the user chooses to commit anyway", async () => {
+      (vscode.window.showWarningMessage as jest.Mock).mockResolvedValueOnce(
+        "commit.protected_branch_continue",
+      );
+      (vscode.window.showQuickPick as jest.Mock).mockResolvedValueOnce({
+        label: "fix",
+        value: "fix",
+      });
+      (vscode.window.showInputBox as jest.Mock)
+        .mockResolvedValueOnce("")
+        .mockResolvedValueOnce("Fix crash")
+        .mockResolvedValueOnce("")
+        .mockResolvedValueOnce("")
+        .mockResolvedValueOnce("");
+      (runCommitWorkflow as jest.Mock).mockResolvedValue({
+        status: "committed",
+        message: "fix: Fix crash",
+      });
+
+      await commitCommand.execute();
+
+      expect(runCommitWorkflow).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "fix", shortDescription: "Fix crash" }),
+        expect.anything(),
+      );
     });
   });
 });
