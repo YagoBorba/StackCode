@@ -45,3 +45,6 @@ coverage/
 
 # VS Code Extension
 *.vsix
+
+# Packaged extensions
+*.vsix
