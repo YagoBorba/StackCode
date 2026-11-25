@@ -1,3 +1,10 @@
+## 2.1.0 (2026-11-25)
+
+- Dashboard with real data from the local Git repository; GitHub stars, forks, watchers and open issues when signed in
+- Warning before committing on main, master or develop, with Start a new branch and Commit anyway
+- Bundled with esbuild: the VSIX includes @stackcode/core, @stackcode/i18n and their templates and translations
+- Removed the debug commands Test Project Statistics and GitHub detection
+
 ## (2025-08-07)
 
 - feat: 🚀 Implement proactive notifications and real-time suggestions for VS Code extension
