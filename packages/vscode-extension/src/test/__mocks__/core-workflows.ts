@@ -241,6 +241,17 @@ export const validateCommitMessage = jest.fn(
 );
 
 /**
+ * Mock implementations of the branch helpers
+ */
+export const getCurrentBranch = jest.fn(
+  async (): Promise<string | null> => "feature/mock",
+);
+
+export const isProtectedBranch = jest.fn((branch: string | null) =>
+  ["main", "master", "develop"].includes(branch ?? ""),
+);
+
+/**
  * Mock implementation of clearRepositoryCache
  */
 export const clearRepositoryCache = jest.fn(async (): Promise<void> => {

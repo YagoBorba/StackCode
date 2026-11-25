@@ -135,7 +135,12 @@
       "test": "test:     Adicionando ou corrigindo testes",
       "chore": "chore:    Mudanças no processo de build ou ferramentas auxiliares",
       "revert": "revert:   Reverte um commit anterior"
-    }
+    },
+    "protected_branch_warning": "Você está prestes a fazer commit direto na \"{branch}\".",
+    "protected_branch_suggestion": "No GitFlow, a \"{branch}\" recebe mudanças por pull request. Crie uma branch com \"stc git start\" e faça o commit nela.",
+    "protected_branch_confirm": "Fazer o commit na \"{branch}\" mesmo assim?",
+    "protected_branch_continue": "Fazer commit mesmo assim",
+    "protected_branch_new_branch": "Criar uma nova branch"
   },
   "config": {
     "command_description": "Gerencia as configurações locais e globais do StackCode.",
