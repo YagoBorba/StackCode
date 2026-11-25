@@ -8,3 +8,12 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <App />
   </React.StrictMode>,
 );
+
+const loadingEl = document.getElementById("loading");
+if (loadingEl && loadingEl.parentElement) {
+  try {
+    loadingEl.parentElement.removeChild(loadingEl);
+  } catch {
+    // The loading element may already be gone.
+  }
+}

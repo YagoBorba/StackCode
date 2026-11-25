@@ -5,7 +5,6 @@ import StatusBar from "./components/StatusBar";
 import NotificationPanel from "./components/NotificationPanel";
 import CommandPalette from "./components/CommandPalette";
 
-// Interfaces para Issues do GitHub
 interface GitHubIssue {
   id: number;
   number: number;
@@ -39,19 +38,16 @@ interface IssuesState {
   timestamp?: string;
 }
 
-// Mock VSCode API for development
 const mockVSCode = {
   postMessage: (message: { type: string; payload?: unknown }) => {
     console.log("VSCode message:", message);
   },
 };
 
-// Tipagem para a API do VS Code, uma boa prática.
 interface VsCodeApi {
   postMessage(message: { type: string; payload?: unknown }): void;
 }
 
-// Declaração global para que o TypeScript conheça a função do VS Code.
 declare global {
   interface Window {
     acquireVsCodeApi(): VsCodeApi;
@@ -72,12 +68,15 @@ interface Notification {
   dismissed?: boolean;
 }
 
-// Estado inicial para as estatísticas que receberemos.
 const initialStats = {
   files: 0,
+  branches: 0,
+  commits: 0,
+  issues: 0,
+  contributors: 0,
+  needsAuth: false,
 };
 
-// Estado inicial para issues
 const initialIssuesState: IssuesState = {
   issues: [],
   loading: false,
@@ -87,6 +86,7 @@ const initialIssuesState: IssuesState = {
 
 function App() {
   const [currentView] = useState<"dashboard" | "project">("dashboard");
+  const [viewMode] = useState<"compact" | "sidebar" | "full">("full");
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: "1",
@@ -101,11 +101,19 @@ function App() {
       timestamp: new Date(),
     },
   ]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setNotifications((prev) => prev.filter((n) => n.id !== "1"));
+    }, 12000); // 12 segundos para dar mais tempo de leitura
+
+    return () => clearTimeout(timer);
+  }, []);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [currentBranch, setCurrentBranch] = useState("main");
   const [hasChanges, setHasChanges] = useState(false);
   const [lastAction, setLastAction] = useState("Ready");
-  const [, setStats] = useState(initialStats);
+  const [stats, setStats] = useState(initialStats);
   const [isReady, setIsReady] = useState(false);
   const [issuesState, setIssuesState] =
     useState<IssuesState>(initialIssuesState);
@@ -115,8 +123,43 @@ function App() {
       : mockVSCode;
   });
 
+  const [hideSidebarHint, setHideSidebarHint] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem("stackcode_hideSidebarHint") === "true";
+    } catch {
+      return false;
+    }
+  });
+
   useEffect(() => {
-    // Listen for keyboard shortcuts
+    if (hideSidebarHint) return;
+
+    const showHint = () => {
+      const hint: Notification = {
+        id: `sidebar-hint-${Date.now()}`,
+        type: "tip",
+        title: "Tip: Expand the View",
+        message:
+          "To see all content, drag the VS Code sidebar boundary to the right. Panel size is controlled by the editor.",
+        actions: [
+          { label: "OK", action: "ui.sidebarHint.ok", primary: true },
+          { label: "Don't remind", action: "ui.sidebarHint.never" },
+        ],
+        timestamp: new Date(),
+      };
+      setNotifications((prev) => [hint, ...prev]);
+    };
+
+    const initialTimer = setTimeout(showHint, 20000);
+    const interval = setInterval(showHint, 10 * 60 * 1000);
+
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+    };
+  }, [hideSidebarHint]);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
@@ -132,14 +175,13 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // Listener para mensagens vindas da extensão (o "backend").
     const handleMessage = (event: MessageEvent) => {
       const message = event.data;
-      console.log("Message received from extension:", message);
 
       switch (message.type) {
         case "updateStats":
           setStats((prevStats) => ({ ...prevStats, ...message.payload }));
+          setIsReady(true);
           break;
         case "updateBranch":
           setCurrentBranch(message.payload?.branch || "main");
@@ -161,24 +203,18 @@ function App() {
 
     window.addEventListener("message", handleMessage);
 
-    // Informa à extensão que a UI está pronta para receber dados.
     vscode.postMessage({ type: "webviewReady" });
-    setIsReady(true);
 
-    // Função de limpeza para remover o listener.
     return () => {
       window.removeEventListener("message", handleMessage);
     };
   }, [vscode]);
 
   const handleCommand = (command: string) => {
-    console.log("Executing command:", command);
     setLastAction(`Executed: ${command}`);
 
-    // Send message to VSCode
     vscode.postMessage({ type: command });
 
-    // Add success notification
     const newNotification: Notification = {
       id: Date.now().toString(),
       type: "success",
@@ -195,10 +231,18 @@ function App() {
   };
 
   const handleNotificationAction = (action: string) => {
-    handleCommand(action);
-  };
-
-  const handleQuickAction = (action: string) => {
+    if (action === "ui.sidebarHint.ok") {
+      return;
+    }
+    if (action === "ui.sidebarHint.never") {
+      setHideSidebarHint(true);
+      try {
+        localStorage.setItem("stackcode_hideSidebarHint", "true");
+      } catch {
+        // Storage can be unavailable in the webview; the hint is hidden for this session anyway.
+      }
+      return;
+    }
     handleCommand(action);
   };
 
@@ -214,22 +258,40 @@ function App() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-slate-900 text-white">
+    <div
+      className="min-h-screen h-screen flex flex-col bg-slate-900 text-white overflow-hidden"
+      style={{ height: "100vh" }}
+    >
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden h-full">
         {/* Sidebar - Project View */}
-        <div className="w-80 border-r border-slate-700 flex-shrink-0">
+        <div
+          className={`border-r border-slate-700 flex-shrink-0 h-full overflow-hidden flex flex-col ${
+            viewMode === "sidebar" ? "w-full" : ""
+          } ${viewMode === "compact" ? "hidden" : ""}`}
+          style={{
+            width:
+              viewMode === "sidebar"
+                ? "100%"
+                : "var(--stackcode-sidebar-width)",
+          }}
+        >
           <ProjectView onCommand={handleCommand} />
         </div>
 
-        {/* Main Panel */}
-        <div className="flex-1 overflow-auto">
+        {/* Main Panel - Dashboard */}
+        <div
+          className={`flex-1 overflow-y-auto overflow-x-hidden w-0 h-full ${
+            viewMode === "sidebar" ? "hidden" : ""
+          }`}
+        >
           {currentView === "dashboard" ? (
             <Dashboard
               vscode={vscode}
               currentBranch={currentBranch}
               hasChanges={hasChanges}
               issues={issuesState}
+              stats={stats}
               onRefreshIssues={() => {
                 setIssuesState((prev) => ({ ...prev, loading: true }));
                 vscode.postMessage({ type: "refreshIssues" });
@@ -254,7 +316,6 @@ function App() {
         currentBranch={currentBranch}
         hasChanges={hasChanges}
         lastAction={lastAction}
-        onQuickAction={handleQuickAction}
       />
 
       {/* Notifications */}

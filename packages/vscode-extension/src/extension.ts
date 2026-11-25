@@ -11,7 +11,6 @@ import { ValidateCommand } from "./commands/ValidateCommand";
 import { ReleaseCommand } from "./commands/ReleaseCommand";
 import { ConfigCommand } from "./commands/ConfigCommand";
 import { AuthCommand } from "./commands/AuthCommand";
-import { TestGitHubDetectionCommand } from "./commands/TestGitHubDetectionCommand";
 import { DashboardProvider } from "./providers/DashboardProvider";
 import { ProjectViewProvider } from "./providers/ProjectViewProvider";
 import { GitHubAuthService } from "./services/GitHubAuthService";
@@ -34,10 +33,6 @@ let releaseCommand: ReleaseCommand;
 let configCommand: ConfigCommand;
 let authCommand: AuthCommand;
 
-/**
- * Activates the StackCode VS Code extension.
- * Initializes all services, monitors, providers, and registers commands.
- */
 export async function activate(context: vscode.ExtensionContext) {
   console.log("🚀 [StackCode] Extension activating...");
 
@@ -47,6 +42,7 @@ export async function activate(context: vscode.ExtensionContext) {
   proactiveManager = new ProactiveNotificationManager(configManager);
   gitMonitor = new GitMonitor(proactiveManager, configManager);
   fileMonitor = new FileMonitor(proactiveManager, configManager);
+
   dashboardProvider = new DashboardProvider(
     context,
     gitHubAuthService,
@@ -61,11 +57,16 @@ export async function activate(context: vscode.ExtensionContext) {
     gitHubAuthService,
     gitMonitor,
     progressManager,
+    context,
   );
   validateCommand = new ValidateCommand();
-  releaseCommand = new ReleaseCommand(gitHubAuthService, progressManager);
+  releaseCommand = new ReleaseCommand(
+    gitHubAuthService,
+    progressManager,
+    context,
+  );
   configCommand = new ConfigCommand();
-  authCommand = new AuthCommand(gitHubAuthService);
+  authCommand = new AuthCommand(gitHubAuthService, dashboardProvider);
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
       "stackcode.dashboard",
@@ -116,9 +117,6 @@ export async function activate(context: vscode.ExtensionContext) {
     ),
     vscode.commands.registerCommand("stackcode.auth.logout", () =>
       authCommand.executeLogout(),
-    ),
-    vscode.commands.registerCommand("stackcode.test.github.detection", () =>
-      new TestGitHubDetectionCommand().execute(),
     ),
     vscode.commands.registerCommand("stackcode.createBranch", () =>
       gitCommand.startBranch(),
@@ -175,10 +173,6 @@ export async function activate(context: vscode.ExtensionContext) {
   proactiveManager.showWelcomeMessage();
   console.log("✅ [StackCode] Extension activated successfully");
 }
-
-/**
- * Deactivates the extension and cleans up resources.
- */
 
 export function deactivate() {
   if (progressManager) {
