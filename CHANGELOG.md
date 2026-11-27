@@ -1,3 +1,7 @@
+## 2.1.3 (2026-11-27)
+
+- ✨ feat(vscode-extension): published on the Visual Studio Marketplace as **StackCode DevOps Assistant** (`YagoBorba.stackcode-vscode`); the README and translated docs link to the listing
+
 ## 2.1.2 (2026-11-27)
 
 - 🐛 fix(cli): `stc --version` reports the installed version instead of a hard-coded 1.0.3
