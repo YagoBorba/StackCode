@@ -12,6 +12,11 @@ import { getReleaseCommand } from "./commands/release.js";
 import { getGitHubCommand } from "./commands/github.js";
 import { initI18n, t, getLocale } from "@stackcode/i18n";
 import { getErrorMessage } from "@stackcode/core";
+import { createRequire } from "module";
+
+const { version } = createRequire(import.meta.url)("../package.json") as {
+  version: string;
+};
 
 async function main() {
   try {
@@ -21,7 +26,7 @@ async function main() {
 
     await yargs(hideBin(process.argv))
       .scriptName("stackcode")
-      .version("1.0.3")
+      .version(version)
       .alias("h", "help")
       .alias("v", "version")
       .strict()
