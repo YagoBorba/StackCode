@@ -1,3 +1,8 @@
+## 2.1.2 (2026-11-27)
+
+- 🐛 fix(cli): `stc --version` reports the installed version instead of a hard-coded 1.0.3
+- 📦 build: the npm packages ship only their build output and declare public access; `@stackcode/github-auth`, a runtime dependency of the CLI, is published with them
+
 ## 2.1.1 (2026-11-27)
 
 - 🐛 fix(cli): `stc validate` no longer prints its status icon twice
