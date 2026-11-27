@@ -34,7 +34,7 @@
 > [!IMPORTANT]
 > StackCode was born from a simple idea: **professional DevOps practices shouldn't be complicated.** If you agree, star this repository to give us a boost! ⭐️
 
-StackCode is a powerful, opinionated CLI designed to bring consistency, quality, and automation to your development lifecycle. From the first line of code to the final release tag, StackCode is there to handle the tedious tasks, letting you focus on what truly matters: building great software.
+StackCode is an opinionated CLI and VS Code extension designed to bring consistency, quality, and automation to your development lifecycle. From the first line of code to the final release tag, StackCode is there to handle the tedious tasks, letting you focus on what truly matters: building great software.
 
 Our goal is to make best practices the easiest path.
 
@@ -49,7 +49,7 @@ StackCode is a suite of tools designed to work together seamlessly:
   Need a `.gitignore`? Don't just get one—get a perfect one. Our composable template engine combines rules for your stack, IDE, and tools (like Docker) into a single, organized file.
 
 - 💬 **Guided Conventional Commits (`commit`):**
-  Never write a non-compliant commit message again. Our interactive wizard guides you through the Conventional Commits specification, ensuring a clean and readable Git history.
+  Never write a non-compliant commit message again. Our interactive wizard guides you through the Conventional Commits specification, ensuring a clean and readable Git history. It also warns you before committing straight to a protected branch (`main`, `master`, `develop`) and offers to start a new branch instead.
 
 - 🔗 **Simplified Gitflow (`git`):**
   Forget memorizing branch names. Use `stc git start` and `stc git finish` to manage feature branches with ease. Our interactive menu makes the process foolproof.
@@ -64,7 +64,10 @@ StackCode is a suite of tools designed to work together seamlessly:
   Manage global preferences (like language and educational mode) and project-specific settings (like enabling commit validation) with a simple, interactive command.
 
 - 🎓 **Educational Mode (`--educate`):**
-  **NEW!** Learn while you work. Enable educational mode to receive helpful explanations about best practices behind every action. Configure globally with `stc config set educate true` or use the `--educate` flag on any command for on-demand learning.
+  Learn while you work. Enable educational mode to receive helpful explanations about best practices behind every action. Configure globally with `stc config set educate true` or use the `--educate` flag on any command for on-demand learning.
+
+- 🧩 **VS Code Extension:**
+  Every command above is also available inside VS Code, plus a project dashboard with real repository statistics (branches, commits, contributors, recent activity; GitHub stars, forks and issues when you sign in), proactive warnings when you work on a protected branch, and a guided commit flow. See the [extension README](packages/vscode-extension/README.md).
 
 ## 🛠️ Under the Hood (Main Technologies)
 
@@ -98,12 +101,22 @@ This is the best approach for ensuring everyone on a project uses the exact same
 
 1.  Install the CLI as a dev dependency in your project:
     ```bash
-    npm install --save-dev @stackcode/cli # Replace with your package name
+    npm install --save-dev @stackcode/cli
     ```
 2.  Run commands using `npx`:
     ```bash
     npx stc commit
     ```
+
+### VS Code Extension
+
+Download `stackcode-vscode-<version>.vsix` from the [latest release](https://github.com/YagoBorba/StackCode/releases/latest) and install it:
+
+```bash
+code --install-extension stackcode-vscode-2.1.0.vsix
+```
+
+Or, in VS Code, open the Extensions view, choose **…** → **Install from VSIX...** and select the file.
 
 ### 🎓 Enable Educational Mode (Recommended for Beginners)
 
