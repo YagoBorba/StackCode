@@ -1,3 +1,10 @@
+## 2.1.1 (2026-11-27)
+
+- 🐛 fix(cli): `stc validate` no longer prints its status icon twice
+- 📚 docs: the README documents the VS Code extension and how to install the VSIX; translated docs link to GitHub Releases instead of an unpublished Marketplace page; broken pt-BR links fixed
+- ✅ test(core): expected paths are built with `path.join`, so the suite also passes on Windows
+- 🧹 chore: devcontainer extension list and CLI package description cleaned up
+
 ## 2.1.0 (2026-11-25)
 
 - ✨ feat: warn before committing directly on main, master or develop, in the CLI (`stc commit`) and in VS Code, with a suggestion to start a branch (closes [#30](https://github.com/YagoBorba/StackCode/issues/30))
