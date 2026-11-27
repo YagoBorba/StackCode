@@ -108,7 +108,7 @@ See our [Contributing Guide](CONTRIBUTING.md) for detailed instructions.
 
 - **[GitHub Repository](https://github.com/YagoBorba/StackCode)** - Source code and issues
 - **[NPM Package](https://www.npmjs.com/package/@stackcode/cli)** - Published CLI package
-- **[VS Code Extension](https://marketplace.visualstudio.com/items?itemName=YagoBorba.stackcode-vscode)** - VS Code Marketplace
+- **[VS Code Extension](https://github.com/YagoBorba/StackCode/releases/latest)** - VSIX package (GitHub Releases)
 
 ## 📞 **Getting Help**
 

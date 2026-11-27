@@ -343,7 +343,7 @@ stackcode config set lang pt  # se audiência portuguesa
 
 - **[Guia de Configuração](../CONTRIBUTING.md#configuration)**: Opções completas de configuração
 - **[Referência de Comandos](../README.md#commands)**: Todos os comandos disponíveis
-- **[Internacionalização](../docs/CONTRIBUTING.md#internationalization)**: Adicionando novos idiomas
+- **[Internacionalização](CONTRIBUTING.md#-internacionalização)**: Adicionando novos idiomas
 - **[Arquitetura](ARCHITECTURE.md#educational-mode)**: Detalhes de implementação técnica
 
 ---
