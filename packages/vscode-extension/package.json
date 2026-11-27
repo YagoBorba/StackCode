@@ -2,7 +2,7 @@
   "name": "stackcode-vscode",
   "displayName": "StackCode",
   "description": "Complete development assistant with project scaffolding, Git workflow, and real-time best practices enforcement",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "publisher": "YagoBorba",
   "engines": {
     "vscode": "^1.85.0"
@@ -291,8 +291,8 @@
   "dependencies": {
     "@octokit/rest": "^22.0.0",
     "@stackcode/github-auth": "^1.0.0",
-    "@stackcode/core": "^2.1.1",
-    "@stackcode/i18n": "^2.1.1"
+    "@stackcode/core": "^2.1.2",
+    "@stackcode/i18n": "^2.1.2"
   },
   "keywords": [
     "git",
