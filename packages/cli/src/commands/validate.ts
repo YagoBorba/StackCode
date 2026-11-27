@@ -25,10 +25,10 @@ export const getValidateCommand = (): CommandModule<object, ValidateArgs> => ({
     const message = argv.message as string;
     const result = await runValidateWorkflow({ message });
     if (result.isValid) {
-      ui.log.success(`✔ ${t("validate.success")}`);
+      ui.log.success(t("validate.success"));
       showBestPractice("educational.commit_validation_explanation");
     } else {
-      ui.log.error(`✖ ${t("validate.error_invalid")}`);
+      ui.log.error(t("validate.error_invalid"));
       showBestPractice("educational.conventional_commits_explanation");
       process.exit(1);
     }

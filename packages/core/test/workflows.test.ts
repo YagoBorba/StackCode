@@ -520,7 +520,7 @@ describe("runReleaseWorkflow", () => {
       "1.2.4",
     );
     expect(mockedFs.writeFile).toHaveBeenCalledWith(
-      `${cwd}/CHANGELOG.md`,
+      path.join(cwd, "CHANGELOG.md"),
       "# Changelog\n",
     );
   });
@@ -551,15 +551,27 @@ describe("runReleaseWorkflow", () => {
       strategy: "independent",
       rootDir: cwd,
       packages: [
-        { name: "pkg1", version: "1.0.0", path: `${cwd}/packages/pkg1` },
+        {
+          name: "pkg1",
+          version: "1.0.0",
+          path: path.join(cwd, "packages", "pkg1"),
+        },
       ],
     });
     vi.mocked(releaseModule.findChangedPackages).mockResolvedValue([
-      { name: "pkg1", version: "1.0.0", path: `${cwd}/packages/pkg1` },
+      {
+        name: "pkg1",
+        version: "1.0.0",
+        path: path.join(cwd, "packages", "pkg1"),
+      },
     ]);
     vi.mocked(releaseModule.determinePackageBumps).mockResolvedValue([
       {
-        pkg: { name: "pkg1", version: "1.0.0", path: `${cwd}/packages/pkg1` },
+        pkg: {
+          name: "pkg1",
+          version: "1.0.0",
+          path: path.join(cwd, "packages", "pkg1"),
+        },
         bumpType: "patch",
         newVersion: "1.0.1",
       },
@@ -597,7 +609,7 @@ describe("runReleaseWorkflow", () => {
       cwd,
     );
     expect(mockedFs.writeFile).toHaveBeenCalledWith(
-      `${cwd}/packages/pkg1/CHANGELOG.md`,
+      path.join(cwd, "packages", "pkg1", "CHANGELOG.md"),
       "Changelog for pkg1\n",
     );
   });

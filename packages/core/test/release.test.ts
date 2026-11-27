@@ -1,3 +1,4 @@
+import path from "path";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { performReleaseCommit } from "../src/release";
 import * as utils from "../src/utils";
@@ -32,8 +33,8 @@ describe("performReleaseCommit", () => {
       "git",
       [
         "add",
-        "/fake/path/to/cli/package.json",
-        "/fake/path/to/cli/CHANGELOG.md",
+        path.join("/fake/path/to/cli", "package.json"),
+        path.join("/fake/path/to/cli", "CHANGELOG.md"),
       ],
       { cwd: projectRoot },
     );
@@ -78,10 +79,10 @@ describe("performReleaseCommit", () => {
       "git",
       [
         "add",
-        "/fake/path/to/cli/package.json",
-        "/fake/path/to/cli/CHANGELOG.md",
-        "/fake/path/to/core/package.json",
-        "/fake/path/to/core/CHANGELOG.md",
+        path.join("/fake/path/to/cli", "package.json"),
+        path.join("/fake/path/to/cli", "CHANGELOG.md"),
+        path.join("/fake/path/to/core", "package.json"),
+        path.join("/fake/path/to/core", "CHANGELOG.md"),
       ],
       { cwd: projectRoot },
     );

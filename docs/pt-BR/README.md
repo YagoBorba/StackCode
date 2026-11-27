@@ -21,7 +21,7 @@ Bem-vindo ao hub de documentação do StackCode! Este diretório contém documen
 
 ### 🌐 **Traduções**
 
-- **[🇧🇷 Português (Brasil)](pt-BR/)** - Documentação em português _(atual)_
+- **[🇧🇷 Português (Brasil)](./)** - Documentação em português _(atual)_
 - **[🇪🇸 Español](../es/)** - Documentación en español
 - **[🇺🇸 English](../)** - English documentation _(original)_
 
@@ -140,7 +140,7 @@ stackcode config
 
 - **[Repositório GitHub](https://github.com/YagoBorba/StackCode)** - Código fonte e issues
 - **[Pacote NPM](https://www.npmjs.com/package/@stackcode/cli)** - Pacote CLI publicado
-- **[Extensão VS Code](https://marketplace.visualstudio.com/items?itemName=YagoBorba.stackcode-vscode)** - VS Code Marketplace
+- **[Extensão VS Code](https://github.com/YagoBorba/StackCode/releases/latest)** - Pacote VSIX (GitHub Releases)
 
 ## 📞 **Obtendo Ajuda**
 
