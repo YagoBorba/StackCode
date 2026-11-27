@@ -9,8 +9,7 @@
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
         "EditorConfig.EditorConfig",
-        "ms-azuretools.vscode-docker",
-        "GitHub.copilot"
+        "ms-azuretools.vscode-docker"
       ]
     }
   },
