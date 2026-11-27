@@ -113,7 +113,7 @@ This is the best approach for ensuring everyone on a project uses the exact same
 Download `stackcode-vscode-<version>.vsix` from the [latest release](https://github.com/YagoBorba/StackCode/releases/latest) and install it:
 
 ```bash
-code --install-extension stackcode-vscode-2.1.1.vsix
+code --install-extension stackcode-vscode-2.1.2.vsix
 ```
 
 Or, in VS Code, open the Extensions view, choose **…** → **Install from VSIX...** and select the file.

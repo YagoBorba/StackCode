@@ -1,6 +1,6 @@
 {
   "name": "stackcode-monorepo",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "private": true,
   "type": "module",
   "description": "An intelligent tool to help junior developers apply best practices from day one.",

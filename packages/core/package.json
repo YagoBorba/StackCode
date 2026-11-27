@@ -1,6 +1,6 @@
 {
   "name": "@stackcode/core",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Core logic for the StackCode tool.",
   "type": "module",
   "main": "dist/index.js",
@@ -48,5 +48,11 @@
     "@types/conventional-changelog-core": "^8.0.0",
     "@types/semver": "^7.7.0",
     "vitest": "^3.2.4"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }
