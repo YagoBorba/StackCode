@@ -142,7 +142,7 @@ Para más detalles, consulta la **[Guía del Modo Educativo](EDUCATIONAL_MODE.md
 
 - **[Repositorio GitHub](https://github.com/YagoBorba/StackCode)** - Código fuente e issues
 - **[Paquete NPM](https://www.npmjs.com/package/@stackcode/cli)** - Paquete CLI publicado
-- **[Extensión VS Code](https://github.com/YagoBorba/StackCode/releases/latest)** - Paquete VSIX (GitHub Releases)
+- **[Extensión VS Code](https://marketplace.visualstudio.com/items?itemName=YagoBorba.stackcode-vscode)** - Visual Studio Marketplace
 
 ## 📞 **Obteniendo Ayuda**
 

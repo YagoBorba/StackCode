@@ -1,6 +1,6 @@
 {
   "name": "stackcode-vscode",
-  "displayName": "StackCode",
+  "displayName": "StackCode DevOps Assistant",
   "description": "Complete development assistant with project scaffolding, Git workflow, and real-time best practices enforcement",
   "version": "2.1.2",
   "publisher": "YagoBorba",

@@ -140,7 +140,7 @@ stackcode config
 
 - **[Repositório GitHub](https://github.com/YagoBorba/StackCode)** - Código fonte e issues
 - **[Pacote NPM](https://www.npmjs.com/package/@stackcode/cli)** - Pacote CLI publicado
-- **[Extensão VS Code](https://github.com/YagoBorba/StackCode/releases/latest)** - Pacote VSIX (GitHub Releases)
+- **[Extensão VS Code](https://marketplace.visualstudio.com/items?itemName=YagoBorba.stackcode-vscode)** - Visual Studio Marketplace
 
 ## 📞 **Obtendo Ajuda**
 
