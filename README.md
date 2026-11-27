@@ -110,13 +110,13 @@ This is the best approach for ensuring everyone on a project uses the exact same
 
 ### VS Code Extension
 
-Download `stackcode-vscode-<version>.vsix` from the [latest release](https://github.com/YagoBorba/StackCode/releases/latest) and install it:
+Install **StackCode DevOps Assistant** from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=YagoBorba.stackcode-vscode), or from the command line:
 
 ```bash
-code --install-extension stackcode-vscode-2.1.2.vsix
+code --install-extension YagoBorba.stackcode-vscode
 ```
 
-Or, in VS Code, open the Extensions view, choose **…** → **Install from VSIX...** and select the file.
+Each [release](https://github.com/YagoBorba/StackCode/releases/latest) also has the `.vsix` package for offline installs (**Extensions → … → Install from VSIX...**).
 
 ### 🎓 Enable Educational Mode (Recommended for Beginners)
 
